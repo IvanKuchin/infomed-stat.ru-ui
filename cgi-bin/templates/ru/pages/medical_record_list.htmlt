@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <<template:templates/ru/pages/header.htmlt>>
+
+    <title><<vars:title_head>></title>
+
+    <script src="/js/pages/medical_record_list.js"></script>
+
+    <script src="/js/pages/tooltip.js"></script>
+    <link href="/css/pages/animate.min.css" rel="stylesheet">
+
+    <script src="/js/chartjs/2.7.2/Chart.bundle.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        medical_record_list.Init();
+      });
+    </script>
+
+  </head>
+
+  <body>
+  <<template:templates/ru/pages/<<vars:user_type>>_navigation_menu.htmlt>>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <h3>
+            <center>
+              Список мед. записей
+            </center>
+          </h3>
+        </div>
+      </div>
+      <div id="medical_record_list"></div>
+    </div>
+
+    <div id="scrollerToShow"></div>
+
+    <!-- "Are you sure remove cost center?" modal  -->
+    <div class="modal fade" id="AreYouSureRemovePatient" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Вы уверены, что хотите удалить запись?</h4>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-danger submit">Уверен</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+        </div>
+      </div>
+      </div>
+    </div>
+
+
+  <<template:templates/ru/pages/footer.htmlt>>
+
+  </body>
+</html>
