@@ -62,3 +62,4 @@ RewriteRule ^invoices_cc/(.*)$			https://devimages.infomed-stat.ru/invoices_cc/$
 RewriteRule ^invoices_subc/(.*)$		https://devimages.infomed-stat.ru/invoices_subc/$1		[L,R=301,NC]
 RewriteRule ^smartway_vouchers/(.*)$	https://devimages.infomed-stat.ru/smartway_vouchers/$1	[L,R=301,NC]
 RewriteRule ^template_(.*)$				https://devimages.infomed-stat.ru/templates_$1			[L,R=301,NC]
+
