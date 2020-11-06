@@ -7,7 +7,7 @@
 
     <title><<vars:title_head>></title>
 
-    <script src="/js/pages/sha512.js"></script>
+    <script src="/js/sha512/sha512.js"></script>
     <script src="/js/pages/doctor_obj.js"></script>
     <script src="/js/pages/hospital_obj.js"></script>
     <script src="/js/pages/hospitals_list.js"></script>
