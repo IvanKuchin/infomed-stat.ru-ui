@@ -3,7 +3,7 @@ var	doctor_dashboard = doctor_dashboard || {};
 
 var	doctor_dashboard = (function()
 {
-	'use strict';
+	"use strict";
 
 	var	data_global;
 
@@ -31,7 +31,7 @@ var	doctor_dashboard = (function()
 
 
 		$.getJSON(
-			'/cgi-bin/doctor.cgi',
+			"/cgi-bin/doctor.cgi",
 			{
 				"action":"AJAX_getDashboardData",
 			})

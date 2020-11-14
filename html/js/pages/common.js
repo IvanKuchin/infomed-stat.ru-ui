@@ -51,17 +51,17 @@ system_calls = (function()
 		$("#imageLogo").on("mouseout", function() { $(this).removeClass("box-shadow--8dp"); });
 
 		// --- Friendship buttons
-		$("#ButtonFriendshipRemovalYes").on('click', function()
+		$("#ButtonFriendshipRemovalYes").on("click", function()
 			{
 				var clickedButton = $(this).data("clickedButton");
 
-				$("#DialogFriendshipRemovalYesNo").modal('hide');
+				$("#DialogFriendshipRemovalYesNo").modal("hide");
 
 				clickedButton.data("action", "disconnect");
 				clickedButton.click();
 			});
 
-		$("#DialogFriendshipRemovalYesNo").on('shown.bs.modal',
+		$("#DialogFriendshipRemovalYesNo").on("shown.bs.modal",
 			function()
 			{
 				$("#DialogFriendshipRemovalYesNo button.btn.btn-default").focus();
@@ -69,29 +69,29 @@ system_calls = (function()
 
 
 		// --- Friends href
-		$("#navbar-my_network").on('click', function()
+		$("#navbar-my_network").on("click", function()
 			{
 				window.location.href = "/my_network?rand=" + Math.random()*98765432123456;
 			} );
 
 		// --- Сhat href
-		$("#navbar-chat").on('click', function()
+		$("#navbar-chat").on("click", function()
 			{
 				window.location.href = "/chat?rand=" + Math.random()*98765432123456;
 			} );
 
 		// --- Notification href
-		$("#navbar-notification").on('click', function()
+		$("#navbar-notification").on("click", function()
 			{
 				window.location.href = "/user_notifications?rand=" + Math.random()*98765432123456;
 			} );
 
 		// --- Menu drop down on mouse over
-		jQuery('ul.nav li.dropdown').mouseenter(function() {
-		  jQuery(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn();
+		jQuery("ul.nav li.dropdown").mouseenter(function() {
+		  jQuery(this).find(".dropdown-menu").stop(true, true).delay(200).fadeIn();
 		});
-		jQuery('ul.nav li.dropdown').mouseleave(function() {
-		  jQuery(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut();
+		jQuery("ul.nav li.dropdown").mouseleave(function() {
+		  jQuery(this).find(".dropdown-menu").stop(true, true).delay(200).fadeOut();
 		});
 
 		// --- Check availability / sign-in
@@ -131,9 +131,9 @@ system_calls = (function()
 
 	var	GetUUID = function()
 	{
-		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) 
+		return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) 
 			{
-				var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+				var r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
 				return v.toString(16);
 			});
 	};
@@ -324,8 +324,8 @@ system_calls = (function()
 		result = result.replace(/•/img, "*");
 		result = result.replace(/\"/img, "&quot;");
 		result = result.replace(/\\/img, "&#92;");
-		result = result.replace(/^\s+/, '');
-		result = result.replace(/\s+$/, '');
+		result = result.replace(/^\s+/, "");
+		result = result.replace(/\s+$/, "");
 
 		return result;
 	};
@@ -352,8 +352,8 @@ system_calls = (function()
 		result = result.replace(/&#92;/img, "\\");
 		result = result.replace(/&#39;/img, "'");
 		result = result.replace(/&#35;/img, "№");
-		result = result.replace(/^\s+/, '');
-		result = result.replace(/\s+$/, '');
+		result = result.replace(/^\s+/, "");
+		result = result.replace(/\s+$/, "");
 
 		return result;
 	};
@@ -367,8 +367,8 @@ system_calls = (function()
 		result = result.replace(/>/img, "&gt;");
 		result = result.replace(/\n/img, "<br>");
 		result = result.replace(/•/img, "*");
-		result = result.replace(/^\s+/, '');
-		result = result.replace(/\s+$/, '');
+		result = result.replace(/^\s+/, "");
+		result = result.replace(/\s+$/, "");
 
 		return result;
 	};
@@ -937,7 +937,7 @@ system_calls = (function()
 	var SendEchoRequest = function()
 	{
 		$.getJSON(
-			'/cgi-bin/system.cgi',
+			"/cgi-bin/system.cgi",
 			{action:"EchoRequest"})
 			.done(function(data)
 				{
@@ -997,7 +997,7 @@ system_calls = (function()
 		if(isUserSignedin())
 		{
 			$.getJSON(
-				'/cgi-bin/system.cgi',
+				"/cgi-bin/system.cgi",
 				{action:"GetUserRequestNotifications"})
 				.done(function(data)
 					{
@@ -1081,8 +1081,8 @@ system_calls = (function()
 
 				$.getJSON
 				(
-					'/cgi-bin/system.cgi',
-					{ action: 'GetUserInfo', userID: item.friendID }
+					"/cgi-bin/system.cgi",
+					{ action: "GetUserInfo", userID: item.friendID }
 				)
 				.done(
 					function(result)
@@ -1100,7 +1100,7 @@ system_calls = (function()
 															.data("action", "disconnect");
 						var		canvasAvatar = $("<canvas/>")	.attr("width", "30")
 																.attr("height", "30")
-																.addClass('canvas-big-avatar')
+																.addClass("canvas-big-avatar")
 																.addClass("RequestUserListOverrideCanvasSize");
 
 						// --- update cache with this user
@@ -1175,8 +1175,8 @@ system_calls = (function()
 			{
 				globalScrollPrevOffset = elementOffset - windowScrollTop;
 
-				$('body').animate({scrollTop: elementOffset }, 400);
-				$('html').animate({scrollTop: elementOffset }, 400);
+				$("body").animate({scrollTop: elementOffset }, 400);
+				$("html").animate({scrollTop: elementOffset }, 400);
 
 				setTimeout(function() { ScrollWindowToElementID(elementID); }, 600);
 			}
@@ -1204,7 +1204,7 @@ system_calls = (function()
 	var	GetParamFromURL = function(paramName)
 	{
 		var result = "";
-		var	tmp = new RegExp('[\?&]' + paramName + '=([^&#]*)').exec(window.location.href);
+		var	tmp = new RegExp("[\?&]" + paramName + "=([^&#]*)").exec(window.location.href);
 
 		if(tmp && tmp.length) result = tmp[1];
 
@@ -1353,7 +1353,7 @@ system_calls = (function()
 		//                         .attr("height", "80");
 		tagCanvas3	= $("<canvas>").attr("width", "80")
 									.attr("height", "80")
-									.addClass('canvas-big-logo');
+									.addClass("canvas-big-logo");
 		divInfo 		= $("<div/>").addClass("col-sm-10 col-xs-12 single_block box-shadow--6dp");
 		tagA5   		= $("<a>").attr("href", "/company/" + item.link + "?rand=" + Math.random() * 1234567890);
 		spanSMButton	= $("<span>").addClass("hidden-xs pull-right");
@@ -1398,7 +1398,7 @@ system_calls = (function()
 		//                         .attr("height", "80");
 		tagCanvas3	= $("<canvas>").attr("width", "80")
 									.attr("height", "80")
-									.addClass('canvas-big-logo');
+									.addClass("canvas-big-logo");
 		divInfo 		= $("<div/>").addClass("col-sm-10 col-xs-12 single_block box-shadow--6dp");
 		tagA5   		= $("<a>").attr("href", "/event/" + item.link + "?rand=" + GetUUID());
 		spanSMButton	= $("<span>").addClass("hidden-xs pull-right");
@@ -1463,7 +1463,7 @@ system_calls = (function()
 		//                         .attr("height", "80");
 		tagCanvas3	= $("<canvas>").attr("width", "80")
 									.attr("height", "80")
-									.addClass('canvas-big-logo');
+									.addClass("canvas-big-logo");
 		divInfo 		= $("<div/>").addClass("col-sm-10 col-xs-12 single_block box-shadow--6dp");
 		tagA5   		= $("<a>").attr("href", "/group/" + item.link + "?rand=" + GetUUID());
 		spanSMButton	= $("<span>").addClass("hidden-xs pull-right");
@@ -1574,7 +1574,7 @@ system_calls = (function()
 		if(handlerButton.data("action") == "disconnectDialog")
 		{
 			$("#ButtonFriendshipRemovalYes").data("clickedButton", handlerButton);
-			$("#DialogFriendshipRemovalYesNo").modal('show');
+			$("#DialogFriendshipRemovalYesNo").modal("show");
 		}
 		else
 		{
@@ -1582,7 +1582,7 @@ system_calls = (function()
 			handlerButton.text("Ожидайте ...");
 
 			$.getJSON(
-				'/cgi-bin/index.cgi',
+				"/cgi-bin/index.cgi",
 				{action:"AJAX_setFindFriend_FriendshipStatus", friendID:handlerButton.data("id"), status:handlerButton.data("action")})
 				.done(function(data) {
 						console.debug("AJAX_setFindFriend_FriendshipStatus.done(): sucess");
@@ -1685,7 +1685,7 @@ system_calls = (function()
 		//                         .attr("height", "80");
 		tagCanvas3	= $("<canvas>").attr("width", "80")
 									.attr("height", "80")
-									.addClass('canvas-big-avatar');
+									.addClass("canvas-big-avatar");
 		tagDiv4 	= $("<div/>").addClass("col-md-10 col-xs-12  single_block box-shadow--6dp");
 		tagA5   	= $("<a>").attr("href", "/userprofile/" + item.id + "?rand=" + Math.random() * 234567890);
 		tagSpan5	= $("<span>").addClass("hidden-xs float_right");
@@ -2066,7 +2066,7 @@ system_calls = (function()
 
 			if(url.length > 32) urlText = url.substring(0, 32) + " ...";
 
-			return '<a href="' + url + '" target="blank">' + urlText + '</a>';
+			return "<a href=\"" + url + "\" target=\"blank\">" + urlText + "</a>";
 		});
 
 		return resultText;
@@ -2098,13 +2098,13 @@ system_calls = (function()
 	{
 		// convert base64/URLEncoded data component to raw binary data held in a string
 		var byteString;
-		if (dataURI.split(',')[0].indexOf('base64') >= 0)
-			byteString = atob(dataURI.split(',')[1]);
+		if (dataURI.split(",")[0].indexOf("base64") >= 0)
+			byteString = atob(dataURI.split(",")[1]);
 		else
-			byteString = unescape(dataURI.split(',')[1]);
+			byteString = unescape(dataURI.split(",")[1]);
 
 		// separate out the mime component
-		var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+		var mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
 
 		// write the bytes of the string to a typed array
 		var ia = new Uint8Array(byteString.length);
@@ -2216,7 +2216,7 @@ system_calls = (function()
 		if(currentValue.length)
 		{
 			$.getJSON(
-				'/cgi-bin/ajax_anyrole_1.cgi',
+				"/cgi-bin/ajax_anyrole_1.cgi",
 				{
 					action: "AJAX_getPositionAutocompleteList",
 					position: currentValue,
@@ -2341,8 +2341,8 @@ system_calls = (function()
 	var FillArrayWithNumbers = function(n) 
 	{
         var arr = Array.apply(null, Array(n));
-        return arr.map(function (x, i) { return i });
-    }
+        return arr.map(function (x, i) { return i; });
+    };
 
 	// --- Companies
 	var	GetCompanyInfo_DOM = function(companies)
@@ -2401,7 +2401,7 @@ system_calls = (function()
 			var		logo_canvas					= $("<canvas>")
 													.attr("width", "80")
 													.attr("height", "80")
-													.addClass('canvas-big-logo');
+													.addClass("canvas-big-logo");
 			var		logo_path					= (company_obj.logo_filename.length ? "/images/companies/" + company_obj.logo_folder + "/" + company_obj.logo_filename : "");
 			var		company_logo				= system_calls.RenderCompanyLogo(logo_canvas[0].getContext("2d"), logo_path, company_obj.name, "fake");
 
@@ -2495,19 +2495,19 @@ system_calls = (function()
             switch(parseInt(EXIF.getTag(this, "Orientation")))
             {
                 case 2:
-                    $img.addClass('exif_flip'); break;
+                    $img.addClass("exif_flip"); break;
                 case 3:
-                    $img.addClass('exif_rotate-180'); break;
+                    $img.addClass("exif_rotate-180"); break;
                 case 4:
-                    $img.addClass('exif_flip-and-rotate-180'); break;
+                    $img.addClass("exif_flip-and-rotate-180"); break;
                 case 5:
-                    $img.addClass('exif_flip-and-rotate-270'); break;
+                    $img.addClass("exif_flip-and-rotate-270"); break;
                 case 6:
-                    $img.addClass('exif_rotate-90'); break;
+                    $img.addClass("exif_rotate-90"); break;
                 case 7:
-                    $img.addClass('exif_flip-and-rotate-90'); break;
+                    $img.addClass("exif_flip-and-rotate-90"); break;
                 case 8:
-                    $img.addClass('exif_rotate-270'); break;
+                    $img.addClass("exif_rotate-270"); break;
             }
         });
 	};
@@ -3141,7 +3141,7 @@ system_calls = (function()
 																}
 																else if(currTag.attr("data-file_type") == "pdf")
 																{
-																	window.open(currTag.attr("data-file"), "_blank")
+																	window.open(currTag.attr("data-file"), "_blank");
 																}
 															});
 
@@ -3537,7 +3537,7 @@ system_calls = (function()
 				processData: false,
 				async: true,
 				data: formData,
-				type: 'post',
+				type: "post",
 				success: function(raw_data) {
 					var		jsonObj = (
 								function(raw)
@@ -3612,7 +3612,7 @@ system_calls = (function()
 				}
 
 				$.getJSON(
-					'/cgi-bin/subcontractor.cgi',
+					"/cgi-bin/subcontractor.cgi",
 					{
 						"action":"AJAX_getBTEntry",
 						"bt_id": bt_id
@@ -3923,7 +3923,7 @@ system_calls = (function()
 					curr_value = __GetTagValue(curr_tag);
 					
 					$.getJSON(
-						'/cgi-bin/' + current_script,
+						"/cgi-bin/" + current_script,
 						{
 							action: curr_tag.data("action"),
 							id: curr_tag.attr("data-id") || curr_tag.data("id"), // --- prefer attr(data_id) over jQuery.data(id), because jQuery.data doesn't updates properly
@@ -4048,7 +4048,7 @@ system_calls = (function()
 			ogrn_text = GetOGRNParsingText(ogrn_input);
 
 			$.getJSON(
-				'/cgi-bin/ajax_anyrole_1.cgi',
+				"/cgi-bin/ajax_anyrole_1.cgi",
 				{
 					action: "AJAX_getGeoRegionName",
 					id: ogrn_input.substring(3,5)
@@ -4132,7 +4132,7 @@ system_calls = (function()
 			kpp_text = GetKPPParsingText(kpp_input);
 
 			$.getJSON(
-				'/cgi-bin/ajax_anyrole_1.cgi',
+				"/cgi-bin/ajax_anyrole_1.cgi",
 				{
 					action: "AJAX_getGeoRegionName",
 					id: kpp_input.substring(0, 2)
@@ -4289,7 +4289,7 @@ system_calls = (function()
 
 
 		return sow_list;
-	}
+	};
 
 	var GetSoWBadge_DOM = function(sow_item)
 	{
@@ -4759,7 +4759,7 @@ var userCache = (function()
 
 			if(param1.length)
 			{
-				$.getJSON('/cgi-bin/system.cgi', { action: 'GetUserInfo', userID: param1 })
+				$.getJSON("/cgi-bin/system.cgi", { action: "GetUserInfo", userID: param1 })
 					.done(
 						function(result)
 						{
@@ -4866,7 +4866,7 @@ navMenu_search = (function()
 		if(inputValue.length >= 2)
 		{
 			$.getJSON(
-				'/cgi-bin/index.cgi',
+				"/cgi-bin/index.cgi",
 				{action:"JSON_getFindFriendsListAutocomplete", lookForKey:inputValue})
 				.done(function(data) {
 						AutocompleteList = [];
@@ -4949,10 +4949,10 @@ navMenu_search = (function()
 		{
 			$("#navMenuSearchText").attr("title", "Напишите более 2 букв")
 									.attr("data-placement", "bottom")
-									.tooltip('show');
+									.tooltip("show");
 			window.setTimeout(function()
 				{
-					$("#navMenuSearchText").tooltip('destroy');
+					$("#navMenuSearchText").tooltip("destroy");
 				}, 3000);
 			return false;
 		}
@@ -5051,7 +5051,7 @@ navMenu_chat = (function()
 														.data("action", "markAsRead")
 														.on("click", function(e)
 															{
-																$.getJSON('/cgi-bin/index.cgi', {action:"AJAX_chatMarkMessageReadByMessageID", messageid:messageInfo.id})
+																$.getJSON("/cgi-bin/index.cgi", {action:"AJAX_chatMarkMessageReadByMessageID", messageid:messageInfo.id})
 																			.done(function(data)
 																				{
 																					if(data.result == "success")
@@ -5068,7 +5068,7 @@ navMenu_chat = (function()
 															});
 					var		canvasAvatar = $("<canvas/>")	.attr("width", "30")
 															.attr("height", "30")
-															.addClass('canvas-big-avatar')
+															.addClass("canvas-big-avatar")
 															.addClass("UnreadChatListOverrideCanvasSize");
 					var		messageBody = $("<div>").addClass("UnreadChatListMessage")
 														.on("click", function(e)
@@ -5141,7 +5141,7 @@ navMenu_chat = (function()
 		{
 
 			$.getJSON(
-				'/cgi-bin/system.cgi',
+				"/cgi-bin/system.cgi",
 				{action:"GetNavMenuChatStatus"})
 				.done(function(data)
 					{
@@ -5360,7 +5360,7 @@ navMenu_userNotification = (function()
 															.addClass("btn btn-link")
 															.on("click", function(e)
 																{
-																	$.getJSON('/cgi-bin/index.cgi', {action:"AJAX_notificationMarkMessageReadByMessageID", notificationID:item.notificationID})
+																	$.getJSON("/cgi-bin/index.cgi", {action:"AJAX_notificationMarkMessageReadByMessageID", notificationID:item.notificationID})
 																				.done(function(data)
 																					{
 																						if(data.result == "success")
@@ -5385,7 +5385,7 @@ navMenu_userNotification = (function()
 																});
 						var		canvasAvatar = $("<canvas/>")	.attr("width", "30")
 																.attr("height", "30")
-																.addClass('canvas-big-avatar')
+																.addClass("canvas-big-avatar")
 																.addClass("UnreadChatListOverrideCanvasSize");
 						var		messageBody = $("<div>").addClass("UnreadChatListMessage")
 															.on("click", function(e)
@@ -5837,7 +5837,7 @@ system_notifications = (function ()
 				}
 				else
 				{
-					if (Notification.permission !== 'denied')
+					if (Notification.permission !== "denied")
 					{
 					    Notification.requestPermission();
 					}
@@ -5894,7 +5894,7 @@ preview_modal = (function ()
 
 	var	Update = function()
 	{
-		$("#ImagePreviewModal_Img").css({'transform': 'rotateZ(' + rotation + 'deg) scaleX(' + scaleX + ') scaleY(' + scaleY + ')'});
+		$("#ImagePreviewModal_Img").css({"transform": "rotateZ(" + rotation + "deg) scaleX(" + scaleX + ") scaleY(" + scaleY + ")"});
 	};
 
 	var	RotateLeft = function()
@@ -5952,7 +5952,7 @@ troubleshooting = (function ()
 		var callback = function(stackframes) {
 		  var stringifiedStack = stackframes.map(function(sf) {
 		    return sf.toString();
-		  }).join('\n');
+		  }).join("\n");
 		  traceback += stringifiedStack + "\n";
 
 		  return traceback;
@@ -6013,29 +6013,29 @@ troubleshooting = (function ()
         other_chrome        = /(CriOS|Chrome)(?=.*\bMobile\b)/i,
         other_firefox       = /(?=.*\bFirefox\b)(?=.*\bMobile\b)/i, // Match 'Firefox' AND 'Mobile'
         seven_inch = new RegExp(
-            '(?:' +         // Non-capturing group
+            "(?:" +         // Non-capturing group
 
-            'Nexus 7' +     // Nexus 7
+            "Nexus 7" +     // Nexus 7
 
-            '|' +           // OR
+            "|" +           // OR
 
-            'BNTV250' +     // B&N Nook Tablet 7 inch
+            "BNTV250" +     // B&N Nook Tablet 7 inch
 
-            '|' +           // OR
+            "|" +           // OR
 
-            'Kindle Fire' + // Kindle Fire
+            "Kindle Fire" + // Kindle Fire
 
-            '|' +           // OR
+            "|" +           // OR
 
-            'Silk' +        // Kindle Fire, Silk Accelerated
+            "Silk" +        // Kindle Fire, Silk Accelerated
 
-            '|' +           // OR
+            "|" +           // OR
 
-            'GT-P1000' +    // Galaxy Tab 7 inch
+            "GT-P1000" +    // Galaxy Tab 7 inch
 
-            ')',            // End non-capturing group
+            ")",            // End non-capturing group
 
-            'i');           // Case-insensitive matching
+            "i");           // Case-insensitive matching
 
     var match = function(regex, userAgent) {
         return regex.test(userAgent);
@@ -6046,16 +6046,16 @@ troubleshooting = (function ()
 
         // Facebook mobile app's integrated browser adds a bunch of strings that
         // match everything. Strip it out if it exists.
-        var tmp = ua.split('[FBAN');
-        if (typeof tmp[1] !== 'undefined') {
+        var tmp = ua.split("[FBAN");
+        if (typeof tmp[1] !== "undefined") {
             ua = tmp[0];
         }
 
         // Twitter mobile app's integrated browser on iPad adds a "Twitter for
         // iPhone" string. Same probable happens on other tablet platforms.
         // This will confuse detection so strip it out if it exists.
-        tmp = ua.split('Twitter');
-        if (typeof tmp[1] !== 'undefined') {
+        tmp = ua.split("Twitter");
+        if (typeof tmp[1] !== "undefined") {
             ua = tmp[0];
         }
 
@@ -6097,7 +6097,7 @@ troubleshooting = (function ()
         // excludes 7 inch devices, classifying as phone or tablet is left to the user
         this.tablet = this.apple.tablet || this.android.tablet || this.windows.tablet;
 
-        if (typeof window === 'undefined') {
+        if (typeof window === "undefined") {
             return this;
         }
     };
@@ -6108,15 +6108,15 @@ troubleshooting = (function ()
         return IM;
     };
 
-    if (typeof module !== 'undefined' && module.exports && typeof window === 'undefined') {
+    if (typeof module !== "undefined" && module.exports && typeof window === "undefined") {
         //node
         module.exports = IsMobileClass;
-    } else if (typeof module !== 'undefined' && module.exports && typeof window !== 'undefined') {
+    } else if (typeof module !== "undefined" && module.exports && typeof window !== "undefined") {
         //browserify
         module.exports = instantiate();
-    } else if (typeof define === 'function' && define.amd) {
+    } else if (typeof define === "function" && define.amd) {
         //AMD
-        define('isMobile', [], global.isMobile = instantiate());
+        define("isMobile", [], global.isMobile = instantiate());
     } else {
         global.isMobile = instantiate();
     }
@@ -6148,16 +6148,16 @@ String.prototype.trim = function(charlist) {
 };
 
 $.fn.selectRange = function(start, end) {
-    var e = document.getElementById($(this).attr('id')); // I don't know why... but $(this) don't want to work today :-/
+    var e = document.getElementById($(this).attr("id")); // I don't know why... but $(this) don't want to work today :-/
     if (!e) return;
     else if (e.setSelectionRange) { e.focus(); e.setSelectionRange(start, end); } /* WebKit */
-    else if (e.createTextRange) { var range = e.createTextRange(); range.collapse(true); range.moveEnd('character', end); range.moveStart('character', start); range.select(); } /* IE */
+    else if (e.createTextRange) { var range = e.createTextRange(); range.collapse(true); range.moveEnd("character", end); range.moveStart("character", start); range.select(); } /* IE */
     else if (e.selectionStart) { e.selectionStart = start; e.selectionEnd = end; }
 };
 
 $.urlParam = function(name)
 {
-    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    var results = new RegExp("[\?&]" + name + "=([^&#]*)").exec(window.location.href);
     if (results === null){
        return "";
     }

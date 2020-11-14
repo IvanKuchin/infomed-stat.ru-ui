@@ -2,7 +2,7 @@ var	initial_wizard = initial_wizard || {};
 
 var	initial_wizard = (function()
 {
-	'use strict';
+	"use strict";
 
 	var		DATE_FORMAT_GLOBAL = "dd/mm/yy";
 
@@ -258,7 +258,7 @@ var	initial_wizard = (function()
 
 	var	RenderTabsWithCompanyInfo = function()
 	{
-		$.getJSON('/cgi-bin/noauth.cgi',
+		$.getJSON("/cgi-bin/noauth.cgi",
 			{
 				action: "AJAX_getGeoCountryList",
 			})
@@ -320,7 +320,7 @@ var	initial_wizard = (function()
 
 			if(company_tin_tag.attr("data-company_type") && company_tin_tag.attr("data-company_type").length)
 			{
-				$.getJSON('/cgi-bin/ajax_anyrole_1.cgi',
+				$.getJSON("/cgi-bin/ajax_anyrole_1.cgi",
 					{
 						action: "AJAX_isCompanyExists",
 						tin: company_tin_tag.val(),
@@ -378,7 +378,7 @@ var	initial_wizard = (function()
 		var	curr_val = curr_tag.val();
 
 		$.getJSON(
-			'/cgi-bin/ajax_anyrole_1.cgi',
+			"/cgi-bin/ajax_anyrole_1.cgi",
 			{
 				action: "AJAX_getAgencyAutocompleteList",
 				name: curr_val,
@@ -529,7 +529,7 @@ var	initial_wizard = (function()
 
 				if((typeof json_param.action != "undefined") && (json_param.action.length))
 				{
-					$.getJSON('/cgi-bin/initial_wizard.cgi', json_param)
+					$.getJSON("/cgi-bin/initial_wizard.cgi", json_param)
 						.done(function(data)
 						{
 							if(data.result == "success")

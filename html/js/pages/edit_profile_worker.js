@@ -12,15 +12,15 @@ var ConvertHTMLToText = function(htmlText)
 	result = result.replace(/&quot;/img, "\"");
 	result = result.replace(/&#92;/img, "\\");
 	result = result.replace(/&#39;/img, "'");
-	result = result.replace(/^\s+/, '');
-	result = result.replace(/\s+$/, '');
+	result = result.replace(/^\s+/, "");
+	result = result.replace(/\s+$/, "");
 
 	return result;
 };
 
 onmessage = function(e)
 {
-	'use strict';
+	"use strict";
 
 	var	JSON_dataForProfile;
 	var	JSON_companyPosition = [];
@@ -89,7 +89,7 @@ onmessage = function(e)
 
 		    close();
 		  } else {
-		    console.debug('ParseBulkData: ERROR: XMLHttpRequest returned not 200');
+		    console.debug("ParseBulkData: ERROR: XMLHttpRequest returned not 200");
 		  }
 		}
 
@@ -99,7 +99,7 @@ onmessage = function(e)
 	if(httpRequest)
 	{
 		httpRequest.onreadystatechange = ParseBulkData;
-		httpRequest.open('GET', "/cgi-bin/index.cgi?action=AJAX_getDataForProfile&rand=" + Math.random() * 1234567890);
+		httpRequest.open("GET", "/cgi-bin/index.cgi?action=AJAX_getDataForProfile&rand=" + Math.random() * 1234567890);
 		httpRequest.send();
 	}
 	else
