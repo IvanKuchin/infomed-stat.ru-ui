@@ -2991,7 +2991,7 @@ var BuildNewsFeedSingleBlock = function(item)
 	{
 		// --- book read
 
-		// --- hide subtitile to save some space
+		// --- hide subtitle to save some space
 		// tagDivMsgInfo.append(jsonMessage["actionTypesTitle"]);
 		divRow.append(tagDivMessage);
 		RenderBookBody(jsonMessage, tagDivMessage);
@@ -3000,7 +3000,7 @@ var BuildNewsFeedSingleBlock = function(item)
 	{
 		// --- create / subscribe group
 
-		// --- hide subtitile to save some space
+		// --- hide subtitle to save some space
 		// tagDivMsgInfo.append(jsonMessage["actionTypesTitle"]);
 		divRow.append(tagDivMessage);
 		RenderGroupBody(jsonMessage, tagDivMessage);
@@ -3009,7 +3009,7 @@ var BuildNewsFeedSingleBlock = function(item)
 	{
 		// --- create / subscribe group
 
-		// --- hide subtitile to save some space
+		// --- hide subtitle to save some space
 		// tagDivMsgInfo.append(jsonMessage["actionTypesTitle"]);
 		divRow.append(tagDivMessage);
 		RenderCompanySubscriptionBody(jsonMessage, tagDivMessage);
@@ -3018,7 +3018,7 @@ var BuildNewsFeedSingleBlock = function(item)
 	{
 		// --- became certified
 
-		// --- hide subtitile to save some space
+		// --- hide subtitle to save some space
 		// tagDivMsgInfo.append(jsonMessage["actionTypesTitle"]);
 		divRow.append(tagDivMessage);
 		RenderCertificationBody(jsonMessage, tagDivMessage);
@@ -3027,7 +3027,7 @@ var BuildNewsFeedSingleBlock = function(item)
 	{
 		// --- course attending
 
-		// --- hide subtitile to save some space
+		// --- hide subtitle to save some space
 		// tagDivMsgInfo.append(jsonMessage["actionTypesTitle"]);
 		divRow.append(tagDivMessage);
 		RenderCourseBody(jsonMessage, tagDivMessage);
@@ -3036,7 +3036,7 @@ var BuildNewsFeedSingleBlock = function(item)
 	{
 		// --- got science degree
 
-		// --- hide subtitile to save some space
+		// --- hide subtitle to save some space
 		// tagDivMsgInfo.append(jsonMessage["actionTypesTitle"]);
 		divRow.append(tagDivMessage);
 		RenderScienceDegreeBody(jsonMessage, tagDivMessage);
@@ -3045,7 +3045,7 @@ var BuildNewsFeedSingleBlock = function(item)
 	{
 		// --- language improved
 
-		// --- hide subtitile to save some space
+		// --- hide subtitle to save some space
 		// tagDivMsgInfo.append(jsonMessage["actionTypesTitle"]);
 		divRow.append(tagDivMessage);
 		RenderLanguageBody(jsonMessage, tagDivMessage);
@@ -3054,7 +3054,7 @@ var BuildNewsFeedSingleBlock = function(item)
 	{
 		// --- change employment
 
-		// --- hide subtitile to save some space
+		// --- hide subtitle to save some space
 		// tagDivMsgInfo.append(jsonMessage["actionTypesTitle"]);
 		divRow.append(tagDivMessage);
 		RenderCompanyBody(jsonMessage, tagDivMessage);

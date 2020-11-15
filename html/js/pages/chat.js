@@ -742,7 +742,7 @@ chat = (function()
 														.addClass("canvas-big-avatar")
 														.addClass("contact_list_avatar")
 														.appendTo(divAvatarFromFriend);
-		var		messageText = ReplaceHTMLSmileySymobolsToImg(ReplaceHTMLSpecialSymbolsToText(messageObj.message));
+		var		messageText = ReplaceHTMLSmileySymbolsToImg(ReplaceHTMLSpecialSymbolsToText(messageObj.message));
 		var		messageImg = $("<img>").addClass("message_pane_image_resize");
 		var		messageType = messageObj.messageType;
 
@@ -992,7 +992,7 @@ chat = (function()
 		return resultText;
 	};
 
-	var	ReplaceHTMLSmileySymobolsToImg = function(srcText)
+	var	ReplaceHTMLSmileySymbolsToImg = function(srcText)
 	{
 		var		resultText = srcText;
 

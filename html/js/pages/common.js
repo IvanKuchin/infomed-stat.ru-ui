@@ -8,7 +8,7 @@
 
 // --- change it in (chat.js, common.js, localy.h)
 var FREQUENCY_ECHO_REQUEST = 60;
-var FREQUENCY_USRENOTIFICATION_REQUEST = 60 * 5;
+var FREQUENCY_USERNOTIFICATION_REQUEST = 60 * 5;
 var FREQUENCY_RANDOM_FACTOR = 10;
 
 // -- global var used because of setTimeout don't support parameters in IE9
@@ -985,7 +985,7 @@ var system_calls = (function()
 		}
 
 		// --- check system notifications
-		window.setTimeout(system_calls.GetUserRequestNotifications, (FREQUENCY_USRENOTIFICATION_REQUEST + (Math.random() * FREQUENCY_RANDOM_FACTOR - FREQUENCY_RANDOM_FACTOR / 2)) * 1000);
+		window.setTimeout(system_calls.GetUserRequestNotifications, (FREQUENCY_USERNOTIFICATION_REQUEST + (Math.random() * FREQUENCY_RANDOM_FACTOR - FREQUENCY_RANDOM_FACTOR / 2)) * 1000);
 
 		// console.debug('system_calls.GetUserRequestNotifications: end');
 	};
@@ -1001,7 +1001,7 @@ var system_calls = (function()
 
 			// --- scroll only if
 			// --- 1) scroll length to element > 10
-			// --- 2) scroll from previous to current cycles is successfull (page was scrolled)
+			// --- 2) scroll from previous to current cycles is successful (page was scrolled)
 			// if((Math.abs(elementOffset - windowScrollTop) > 10) && (!globalScrollPrevOffset || (globalScrollPrevOffset > Math.abs(elementOffset - windowScrollTop))))
 			if((Math.abs(elementOffset - windowScrollTop) > 10) && (globalScrollPrevOffset != (elementOffset - windowScrollTop)))
 			{
@@ -1414,7 +1414,7 @@ var system_calls = (function()
 				"/cgi-bin/index.cgi",
 				{action:"AJAX_setFindFriend_FriendshipStatus", friendID:handlerButton.data("id"), status:handlerButton.data("action")})
 				.done(function(data) {
-						console.debug("AJAX_setFindFriend_FriendshipStatus.done(): sucess");
+						console.debug("AJAX_setFindFriend_FriendshipStatus.done(): success");
 
 						if(data.result == "ok")
 						{
@@ -2968,7 +2968,7 @@ var system_calls = (function()
 		}
 		else
 		{
-			console.error("ERROR: expense_line_templats array undefined");
+			console.error("ERROR: expense_line_templates array undefined");
 		}
 
 		return lines_tag;
@@ -3409,7 +3409,7 @@ var system_calls = (function()
 		return	result;
 	};
 
-	var	GetTaskAssignmentObjByTaksID = function(sow_id, task_id, task_assignments)
+	var	GetTaskAssignmentObjByTaskID = function(sow_id, task_id, task_assignments)
 	{
 		var		result = {};
 
@@ -4234,7 +4234,7 @@ var system_calls = (function()
 		GetTimecardApprovers_DOM: GetTimecardApprovers_DOM,
 		GetBTApprovers_DOM: GetBTApprovers_DOM,
 		GetBTExpenseTemplates_DOM: GetBTExpenseTemplates_DOM,
-		GetTaskAssignmentObjByTaksID: GetTaskAssignmentObjByTaksID,
+		GetTaskAssignmentObjByTaskID: GetTaskAssignmentObjByTaskID,
 		GetBTExpenseAssignmentObjByTemplateID: GetBTExpenseAssignmentObjByTemplateID,
 		SetCurrentScript: SetCurrentScript,
 		UpdateInputFieldOnServer: UpdateInputFieldOnServer,
@@ -4833,7 +4833,7 @@ navMenu_userNotification = (function()
 		{
 			matchArray.forEach(function(item)
 				{
-					// --- substr'ing: @1030 -> 1030
+					// --- substring: @1030 -> 1030
 					if(userCache.isUserCached(item.substr(1, item.length - 1)))
 					{
 						var 	user = userCache.GetUserByID(item.substr(1, item.length - 1));
