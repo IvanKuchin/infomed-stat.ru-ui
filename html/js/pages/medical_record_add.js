@@ -27,9 +27,9 @@ var	medical_record_add = (function()
 		BuildStepIndicators(0);
 
 		$("input.___zip_code")		.on("input", UpdateZipCode_InputHandler);
-		$("input.___first_name")	.on("change", CheckPatientExistance_ChangeHandler);
-		$("input.___last_name")		.on("change", CheckPatientExistance_ChangeHandler);
-		$("input.___birthdate")		.on("change", CheckPatientExistance_ChangeHandler);
+		$("input.___first_name")	.on("change", CheckPatientExistence_ChangeHandler);
+		$("input.___last_name")		.on("change", CheckPatientExistence_ChangeHandler);
+		$("input.___birthdate")		.on("change", CheckPatientExistence_ChangeHandler);
 
 		InitPatientID(patient_id_from_url_global);
 	};
@@ -212,7 +212,7 @@ var	medical_record_add = (function()
 		}
 		else
 		{
-			// --- if algorithm not difined, nothing to check
+			// --- if algorithm not defined, nothing to check
 			result = true;
 		}
 
@@ -221,7 +221,7 @@ var	medical_record_add = (function()
 		return result;
 	};
 
-	var	CheckPatientExistance_ChangeHandler = function(e)
+	var	CheckPatientExistence_ChangeHandler = function(e)
 	{
 		{
 			let	selectors			= ["input.___first_name", "input.___last_name", "input.___middle_name", "input.___birthdate"];

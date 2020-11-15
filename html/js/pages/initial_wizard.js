@@ -51,7 +51,7 @@ var	initial_wizard = (function()
 
 		// --- if autocomplete functionality is not initialized from the beginning
 		// --- it will not pop-up after configured threshold, it will wait one symbol more
-		// --- to overcome this fake autocomplete initializtion applied
+		// --- to overcome this fake autocomplete initialization applied
 		system_calls.CreateAutocompleteWithSelectCallback($("input.__notify_agency_name"), [{0:"0"}], AgencyName_Autocomplete_SelectHandler);
 		$("input.__notify_agency_name").on("input", AgencyName_Autocomplete_InputHandler);
 
@@ -84,7 +84,7 @@ var	initial_wizard = (function()
 		}
 		else
 		{
-			HighlighStepIndicator(tab_id);
+			HighlightStepIndicator(tab_id);
 			$(".__control_block").show();
 		}
 
@@ -209,7 +209,7 @@ var	initial_wizard = (function()
 		}
 		else
 		{
-			// --- if algorithm not difined, nothing to check
+			// --- if algorithm not defined, nothing to check
 			result = true;
 		}
 
@@ -246,7 +246,7 @@ var	initial_wizard = (function()
 		$("#step_indicators .step[data-tab_id=\"" + tab_id + "\"]").addClass("complete");
 	};
 
-	var	HighlighStepIndicator = function(tab_id)
+	var	HighlightStepIndicator = function(tab_id)
 	{
 		$("#step_indicators .step[data-tab_id=\"" + tab_id + "\"]").addClass("active");
 	};
@@ -481,7 +481,7 @@ var	initial_wizard = (function()
 									function(err) {console.error("fail to create company"); SubmitDataToBackend(); }
 								);
 
-						// --- this block allows avoid repetative calling recursive.
+						// --- this block allows avoid repetitive calling recursive.
 						// --- if it will be removed, then recursive func SubmitDataToBackend() will be called after loop
 						// --- this may trigger window.redirect before workflow finish. (synchronous flow faster than async calls) 
 						{

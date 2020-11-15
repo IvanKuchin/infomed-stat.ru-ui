@@ -18,8 +18,6 @@ var	modalScrollPosition;
 var Init = function() 
 {
 	var		uploadFileRegexImageVideo = /(\.|\/)(gif|jpe?g|png|mov|avi|mp4|webm)$/i;
-	var		uploadFileRegexImage = /(\.|\/)(gif|jpe?g|png)$/i;
-	var		uploadFileRegexVideo = /(\.|\/)(mov|avi|mp4|webm)$/i;
 
 	myProfile.id = $("#myUserID").data("myuserid");
 	myProfile.firstName = $("#myFirstName").text();
@@ -40,14 +38,14 @@ var Init = function()
 			GetDataFromProvidedURL();
 		});
 		// --- Post message modal window show handler
-		$("#NewsFeedNewMessage").on("shown.bs.modal", function (e) {
+		$("#NewsFeedNewMessage").on("shown.bs.modal", function () {
 			NewMessageNewsFeedModalShownHandler();
 		});
 		// --- Post message modal window hide handler
-		$("#NewsFeedNewMessage").on("hidden.bs.modal", function (e) {
+		$("#NewsFeedNewMessage").on("hidden.bs.modal", function () {
 			NewMessageNewsFeedModalHiddenHandler();
 		});
-		$("#newsFeedMessageLink").on("input" , function (e) {
+		$("#newsFeedMessageLink").on("input" , function () {
 			var		content = $(this).val();
 			if(content.length) $("#newsFeed_NewMessageLink_GetDataButton").removeAttr("disabled");
 			else $("#newsFeed_NewMessageLink_GetDataButton").attr("disabled", "");
@@ -59,11 +57,11 @@ var Init = function()
 			EditNewsFeedPostMessage();
 		});
 		// --- Post message modal window show handler
-		$("#editNewsFeedMessage").on("show.bs.modal", function (e) {
+		$("#editNewsFeedMessage").on("show.bs.modal", function () {
 			EditNewsFeedModalShownHandler();
 		});
 		// --- Post message modal window hide handler
-		$("#editNewsFeedMessage").on("hidden.bs.modal", function (e) {
+		$("#editNewsFeedMessage").on("hidden.bs.modal", function () {
 			EditNewsFeedModalHiddenHandler();
 		});
 
@@ -89,7 +87,7 @@ var Init = function()
 					containerPreview.addClass("container-fluid");
 
 					data.files.forEach(
-						function(item, i, arr)
+						function(item, i)
 						{
 							var		rowPreview = $("<div>").appendTo(containerPreview)
 																.addClass("row");
@@ -100,7 +98,7 @@ var Init = function()
 							$("#NewsFeedMessageSubmit").text("Загрузка (" + (globalUploadImageTotal - globalUploadImageCounter) + " из " + globalUploadImageTotal + ") ...");
 
 							// TODO: 2delete: debug function to check upload functionality
-							globalUploadImage_UnloadedList = jQuery.grep(globalUploadImage_UnloadedList, function(itemList, numList) { return itemList != item.name; } );
+							globalUploadImage_UnloadedList = jQuery.grep(globalUploadImage_UnloadedList, function(itemList) { return itemList != item.name; } );
 							Update_PostMessage_ListUnloaded(globalUploadImage_UnloadedList);
 
 
@@ -112,8 +110,8 @@ var Init = function()
 							}
 
 							// --- reset progress bar
-							$("#NewMessageProgress .progress-bar").removeClass("active")
-																  .css("width", "0%");
+							$("#NewMessageProgress .progress-bar")	.removeClass("active")
+																	.css("width", "0%");
 							$("#NewMessageProgress .progress-string").empty();
 
 
@@ -220,7 +218,7 @@ var Init = function()
 						(typeof(data.files.error) !=  "undefined") && data.files.error
 						&& 
 						(typeof(data.files[0].error) !=  "undefined") && (data.files[0].error == "File is too large")
-					  )
+					)
 					{
 						system_calls.AlertError("newsFeedNewMessageError", "Фаил слишком большой");
 					}
@@ -263,7 +261,7 @@ var Init = function()
 					containerPreview.addClass("container-fluid");
 
 					data.files.forEach(
-						function(item, i, arr)
+						function(item, i)
 						{
 							var		rowPreview = $("<div>").appendTo(containerPreview)
 																.addClass("row");
@@ -274,7 +272,7 @@ var Init = function()
 							$("#editNewsFeedMessageSubmit").text("Загрузка (" + (globalUploadImageTotal - globalUploadImageCounter) + " из " + globalUploadImageTotal + ") ...");
 
 							// TODO: 2delete: debug function to check upload functionality
-							globalUploadImage_UnloadedList = jQuery.grep(globalUploadImage_UnloadedList, function(itemList, numList) { return itemList != item.name; } );
+							globalUploadImage_UnloadedList = jQuery.grep(globalUploadImage_UnloadedList, function(itemList) { return itemList != item.name; } );
 							Update_PostMessage_ListUnloaded(globalUploadImage_UnloadedList);
 
 							console.debug("editimageuploader: always handler: number of uploading images is " + globalUploadImageCounter);
@@ -286,7 +284,7 @@ var Init = function()
 
 							// --- reset progress bar
 							$("#EditMessageProgress .progress-bar").removeClass("active")
-																  .css("width", "0%");
+																	.css("width", "0%");
 							$("#EditMessageProgress .progress-string").empty();
 
 							if(typeof(data.result) != "undefined")
@@ -392,7 +390,7 @@ var Init = function()
 						(typeof(data.files.error) !=  "undefined") && data.files.error
 						&& 
 						(typeof(data.files[0].error) !=  "undefined") && (data.files[0].error == "File is too large")
-					  )
+					)
 					{
 						system_calls.AlertError("newsFeedEditMessageError", "Фаил слишком большой");
 					}
@@ -418,6 +416,7 @@ var Init = function()
 			{
 				if(isUserAvatarExist() == true)
 				{
+					// --- good2go
 
 				}
 			}
@@ -523,7 +522,7 @@ var EditNewsFeedModalShownHandler = function()
 	imageTempSet = Math.floor(Math.random()*99999999);
 	$("#editFileupload").fileupload({formData: {imageTempSet: imageTempSet, messageID: $("#editNewsFeedMessageSubmit").data("messageID")}});
 
-	globalNewsFeed.forEach(function(item, i, arr)
+	globalNewsFeed.forEach(function(item)
 		{
 			if(typeof(item.messageId) != "undefined")
 			{
@@ -554,7 +553,7 @@ var EditNewsFeedModalShownHandler = function()
 					containerPreview.addClass("container-fluid");
 
 					item.messageImageList.forEach(
-						function(item, i, arr)
+						function(item, i)
 						{
 							// --- video could be encoded in two formats (webm and mp4), but having the same content
 							// --- video must be displayed as the only file
@@ -563,7 +562,7 @@ var EditNewsFeedModalShownHandler = function()
 								(i == 0) 
 								||
 								((typeof(item.mediaType) != "undefined") && (item.mediaType == "image"))
-							   )
+							)
 							{
 
 								var		rowPreview = $("<div>").appendTo(containerPreview)
@@ -618,7 +617,7 @@ var EditNewsFeedModalShownHandler = function()
 			});
 };
 
-var EditNewsFeedModalRemoveImage = function(e)
+var EditNewsFeedModalRemoveImage = function()
 {
 	var		currTag = $(this);
 	var		currAction = currTag.data("action");
@@ -630,6 +629,7 @@ var EditNewsFeedModalRemoveImage = function(e)
 			.done(function(data) {
 				if(data.result == "success")
 				{
+					// --- good2go
 
 				}
 				else
@@ -667,10 +667,10 @@ var EditNewsFeedModalHiddenHandler = function()
 
 var	EditNewsFeedPostMessage = function () 
 {
-	var	isClearToSubmit = false;
 	var	title = $("#editNewsFeedMessageTitle").val();
 	var	text = $("#editNewsFeedMessageText").val();
 	var	images = $("#editPostMessage_PreviewImage").html();
+	var	lenghtyWord;
 
 	if((title.length === 0) && (text.length === 0) && (images.length < 40))
 	{
@@ -678,7 +678,7 @@ var	EditNewsFeedPostMessage = function ()
 	}
 	else if(system_calls.LongestWordSize(title) > 37) // четырёхсотпятидесятисемимиллиметровое
 	{
-		var	lenghtyWord = system_calls.LongestWord(title);
+		lenghtyWord = system_calls.LongestWord(title);
 
 		$("#editNewsFeedMessageTitle").selectRange(title.search(lenghtyWord), title.search(lenghtyWord) + lenghtyWord.length);
 
@@ -686,7 +686,7 @@ var	EditNewsFeedPostMessage = function ()
 	}
 	else if(system_calls.LongestWordSize(text) > 37) // четырёхсотпятидесятисемимиллиметровое
 	{
-		var	lenghtyWord = system_calls.LongestWord(text);
+		lenghtyWord = system_calls.LongestWord(text);
 
 		$("#editNewsFeedMessageText").selectRange(text.search(lenghtyWord), text.search(lenghtyWord) + lenghtyWord.length);
 
@@ -725,11 +725,11 @@ var	EditNewsFeedPostMessage = function ()
 						$("#editNewsFeedMessage").modal("hide");
 					}			
 				})
-				.fail( function(data) {
+				.fail( function() {
 					system_calls.AlertError("newsFeedNewMessageError", "ошибка ответа сервера");
 					console.error("$(document).getJSON(AJAX_updateNewsFeed).success():ERROR parsing JSON server response");
 				})
-				.always(function(data) {
+				.always(function() {
 					$("#NewsFeedMessageSubmit").button("reset");
 				});
 	}
@@ -742,8 +742,8 @@ var DeleteMessage = function(messageID)
 	// --- on a slow speed links users can continue seeing it some time
 	$("div#message" + messageID).parent().empty();
 	$.getJSON("/cgi-bin/index.cgi?action=AJAX_deleteNewsFeedMessage", {messageID: messageID})
-	 		.done(function(data) 
-	 		{
+			.done(function(data) 
+			{
 				if(data.result == "success")
 				{
 					ZeroizeThenUpdateNewsFeedThenScrollTo("");
@@ -758,8 +758,8 @@ var DeleteMessage = function(messageID)
 var DeleteMessageComment = function(commentID) 
 {
 	$.getJSON("/cgi-bin/index.cgi?action=AJAX_deleteNewsFeedComment", {commentID: commentID})
-	 		.done(function(data) 
-	 		{
+			.done(function(data) 
+			{
 				if(data.result == "success")
 				{
 					if($("#buttonNewsFeedViewMessageComment").data("action") == "AJAX_commentOnMessageInNewsFeed")
@@ -791,7 +791,7 @@ var LazyImageLoad = function()
 			}
 		});
 
-	// --- !!! It is imprtant to rebuild carousel after downloading carousel-images
+	// --- !!! It is important to rebuild carousel after downloading carousel-images
 	$(".carousel").carousel();
 };
 
@@ -824,7 +824,7 @@ var GetDataFromProvidedURL = function()
 		NewMessageModalFreezeAllFields();
 
 		$.getJSON("/cgi-bin/index.cgi?action=AJAX_getURLMetaData", {url: newMessageURL, imageTempSet: imageTempSet})
-		 		.done(function(data) {
+				.done(function(data) {
 					if(data.result == "success")
 					{
 						if(data.title.length)
@@ -879,7 +879,7 @@ var GetDataFromProvidedURL = function()
 							}
 							else if((typeof(data.mediaType) != "undefined") && (data.mediaType == "youtube_video"))
 							{
-								// --- <iframe width="560" height="315" src="https://www.youtube.com/embed/WNkCqa1LfuI" frameborder="0" allowfullscreen></iframe>
+								// --- <iframe width="560" height="315" src="https://www.youtube.com/embed/________" frameborder="0" allowfullscreen></iframe>
 								mediaPreview = $("<iframe>").addClass("max_100percents_100px")
 															.attr("src", data.imageURL)
 															.attr("frameborder", "0")
@@ -914,7 +914,7 @@ var GetDataFromProvidedURL = function()
 						console.error("GetDataFromProvidedURL: getJSON(AJAX_getURLMetaData).done():ERROR [" + data.description + "]");
 					}
 				})
-				.always(function(data) {
+				.always(function() {
 					NewMessageModalResetLayout();
 				});
 	}
@@ -976,11 +976,12 @@ var UsernameUpdate = function()
 
 
 	$.getJSON("/cgi-bin/index.cgi?action=AJAX_updateFirstLastName", {firstName: firstName, lastName: lastName})
-	 		.done(function(data) {
+			.done(function(data) {
 				console.debug("UsernameUpdateClickHandler: getJSON(AJAX_updateFirstLastName).done(): receive answer from server on 'like' click");
 
 				if(data.result == "success")
 				{
+					// --- good2go
 				}
 			});
 
@@ -1031,7 +1032,7 @@ var	IsMeHere = function(arr)
 	var	result = false;
 
 	arr.forEach(
-		function(item, i, arr)
+		function(item)
 		{
 			if(item.isMe == "yes")
 			{
@@ -1063,7 +1064,7 @@ var ButtonLikeTooltipTitle = function(buttonLike)
 	var		nameCounter = 0;
 
 	messageLikesUserList.forEach(
-		function(item, i, arr) 
+		function(item, i) 
 		{
 			var		strUser = "";
 
@@ -1131,7 +1132,7 @@ var ButtonMessageLikeClickHandler = function ()
 	ButtonLikeRender(buttonLike);
 
 	$.getJSON("/cgi-bin/index.cgi?action=JSON_ClickLikeHandler", {messageId: buttonLike.data().messageId, messageLikeType: messageLikeType})
-	 		.done(function(data) {
+			.done(function(data) {
 				console.debug("ButtonMessageLikeClickHandler: getJSON(JSON_ClickLikeHandler).done(): receive answer from server on 'like' click");
 
 				if(data.result == "success")
@@ -1177,7 +1178,7 @@ var WriteCommentButtonHandler = function()
 		$("#textareaNewsFeedViewMessage").val("");
 		$("#buttonNewsFeedViewMessageComment").button("loading");
 
-		tempArray.forEach(function(item, i, arr)
+		tempArray.forEach(function(item)
 			{
 				replyToUserList.push("@" + $(item).data("userid") + " ");
 			});
@@ -1197,7 +1198,7 @@ var WriteCommentButtonHandler = function()
 
 					setTimeout(function() {$("#buttonNewsFeedViewMessageComment").button("reset"); }, 500); // --- wait for animation
 				})
-				.fail(function(data) {
+				.fail(function() {
 					$("#buttonNewsFeedViewMessageComment").button("reset");
 				});
 	}
@@ -1213,7 +1214,7 @@ var ButtonViewMessageClickHandler = function ()
 	var		messageID = $(this).data("messageId");
 	var		messageObject = {};
 
-	globalNewsFeed.forEach(function(item, i, arr)
+	globalNewsFeed.forEach(function(item)
 		{
 			if((typeof(item.messageId) != "undefined") && (item.messageId == messageID))
 			{
@@ -1225,7 +1226,6 @@ var ButtonViewMessageClickHandler = function ()
 	{
 		var		spanHeaderText = $("<span/>");
 		var		spanHeaderLink = $("<a/>");
-		var		spanBodyText = $("<span/>");
 		var		srcObjName = messageObject.srcObj.name + " " + messageObject.srcObj.nameLast;
 
 		$("#viewNewsFeedMessage").modal("show");
@@ -1289,7 +1289,7 @@ var ButtonViewBookClickHandler = function ()
 	var		bookID = $(this).data("bookID");
 	var		bookObject = {};
 
-	globalNewsFeed.forEach(function(item, i, arr)
+	globalNewsFeed.forEach(function(item)
 		{
 			if((typeof(item.bookID) != "undefined") && (item.bookID == bookID))
 				bookObject = item;
@@ -1322,7 +1322,7 @@ var ButtonViewCertificationClickHandler = function ()
 	var		certificationTrackID = $(this).data("certificationTrackID");
 	var		certificationObject = {};
 
-	globalNewsFeed.forEach(function(item, i, arr)
+	globalNewsFeed.forEach(function(item)
 		{
 			if((typeof(item.certificationTrackID) != "undefined") && (item.certificationTrackID == certificationTrackID))
 				certificationObject = item;
@@ -1355,7 +1355,7 @@ var ButtonViewCourseClickHandler = function ()
 	var		courseTrackID = $(this).data("courseTrackID");
 	var		courseObject = {};
 
-	globalNewsFeed.forEach(function(item, i, arr)
+	globalNewsFeed.forEach(function(item)
 		{
 			if((typeof(item.courseTrackID) != "undefined") && (item.courseTrackID == courseTrackID))
 				courseObject = item;
@@ -1388,7 +1388,7 @@ var ButtonViewLanguageClickHandler = function ()
 	var		usersLanguageID = $(this).data("usersLanguageID");
 	var		languageObject = {};
 
-	globalNewsFeed.forEach(function(item, i, arr)
+	globalNewsFeed.forEach(function(item)
 		{
 			if((typeof(item.languageID) != "undefined") && (item.languageID == languageID))
 				languageObject = item;
@@ -1421,7 +1421,7 @@ var ButtonViewCompanyClickHandler = function ()
 	var		usersCompanyID = $(this).data("usersCompanyID");
 	var		companyObject = {};
 
-	globalNewsFeed.forEach(function(item, i, arr)
+	globalNewsFeed.forEach(function(item)
 		{
 			if((typeof(item.companyID) != "undefined") && (item.companyID == companyID))
 				companyObject = item;
@@ -1455,7 +1455,7 @@ var ButtonViewScienceDegreeClickHandler = function ()
 	var		scienceDegreeUniversityID = $(this).data("scienceDegreeUniversityID");
 	var		scienceDegreeObject = {};
 
-	globalNewsFeed.forEach(function(item, i, arr)
+	globalNewsFeed.forEach(function(item)
 		{
 			if((typeof(item.scienceDegreeID) != "undefined") && (item.scienceDegreeID == scienceDegreeID))
 				scienceDegreeObject = item;
@@ -1484,7 +1484,7 @@ var ButtonViewScienceDegreeClickHandler = function ()
 
 
 // --- function adds user from this tag to ReplyTo field
-var AddCommentOwnerToReply_ClickHandler = function(event)
+var AddCommentOwnerToReply_ClickHandler = function()
 {
 	var		currTag = $(this);
 	var		replyToUserID = currTag.data("ownerID");
@@ -1507,7 +1507,7 @@ var AddCommentOwnerToReply_ClickHandler = function(event)
 		else
 		{
 			var		removeSign = $("<span>").addClass("glyphicon glyphicon-remove cursor_pointer")
-											.on("click", function(e)
+											.on("click", function()
 												{
 													// --- remove user from ReplyTo list
 													$(this).parent().remove();
@@ -1553,12 +1553,12 @@ var BuildCommentsList = function(commentsArray, DOMtag)
 	commentsArray = commentsArray.sort(function(item1, item2) { return ((parseFloat(item1.id) < parseFloat(item2.id)) ? -1 : 1); });
 
 	// --- populate commentsUserArray with users-comment-writers (for ex: commentsUserArray["@23"]="Иван Кучин")
-	commentsArray.forEach(function(item, i, arr)
+	commentsArray.forEach(function(item)
 		{
 			commentsUserArray["@" + item.user.userID] = "@" + item.user.name + " " + item.user.nameLast;
 		});
 
-	commentsArray.forEach(function(item, i, arr)
+	commentsArray.forEach(function(item, i)
 	{
 		var	spanUser = $("<span/>").append($("<a>").attr("href", "/userprofile/" + item.user.userID).append(item.user.name + " " + item.user.nameLast)).append(" написал(а) ");
 		var	spanReplyTo = $("<span>").append($("<span>").addClass("fa fa-reply")).append(" <div class=\"display_inline hidden-xs\">ответить</div>")
@@ -1574,9 +1574,9 @@ var BuildCommentsList = function(commentsArray, DOMtag)
 		if(i > 0) { DOMtag.append($("<div/>").addClass("news_feed_comment_separator")); }
 
 		// --- replace @userID -> @name_nameLast
-		Object.keys(commentsUserArray).forEach(function(item)
+		Object.keys(commentsUserArray).forEach(function()
 			{
-				function convert(str, match, offset, s)
+				function convert(str, match)
 				{
 					return "<i>" + commentsUserArray[match] + "</i>";
 				}
@@ -1618,7 +1618,7 @@ var BuildCommentsList = function(commentsArray, DOMtag)
 
 // --- iOS based devices only
 // --- 1) modal open
-// --- 2) initial content size have to be smoller than screen vertical size
+// --- 2) initial content size have to be smaller than screen vertical size
 // --- 3) after rendering, modal have to become larger (comments added in this case)
 // --- 4) y-scroll disabled because of bug
 // --- https://github.com/twbs/bootstrap/issues/14839
@@ -1866,7 +1866,6 @@ var BuildVideoTag = function(imageList, DOMtag)
 	if(imageList.length > 0)
 	{
 		// --- Image carousel
-		var		imageArr = imageList;
 		var		tagDivContainer = $("<div/>").addClass("videoTag");
 		var		videoTag = $("<video>").addClass("videoPlacement")
 										.data("playedAttempts", "0")
@@ -1908,7 +1907,6 @@ var BuildYoutubeEmbedTag = function(imageList, DOMtag)
 	if(imageList.length > 0)
 	{
 		// --- Image carousel
-		var		imageArr = imageList;
 		var		tagDivContainer = $("<div/>").addClass("videoTag");
 		var		videoTag = $("<iframe>").addClass("youtubeVideoPlacement")
 										.attr("id", "youtubeEmbedTag" + uniqueID)
@@ -1954,7 +1952,7 @@ var BuildCarousel = function(imageList, DOMtag)
 													.attr("data-slide", "next");
 
 		imageArr.forEach(
-			function(item, i, arr)
+			function(item, i)
 			{
 				var	tagLiIndicator = $("<li/>").attr("data-target", "#carousel" + uniqueID)
 												.attr("data-slide-to", i);
@@ -1968,7 +1966,7 @@ var BuildCarousel = function(imageList, DOMtag)
 		);
 
 		imageArr.forEach(
-			function(item, i, arr)
+			function(item, i)
 			{
 				var	tagDivItem = $("<div/>").addClass("item");
 				var	tagImgCarousel = $("<img/>");
@@ -2064,7 +2062,7 @@ var RenderBookMainInfo = function(jsonBook, DOMtag)
 										$("span.bookTotalVoters" + bookID).empty().append(GetTotalVoters(data.bookReadersRatingList));
 
 										// --- update bookReadersRatingList in globalNewsFeed object
-										globalNewsFeed.forEach(function(item, i, arr)
+										globalNewsFeed.forEach(function(item, i)
 											{
 												if((typeof(item.bookID) != "undefined") && (item.bookID == bookID))
 													globalNewsFeed[i].bookReadersRatingList = data.bookReadersRatingList;
@@ -2072,12 +2070,12 @@ var RenderBookMainInfo = function(jsonBook, DOMtag)
 									}
 									else
 									{
-									  console.error("ratingCallback:ERROR: " + data.description);
+									console.error("ratingCallback:ERROR: " + data.description);
 									}
 								});
 
 								// --- update bookMyRating in globalNewsFeed object
-								globalNewsFeed.forEach(function(item, i, arr)
+								globalNewsFeed.forEach(function(item, i)
 									{
 										if((typeof(item.bookID) != "undefined") && (item.bookID == bookID))
 											globalNewsFeed[i].bookMyRating = rating;
@@ -2119,14 +2117,14 @@ var RenderBookMainInfo = function(jsonBook, DOMtag)
 	{
 		imgCover = $("<img>").addClass("max_100percents_100px div_content_center_alignment niceborder cursor_pointer")
 							.attr("src", "/images/books/" + jsonBook.bookCoverPhotoFolder + "/" + jsonBook.bookCoverPhotoFilename)
-							.on("click", function(e) {
+							.on("click", function() {
 								$("#NewsFeedBookCoverDisplayModal").modal("show");
 								$("#NewsFeedBookCoverDisplayModal span.bookTitle").empty().append(jsonBook.bookTitle);
 								$("#NewsFeedBookCoverDisplayModal img").attr("src", "/images/books/" + jsonBook.bookCoverPhotoFolder + "/" + jsonBook.bookCoverPhotoFilename);
 							});
 		imgXSCover = $("<img>").addClass("max_100px visible-xs-inline niceborder cursor_pointer")
 							.attr("src", "/images/books/" + jsonBook.bookCoverPhotoFolder + "/" + jsonBook.bookCoverPhotoFilename)
-							.on("click", function(e) {
+							.on("click", function() {
 								$("#NewsFeedBookCoverDisplayModal").modal("show");
 								$("#NewsFeedBookCoverDisplayModal span.bookTitle").empty().append(jsonBook.bookTitle);
 								$("#NewsFeedBookCoverDisplayModal img").attr("src", "/images/books/" + jsonBook.bookCoverPhotoFolder + "/" + jsonBook.bookCoverPhotoFilename);
@@ -2172,15 +2170,12 @@ var RenderCertificationMainInfo = function(jsonCertification, DOMtag)
 	var		divMain = $("<div>").addClass("col-xs-8 col-sm-10");
 	var		divCover = $("<div>").addClass("col-xs-4 col-sm-2 margin_top_10 ");
 	var		imgLogo;
-	var		imgXSCover;
-	var		certificationID = jsonCertification.certificationID;
-
 
 	if((typeof(jsonCertification.certificationVendorLogoFolder) != "undefined") && (typeof(jsonCertification.certificationVendorLogoFilename) != "undefined") && (jsonCertification.certificationVendorLogoFolder.length) && (jsonCertification.certificationVendorLogoFilename.length))
 	{
 		imgLogo = $("<img>").addClass("max_100percents_100px div_content_center_alignment niceborder cursor_pointer")
 							.attr("src", "/images/certifications/" + jsonCertification.certificationVendorLogoFolder + "/" + jsonCertification.certificationVendorLogoFilename)
-							.on("click", function(e) {
+							.on("click", function() {
 								$("#NewsFeedBookCoverDisplayModal").modal("show");
 								$("#NewsFeedBookCoverDisplayModal span.bookTitle").empty().append(jsonCertification.certificationTrackTitle);
 								$("#NewsFeedBookCoverDisplayModal img").attr("src", "/images/certifications/" + jsonCertification.certificationVendorLogoFolder + "/" + jsonCertification.certificationVendorLogoFilename);
@@ -2206,8 +2201,6 @@ var RenderGroupMainInfo = function(jsonGroup, DOMtag)
 	var		divDescription = $("<div>").addClass("col-xs-8 col-sm-10");
 	var		divCover = $("<div>").addClass("col-xs-4 col-sm-2 margin_top_10 ");
 	var		imgLogo;
-	var		imgXSCover;
-	var		groupID = jsonGroup.groups[0].groupID;
 
 
 	if((typeof(jsonGroup.groups[0].logo_folder) != "undefined") && (typeof(jsonGroup.groups[0].logo_filename) != "undefined") && (jsonGroup.groups[0].logo_folder.length) && (jsonGroup.groups[0].logo_filename.length))
@@ -2239,8 +2232,6 @@ var RenderCompanySubscriptionMainInfo = function(jsonCompany, DOMtag)
 	var		divMain = $("<div>").addClass("col-xs-8 col-sm-10");
 	var		divCover = $("<div>").addClass("col-xs-4 col-sm-2 margin_top_10 ");
 	var		imgLogo;
-	var		imgXSCover;
-	var		companyID = jsonCompany.companies[0].companyID;
 
 
 	if((typeof(jsonCompany.companies[0].logo_folder) != "undefined") && (typeof(jsonCompany.companies[0].logo_filename) != "undefined") && (jsonCompany.companies[0].logo_folder.length) && (jsonCompany.companies[0].logo_filename.length))
@@ -2270,7 +2261,6 @@ var RenderCourseMainInfo = function(jsonCourse, DOMtag)
 	var		divMain = $("<div>").addClass("col-xs-8 col-sm-10");
 	var		divCover = $("<div>").addClass("col-xs-4 col-sm-2 margin_top_10 ");
 	var		imgLogo;
-	var		imgXSCover;
 	var		courseID = jsonCourse.courseID;
 
 	var		ratingCallback = function(rating)
@@ -2287,7 +2277,7 @@ var RenderCourseMainInfo = function(jsonCourse, DOMtag)
 										$("span.courseTotalVoters" + courseID).empty().append(GetTotalVoters(data.courseReadersRatingList));
 
 										// --- update courseReadersRatingList in globalNewsFeed object
-										globalNewsFeed.forEach(function(item, i, arr)
+										globalNewsFeed.forEach(function(item, i)
 											{
 												if((typeof(item.courseID) != "undefined") && (item.courseID == courseID))
 													globalNewsFeed[i].courseReadersRatingList = data.courseReadersRatingList;
@@ -2295,12 +2285,12 @@ var RenderCourseMainInfo = function(jsonCourse, DOMtag)
 									}
 									else
 									{
-									  console.error("ratingCallback:ERROR: " + data.description);
+									console.error("ratingCallback:ERROR: " + data.description);
 									}
 								});
 
 								// --- update courseMyRating in globalNewsFeed object
-								globalNewsFeed.forEach(function(item, i, arr)
+								globalNewsFeed.forEach(function(item, i)
 									{
 										if((typeof(item.courseID) != "undefined") && (item.courseID == courseID))
 											globalNewsFeed[i].courseMyRating = rating;
@@ -2318,7 +2308,7 @@ var RenderCourseMainInfo = function(jsonCourse, DOMtag)
 	{
 		imgLogo = $("<img>").addClass("max_100percents_100px div_content_center_alignment niceborder cursor_pointer")
 							.attr("src", "/images/certifications/" + jsonCourse.courseVendorLogoFolder + "/" + jsonCourse.courseVendorLogoFilename)
-							.on("click", function(e) {
+							.on("click", function() {
 								$("#NewsFeedBookCoverDisplayModal").modal("show");
 								$("#NewsFeedBookCoverDisplayModal span.bookTitle").empty().append(jsonCourse.courseTrackTitle);
 								$("#NewsFeedBookCoverDisplayModal img").attr("src", "/images/certifications/" + jsonCourse.courseVendorLogoFolder + "/" + jsonCourse.courseVendorLogoFilename);
@@ -2348,7 +2338,6 @@ var RenderScienceDegreeMainInfo = function(jsonScienceDegree, DOMtag)
 	var		divMain = $("<div>").addClass("col-xs-8 col-sm-10");
 	var		divCover = $("<div>").addClass("col-xs-4 col-sm-2 margin_top_10 ");
 	var		imgLogo;
-	var		scienceDegreeID = jsonScienceDegree.scienceDegreeID;
 	var		universityLocation = "";
 	var		studyPeriodLength = 0;
 	var		studyPeriodMessage = "";
@@ -2358,7 +2347,7 @@ var RenderScienceDegreeMainInfo = function(jsonScienceDegree, DOMtag)
 	{
 		imgLogo = $("<img>").addClass("max_100percents_100px div_content_center_alignment niceborder cursor_pointer")
 							.attr("src", "/images/universities/" + jsonScienceDegree.scienceDegreeUniversityLogoFolder + "/" + jsonScienceDegree.scienceDegreeUniversityLogoFilename)
-							.on("click", function(e) {
+							.on("click", function() {
 								$("#NewsFeedBookCoverDisplayModal").modal("show");
 								$("#NewsFeedBookCoverDisplayModal span.bookTitle").empty().append(jsonScienceDegree.scienceDegreeUniversityTitle);
 								$("#NewsFeedBookCoverDisplayModal img").attr("src", "/images/universities/" + jsonScienceDegree.scienceDegreeUniversityLogoFolder + "/" + jsonScienceDegree.scienceDegreeUniversityLogoFilename);
@@ -2398,16 +2387,12 @@ var RenderLanguageMainInfo = function(jsonLanguage, DOMtag)
 	var		divMain = $("<div>").addClass("col-xs-8 col-sm-10");
 	var		divCover = $("<div>").addClass("col-xs-4 col-sm-2 margin_top_10 ");
 	var		imgLogo;
-	var		languageID = jsonLanguage.languageID;
-	var		studyPeriodLength = 0;
-	var		studyPeriodMessage = "";
-
 
 	if((typeof(jsonLanguage.languageLogoFolder) != "undefined") && (typeof(jsonLanguage.languageLogoFilename) != "undefined") && (jsonLanguage.languageLogoFolder.length) && (jsonLanguage.languageLogoFilename.length))
 	{
 		imgLogo = $("<img>").addClass("max_100percents_100px div_content_center_alignment niceborder cursor_pointer")
 							.attr("src", "/images/flags/" + jsonLanguage.languageLogoFolder + "/" + jsonLanguage.languageLogoFilename)
-							.on("click", function(e) {
+							.on("click", function() {
 								$("#NewsFeedBookCoverDisplayModal").modal("show");
 								$("#NewsFeedBookCoverDisplayModal span.bookTitle").empty().append(jsonLanguage.languageUniversityTitle);
 								$("#NewsFeedBookCoverDisplayModal img").attr("src", "/images/flags/" + jsonLanguage.languageLogoFolder + "/" + jsonLanguage.languageLogoFilename);
@@ -2429,16 +2414,12 @@ var RenderCompanyMainInfo = function(jsonCompany, DOMtag)
 	var		divMain = $("<div>").addClass("col-xs-8 col-sm-10");
 	var		divCover = $("<div>").addClass("col-xs-4 col-sm-2 margin_top_10 ");
 	var		imgLogo;
-	var		companyID = jsonCompany.companyID;
-	var		studyPeriodLength = 0;
-	var		studyPeriodMessage = "";
-
 
 	if((typeof(jsonCompany.companyLogoFolder) != "undefined") && (typeof(jsonCompany.companyLogoFilename) != "undefined") && (jsonCompany.companyLogoFolder.length) && (jsonCompany.companyLogoFilename.length))
 	{
 		imgLogo = $("<img>").addClass("max_100percents_100px div_content_center_alignment niceborder cursor_pointer")
 							.attr("src", "/images/companies/" + jsonCompany.companyLogoFolder + "/" + jsonCompany.companyLogoFilename)
-							.on("click", function(e) {
+							.on("click", function() {
 								$("#NewsFeedBookCoverDisplayModal").modal("show");
 								$("#NewsFeedBookCoverDisplayModal span.bookTitle").empty().append(jsonCompany.companyUniversityTitle);
 								$("#NewsFeedBookCoverDisplayModal img").attr("src", "/images/companies/" + jsonCompany.companyLogoFolder + "/" + jsonCompany.companyLogoFilename);
@@ -2489,7 +2470,6 @@ var RenderBookBody = function(jsonBook, DOMtag)
 		var		imgComment = $("<img>").attr("src", "/images/pages/news_feed/comment.png")
 										.addClass("news_feed_comment");
 
-		var		myUserID = $("#myUserID").data("myuserid");
 
 		DOMtag.append(tagDiv6_1);
 		tagDiv6_1.append(tagSpan7_1);
@@ -2530,12 +2510,6 @@ var RenderCompanySubscriptionBody = function(jsonCompany, DOMtag)
 // --- used for certification and citing
 var RenderCertificationBody = function(jsonCertification, DOMtag)
 {
-	var			divRow = $("<div>").addClass("row");
-	var 		isbns = "";
-	var			divMain = $("<div>").addClass("col-xs-8 col-sm-10");
-	var			divLogo = $("<div>").addClass("col-xs-4 col-sm-2");
-	var			imgLogo;
-
 	if(jsonCertification.certificationID && jsonCertification.certificationID.length) DOMtag.attr("id", "certification" + jsonCertification.certificationID);
 
 	RenderCertificationMainInfo(jsonCertification, DOMtag);
@@ -2563,7 +2537,6 @@ var RenderCertificationBody = function(jsonCertification, DOMtag)
 		var		imgComment = $("<img>").attr("src", "/images/pages/news_feed/comment.png")
 										.addClass("news_feed_comment");
 
-		var		myUserID = $("#myUserID").data("myuserid");
 
 		DOMtag.append(tagDiv6_1);
 		tagDiv6_1.append(tagSpan7_1);
@@ -2585,12 +2558,6 @@ var RenderCertificationBody = function(jsonCertification, DOMtag)
 // --- used for course and citing
 var RenderCourseBody = function(jsonCourse, DOMtag)
 {
-	var			divRow = $("<div>").addClass("row");
-	var 		isbns = "";
-	var			divMain = $("<div>").addClass("col-xs-8 col-sm-10");
-	var			divLogo = $("<div>").addClass("col-xs-4 col-sm-2");
-	var			imgLogo;
-
 	if(jsonCourse.usersCourseID && jsonCourse.usersCourseID.length) DOMtag.attr("id", "usercourse" + jsonCourse.usersCourseID);
 	if(jsonCourse.courseID && jsonCourse.courseID.length) DOMtag.append("<div id=\"course" + jsonCourse.courseID + "\"></div>");
 
@@ -2619,8 +2586,6 @@ var RenderCourseBody = function(jsonCourse, DOMtag)
 		var		imgComment = $("<img>").attr("src", "/images/pages/news_feed/comment.png")
 										.addClass("news_feed_comment");
 
-		var		myUserID = $("#myUserID").data("myuserid");
-
 		DOMtag.append(tagDiv6_1);
 		tagDiv6_1.append(tagSpan7_1);
 		tagSpan7_1.append(buttonLike)
@@ -2642,14 +2607,6 @@ var RenderCourseBody = function(jsonCourse, DOMtag)
 // --- used for scienceDegree and citing
 var RenderScienceDegreeBody = function(jsonScienceDegree, DOMtag)
 {
-	var			divRow = $("<div>").addClass("row");
-	var 		isbns = "";
-	var			divMain = $("<div>").addClass("col-xs-8 col-sm-10");
-	var			divLogo = $("<div>").addClass("col-xs-4 col-sm-2");
-	var			imgLogo;
-	var			universityLocation = "";
-
-
 	// --- assign scienceDegreeID to be able to scroll to this scienceDegree
 	if(jsonScienceDegree.scienceDegreeID && jsonScienceDegree.scienceDegreeID.length) DOMtag.attr("id", "scienceDegree" + jsonScienceDegree.scienceDegreeID);
 	if(jsonScienceDegree.scienceDegreeUniversityID && jsonScienceDegree.scienceDegreeUniversityID.length) DOMtag.append("<div id=\"university" + jsonScienceDegree.scienceDegreeUniversityID + "\"></div>");
@@ -2679,8 +2636,6 @@ var RenderScienceDegreeBody = function(jsonScienceDegree, DOMtag)
 		var		imgComment = $("<img>").attr("src", "/images/pages/news_feed/comment.png")
 										.addClass("news_feed_comment");
 
-		var		myUserID = $("#myUserID").data("myuserid");
-
 		DOMtag.append(tagDiv6_1);
 		tagDiv6_1.append(tagSpan7_1);
 		tagSpan7_1.append(buttonLike)
@@ -2701,11 +2656,6 @@ var RenderScienceDegreeBody = function(jsonScienceDegree, DOMtag)
 // --- used for language and citing
 var RenderLanguageBody = function(jsonLanguage, DOMtag)
 {
-	var			divRow = $("<div>").addClass("row");
-	var			divMain = $("<div>").addClass("col-xs-8 col-sm-10");
-	var			divLogo = $("<div>").addClass("col-xs-4 col-sm-2");
-	var			imgLogo;
-
 	// --- assign languageID to be able to scroll to this language
 	if(jsonLanguage.usersLanguageID && jsonLanguage.usersLanguageID.length) DOMtag.attr("id", "userLanguage" + jsonLanguage.usersLanguageID);
 	if(jsonLanguage.languageID && jsonLanguage.languageID.length) DOMtag.append("<div id=\"language" + jsonLanguage.languageID + "\"></div>");
@@ -2735,8 +2685,6 @@ var RenderLanguageBody = function(jsonLanguage, DOMtag)
 		var		imgComment = $("<img>").attr("src", "/images/pages/news_feed/comment.png")
 										.addClass("news_feed_comment");
 
-		var		myUserID = $("#myUserID").data("myuserid");
-
 		DOMtag.append(tagDiv6_1);
 		tagDiv6_1.append(tagSpan7_1);
 		tagSpan7_1.append(buttonLike)
@@ -2757,11 +2705,6 @@ var RenderLanguageBody = function(jsonLanguage, DOMtag)
 // --- used for company and citing
 var RenderCompanyBody = function(jsonCompany, DOMtag)
 {
-	var			divRow = $("<div>").addClass("row");
-	var			divMain = $("<div>").addClass("col-xs-8 col-sm-10");
-	var			divLogo = $("<div>").addClass("col-xs-4 col-sm-2");
-	var			imgLogo;
-
 	// --- assign companyID to be able to scroll to this company
 	if(jsonCompany.usersCompanyID && jsonCompany.usersCompanyID.length) DOMtag.attr("id", "vacancy" + jsonCompany.usersCompanyID);
 	if(jsonCompany.companyID && jsonCompany.companyID.length) DOMtag.append("<div id=\"company" + jsonCompany.companyID + "\"></div>");
@@ -2790,8 +2733,6 @@ var RenderCompanyBody = function(jsonCompany, DOMtag)
 										.on("click", ButtonViewCompanyClickHandler);
 		var		imgComment = $("<img>").attr("src", "/images/pages/news_feed/comment.png")
 										.addClass("news_feed_comment");
-
-		var		myUserID = $("#myUserID").data("myuserid");
 
 		DOMtag.append(tagDiv6_1);
 		tagDiv6_1.append(tagSpan7_1);
@@ -2940,7 +2881,7 @@ var	GetHrefAttrFromDstObj = function(jsonMessage)
 	return result;
 };
 
-var BuildNewsFeedSingleBlock = function(item, i, arr)
+var BuildNewsFeedSingleBlock = function(item)
 {
 	var 	divContainer, divRow, divPhoto, hrefSrcObj, tagImg3, tagDivMessage, hrefUsername, spanTimestamp, canvasSrcObj;
 	var		tagDivMsgInfo;
@@ -2965,8 +2906,8 @@ var BuildNewsFeedSingleBlock = function(item, i, arr)
 								.append(system_calls.GetLocalizedDateInHumanFormatMsecSinceEvent(parseFloat(jsonMessage.eventTimestampDelta) * 1000) + " назад");
 
 	divContainer.append(divRow); 
-	divRow.append(divPhoto)
-		   .append(tagDivMsgInfo);
+	divRow	.append(divPhoto)
+			.append(tagDivMsgInfo);
 	divPhoto.append(hrefSrcObj);
 	hrefSrcObj.append(tagImg3);
 	hrefSrcObj.append(canvasSrcObj);
@@ -3026,7 +2967,7 @@ var BuildNewsFeedSingleBlock = function(item, i, arr)
 		tagDivMsgInfo.append(spanTimestamp);
 		tagDivMsgInfo.append(hrefUsername);
 		tagDivMsgInfo.append(" " + jsonMessage["actionCategoryTitle"] + " ")
-			   .append(tagFriendLink);
+				.append(tagFriendLink);
 
 		var infoAboutFriend = BuildFriendBlock(jsonMessage);
 		divRow.append(tagDivMessage);
@@ -3233,9 +3174,6 @@ var	GetNewsFeedFromServer = function(cleanBeforeUpdate, scrollToElementID)
 
 var	ZeroizeThenUpdateNewsFeedThenScrollTo = function(scrollToElementID)
 {
-	var		action = "";
-	var		cgiScript = "";
-
 	globalPageCounter = 0;
 	GetNewsFeedFromServer(true, scrollToElementID);
 };
@@ -3298,10 +3236,10 @@ var ZeroizeNewMessageModal = function()
 
 var	NewsFeedPostMessage = function () 
 {
-	var	isClearToSubmit = false;
 	var	title = $("#newsFeedMessageTitle").val();
 	var	text = $("#newsFeedMessageText").val();
 	var	images = $("#PostMessage_PreviewImage").html();
+	var	lenghtyWord;
 
 	if((title.length || text.length || images.length) == 0)
 	{
@@ -3309,7 +3247,7 @@ var	NewsFeedPostMessage = function ()
 	}
 	else if(system_calls.LongestWordSize(title) > 37) // четырёхсотпятидесятисемимиллиметровое
 	{
-		var	lenghtyWord = system_calls.LongestWord(title);
+		lenghtyWord = system_calls.LongestWord(title);
 
 		$("#newsFeedMessageTitle").selectRange(title.search(lenghtyWord), title.search(lenghtyWord) + lenghtyWord.length);
 
@@ -3317,7 +3255,7 @@ var	NewsFeedPostMessage = function ()
 	}
 	else if(system_calls.LongestWordSize(text) > 37) // четырёхсотпятидесятисемимиллиметровое
 	{
-		var	lenghtyWord = system_calls.LongestWord(text);
+		lenghtyWord = system_calls.LongestWord(text);
 
 		$("#newsFeedMessageText").selectRange(text.search(lenghtyWord), text.search(lenghtyWord) + lenghtyWord.length);
 
@@ -3364,11 +3302,11 @@ var	NewsFeedPostMessage = function ()
 						$("#NewsFeedNewMessage").modal("hide");
 					}			
 				})
-				.fail( function(data) {
+				.fail( function() {
 					system_calls.AlertError("newsFeedNewMessageError", "ошибка ответа сервера");
 					console.error("$(document).getJSON(AJAX_postNewsFeed).success():ERROR parsing JSON server response");
 				})
-				.always(function(data) {
+				.always(function() {
 					$("#NewsFeedMessageSubmit").button("reset");
 				});
 	}
@@ -3452,11 +3390,11 @@ var NewMessageNewsFeedModalShownHandler = function()
 					console.error("NewMessageNewsFeedModalShownHandler:ERROR: unknown status returned from server");
 				}
 			})
-			.fail(function(e) {
+			.fail(function() {
 				console.error("NewMessageNewsFeedModalShownHandler:ERROR: parsing JSON response from server");
 			});
 
-	// --- enable all field for safelty reason, just in case they were disabled earlier
+	// --- enable all field for safely reason, just in case they were disabled earlier
 	NewMessageModalResetLayout();
 };
 
@@ -3483,7 +3421,7 @@ var NewMessageNewsFeedModalHiddenHandler = function()
 	// --- set progress bar to 0 length
 	$("#progress .progress-bar").css("width", "0%");
 
-	// --- clean-up error mesage div
+	// --- clean-up error message div
 	$("#newsFeedNewMessageError").empty().removeClass();
 
 	// --- cleanup picture list from the posted message

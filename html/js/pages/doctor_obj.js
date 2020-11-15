@@ -1,6 +1,9 @@
+/*globals jsSHA*/
+/*exported doctors_arr*/
+
 var	doctor_obj = function()
 {
-	'use strict';
+	"use strict";
 
 
 	let	data_global;
@@ -12,9 +15,7 @@ var	doctor_obj = function()
 	let	reset_form_button_global = "hidden";
 	let	reset_form_callback_global;
 	let	submit_button_global = "hidden";
-	let	hospital_obj_global = {};
 	let	submit_callback_global;
-	let	append_label = true;
 	let	admin_mode_global = "";
 	let	append_hospital_dom_global;
 
@@ -98,7 +99,7 @@ var	doctor_obj = function()
 		return result;
 	};
 
-	var SubmitNewDoctor_ClickHandler = function(e)
+	var SubmitNewDoctor_ClickHandler = function()
 	{
 		var	curr_tag = $(this);
 
@@ -122,7 +123,7 @@ var	doctor_obj = function()
 					curr_tag.button("loading");
 					
 					$.getJSON(
-						'/cgi-bin/doctor.cgi',
+						"/cgi-bin/doctor.cgi",
 						{
 							action		: action,
 							login		: login.val(),
@@ -151,11 +152,11 @@ var	doctor_obj = function()
 								system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 							}
 						})
-						.fail(function(data)
+						.fail(function()
 						{
 							system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
 						})
-						.always(function(data)
+						.always(function()
 						{
 							setTimeout(function(){ curr_tag.button("reset"); }, 500);
 						});
@@ -198,11 +199,6 @@ var	doctor_obj = function()
 		submit_button_global = state;
 	};
 
-	var	DontAppendLabel = function()
-	{
-		append_label = false;
-	};
-
 	var ResetFormButton = function(state, reset_form_callback)
 	{
 		reset_form_button_global = state;
@@ -237,7 +233,6 @@ var	doctor_obj = function()
 		var		input_login			= $("<input>")	.addClass("transparent __doctor __login")				.attr("placeholder", "Логин");
 		var		input_email			= $("<input>")	.addClass("transparent __doctor __email")				.attr("placeholder", "email");
 		var		input_phone			= $("<input>")	.addClass("transparent __doctor __phone")				.attr("placeholder", "Телефон");
-		var		input_hospital		= $("<input>")	.addClass("transparent __doctor __hospital_employee")	.attr("placeholder", "Название");
 		var		input_pass			= $("<input>")	.addClass("transparent __doctor __password")			.attr("placeholder", "Пароль");
 		var		remove_button		= $("<i>")		.addClass("fa fa-times-circle padding_close float_right cursor_pointer animate_close_onhover  " + remove_button_state_global);
 		var		open_col	 		= $("<div>")	.addClass("col-xs-2 col-md-1");
@@ -249,7 +244,6 @@ var	doctor_obj = function()
 		var		remove_col			= $("<div>")	.addClass("col-xs-1 col-md-1 col-md-offset-2");
 		var		reset_form_button	= $("<button>")	.addClass("btn btn-default form-control " + reset_form_button_global).append("Сбросить");
 		var		submit_button		= $("<button>")	.addClass("btn btn-primary form-control " + submit_button_global).append("Сохранить");
-		var		temp = [];
 
 		// --- render collapsible part
 		var		row_collapsible 	= $("<div>")	.addClass("row collapse " + details_area_state_global);
@@ -259,7 +253,6 @@ var	doctor_obj = function()
 		var		submit_col 			= $("<div>")	.addClass("col-xs-6 col-md-2");
 
 		var		collapsible_row_1	= $("<div>")	.addClass("row highlight_onhover zebra_painting doctor_" + data_global.id);
-		var		collapsible_row_2	= $("<div>")	.addClass("row highlight_onhover zebra_painting doctor_" + data_global.id);
 		var		col_name_first 		= $("<div>")	.addClass("col-xs-3 col-md-2");
 		var		col_name_middle		= $("<div>")	.addClass("col-xs-3 col-md-2");
 		var		col_name_last 		= $("<div>")	.addClass("col-xs-3 col-md-2 col-xs-offset-2 col-md-offset-1");
@@ -267,10 +260,6 @@ var	doctor_obj = function()
 		var		col_admin_hint		= $("<div>")	.addClass("col-xs-3 col-md-1");
 		var		col_active			= $("<div>")	.addClass("col-xs-2 col-md-1");
 		var		col_active_hint		= $("<div>")	.addClass("col-xs-3 col-md-1");
-
-
-		var		col_main_fields		= $("<div>")	.addClass("col-xs-12")
-		var		col_custom_fields	= $("<div>")	.addClass("col-xs-12")
 
 		var		admin_switcher		= $("<div>").addClass("form-switcher")
 										.append($("<input>")
@@ -407,7 +396,6 @@ var	doctor_obj = function()
 		input_pass			.on("change", function(e)
 										{
 											var		curr_tag = $(this);
-											var		password_hash;
 											var 	shaObj = new jsSHA("SHA-512", "TEXT");
 
 											shaObj.update(curr_tag.val());
@@ -459,7 +447,7 @@ var	doctor_obj = function()
 		return admin_mode_global == "admin" ? GetAdminDOM() : GetUserDOM();
 	};
 
-	var	UpdateSwitcherHintValues = function(e)
+	var	UpdateSwitcherHintValues = function()
 	{
 			let		label_tag	= $(this).find("label");
 			let		hint_tag	= $(label_tag.attr("data-hint_selector"));
@@ -472,13 +460,13 @@ var	doctor_obj = function()
 
 	};
 
-	var	TriggerCollapsible_ClickHandler = function(e)
+	var	TriggerCollapsible_ClickHandler = function()
 	{
 		var		collapsible_tag_id = $(this).attr("data-target");
 		$("#" + collapsible_tag_id).collapse("toggle");
 	};
 
-	var	RemoveCompany_AreYouSure_ClickHandler = function(e)
+	var	RemoveCompany_AreYouSure_ClickHandler = function()
 	{
 		var		curr_tag = $(this);
 
@@ -487,14 +475,14 @@ var	doctor_obj = function()
 		$("#AreYouSureRemoveDoctor").modal("show");
 	};
 
-	var	Switcher_ClickHandler = function(e)
+	var	Switcher_ClickHandler = function()
 	{
 		var		curr_tag = $(this);
 		var		input_tag = $("#" + $(this).attr("for"));
 		var		curr_value = !input_tag.prop("checked");
 
 		$.getJSON(
-			'/cgi-bin/doctor.cgi',
+			"/cgi-bin/doctor.cgi",
 			{
 				action: curr_tag.data("action"),
 				id: curr_tag.data("id"),
@@ -504,6 +492,7 @@ var	doctor_obj = function()
 			{
 				if(data.result == "success")
 				{
+					// --- good2go
 				}
 				else
 				{
@@ -513,12 +502,12 @@ var	doctor_obj = function()
 					system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 				}
 			})
-			.fail(function(e)
+			.fail(function()
 			{
 				input_tag.prop("checked", !curr_value).trigger("change");
 				system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
 			})
-			.always(function(e)
+			.always(function()
 			{
 				curr_tag.removeAttr("disabled");
 			});
@@ -555,19 +544,19 @@ var	doctors_arr = (function()
 {
 	var	CraftDoctorObjects = function(doctors_in, mode)
 	{
-		let	dortors_out = [];
+		var	doctors_out = [];
 
 		if((typeof(doctors_in) != "undefined"))
 		{
 			doctors_in.forEach(function(hospital)
 			{
-				let		temp_obj = new doctor_obj();
+				var		temp_obj = new doctor_obj();
 
 				temp_obj.SetGlobalData(hospital);
 				temp_obj.Init();
 				temp_obj.SetAdminMode(mode);
 
-				dortors_out.push(temp_obj);
+				doctors_out.push(temp_obj);
 			});
 		}
 		else
@@ -575,7 +564,7 @@ var	doctors_arr = (function()
 			system_calls.PopoverError("body", "Ошибка в объекте doctors_in");
 		}
 
-		return dortors_out;
+		return doctors_out;
 	};
 
 	return {

@@ -81,7 +81,7 @@ var find_friends = (function()
 							create: function () {
 								console.debug ("FindFriendsOnInputHandler autocomplete.create: _create event handler");
 							},
-							_renderMenu: function (ul, items)  // --- requres plugin only
+							_renderMenu: function (ul, items)  // --- requires plugin only
 							{
 								var	that = this;
 								currentCategory = "";

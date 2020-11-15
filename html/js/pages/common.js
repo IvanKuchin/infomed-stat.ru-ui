@@ -1,16 +1,10 @@
-/*jslint devel: true, indent: 4, maxerr: 50*/
-/*globals $:false localStorage:false location: false*/
-/*globals localStorage:false*/
-/*globals location:false*/
-/*globals document:false*/
-/*globals window:false*/
-/*globals Image:false*/
-/*globals jQuery:false*/
-/*globals Notification:false*/
-/*globals setTimeout:false*/
-/*globals navigator:false*/
-/*globals module:false*/
-/*globals define:false*/
+/*exported system_notifications, preview_modal*/
+/*global EXIF, module, define*/
+/*global system_calls:off*/
+/*global system_notifications:off*/
+/*global userCache:off*/
+/*global DrawUserAvatar:off*/
+/*global DrawCompanyAvatar:off*/
 
 // --- change it in (chat.js, common.js, localy.h)
 var FREQUENCY_ECHO_REQUEST = 60;
@@ -21,13 +15,9 @@ var FREQUENCY_RANDOM_FACTOR = 10;
 var	navMenu_search = navMenu_search || {};
 var	navMenu_chat = navMenu_chat || {};
 var navMenu_userNotification = navMenu_userNotification || {};
-var	system_calls = system_calls || {};
-var	system_notifications = system_notifications || {};
-var userRequestList;
-var	userCache = userCache || {};
 var	gift_list = gift_list || {};
 
-system_calls = (function()
+var system_calls = (function()
 {
 	"use strict";
 	var	userSignedIn = false;
@@ -35,7 +25,6 @@ system_calls = (function()
 	var	companyTypes = ["___","ООО","ОАО","ПАО","ЗАО","Группа","ИП","ЧОП","Концерн","Конгломерат","Кооператив","ТСЖ","Холдинг","Корпорация","НИИ"].sort();
 	var	eventTypes = {invitee: "По приглашению", everyone: "Открыто для всех"};
 	var	startTime = {"0:00":"0:00", "0:30":"0:30", "1:00":"1:00", "1:30":"1:30", "2:00":"2:00", "2:30":"2:30", "3:00":"3:00", "3:30":"3:30", "4:00":"4:00", "4:30":"4:30", "5:00":"5:00", "5:30":"5:30", "6:00":"6:00", "6:30":"6:30", "7:00":"7:00", "7:30":"7:30", "8:00":"8:00", "8:30":"8:30", "9:00":"9:00", "9:30":"9:30", "10:00":"10:00", "10:30":"10:30", "11:00":"11:00", "11:30":"11:30", "12:00":"12:00", "12:30":"12:30", "13:00":"13:00", "13:30":"13:30", "14:00":"14:00", "14:30":"14:30", "15:00":"15:00", "15:30":"15:30", "16:00":"16:00", "16:30":"16:30", "17:00":"17:00", "17:30":"17:30", "18:00":"18:00", "18:30":"18:30", "19:00":"19:00", "19:30":"19:30", "20:00":"20:00", "20:30":"20:30", "21:00":"21:00", "21:30":"21:30", "22:00":"22:00", "22:30":"22:30", "23:00":"23:00", "23:30":"23:30"};
-	var	holidays = ["2018-01-01","2018-01-02","2018-01-03","2018-01-04","2018-01-05","2018-01-06"];
 	var	TIMECARD_REPORT_TIME_FORMAT = "DD MMMM YYYY hh:mm";
 
 	var	globalScrollPrevOffset = -1;
@@ -88,10 +77,10 @@ system_calls = (function()
 
 		// --- Menu drop down on mouse over
 		jQuery("ul.nav li.dropdown").mouseenter(function() {
-		  jQuery(this).find(".dropdown-menu").stop(true, true).delay(200).fadeIn();
+			jQuery(this).find(".dropdown-menu").stop(true, true).delay(200).fadeIn();
 		});
 		jQuery("ul.nav li.dropdown").mouseleave(function() {
-		  jQuery(this).find(".dropdown-menu").stop(true, true).delay(200).fadeOut();
+			jQuery(this).find(".dropdown-menu").stop(true, true).delay(200).fadeOut();
 		});
 
 		// --- Check availability / sign-in
@@ -160,8 +149,8 @@ system_calls = (function()
 	};
 
 	function isTouchBasedUA() {
-	  try{ document.createEvent("TouchEvent"); return true; }
-	  catch(e){ return false; }
+		try{ document.createEvent("TouchEvent"); return true; }
+		catch(e){ return false; }
 	}
 
 	function isOrientationPortrait()
@@ -184,12 +173,12 @@ system_calls = (function()
 
 	var CutLongMessages = function(message, len)
 	{
-	 	if(message.length > len)
+		if(message.length > len)
 		{
-	 		return message.substr(0, len) + "...";
+			return message.substr(0, len) + "...";
 		}
 
-	 	return message;
+		return message;
 	};
 
 	var	PopoverError = function(tagID, message, placement)
@@ -201,7 +190,7 @@ system_calls = (function()
 		var		original_tag = tagID;
 		var		display_timeout = Math.min(Math.max(30, message.length) * 100, 10000);
 
-		if(placement) {} else { placement = "top"; }
+		if(placement) { /*placement defined*/ } else { placement = "top"; }
 
 		if(typeof(tagID) == "string") 		{ alarm_tag = $("#" + tagID); attr_id = tagID; }
 		else if(typeof(tagID) == "object")	{ alarm_tag = tagID; attr_id = tagID.attr("id"); }
@@ -265,7 +254,7 @@ system_calls = (function()
 		var		original_tag = tagID;
 		var		display_timeout = Math.min(Math.max(30, message.length) * 100, 10000);
 
-		if(html) {} else { html = false; }
+		if(html) { /*message is a html*/ } else { html = false; }
 
 		if(typeof(tagID) == "string") 		{ alarm_tag = $("#" + tagID); }
 		else if(typeof(tagID) == "object")	{ alarm_tag = tagID; }
@@ -322,7 +311,7 @@ system_calls = (function()
 
 		result = result.replace(/–/img, "-");
 		result = result.replace(/•/img, "*");
-		result = result.replace(/\"/img, "&quot;");
+		result = result.replace(/"/img, "&quot;");
 		result = result.replace(/\\/img, "&#92;");
 		result = result.replace(/^\s+/, "");
 		result = result.replace(/\s+$/, "");
@@ -697,68 +686,10 @@ system_calls = (function()
 		return	result;
 	};
 
-	var	GetLocalizedDateFromSecondsHumanFormat = function(seconds)
-	{
-		var		timestampEvent = new Date(GetMsecSinceEpoch());
-		var		timestampNow = new Date();
-		var		diffYears = timestampNow.getFullYear() - timestampEvent.getFullYear();
-		var		diffMonths = timestampNow.getMonth() - timestampEvent.getMonth();
-		var		diffDays = timestampNow.getDate() - timestampEvent.getDate();
-		var		diffHours = timestampNow.getHours() - timestampEvent.getHours();
-		var		diffMins = timestampNow.getMinutes() - timestampEvent.getMinutes();
-		var		months;
-
-		var		result = "";
-
-		if((diffYears > 1) || ((diffYears == 1) && (diffMonths >= 0)))
-		{
-			result = timestampEvent.getDate() + " " + GetSpellingMonthName(timestampEvent.getMonth() + 1) + " " + timestampEvent.getFullYear();
-		}
-		else if((diffYears == 1) && (diffMonths < 0))
-		{
-			months = 12 - (timestampEvent.getMonth() + 1) + (timestampNow.getMonth() + 1);
-
-			if(months == 1) { result = "прошлый месяц"; }
-			else if(months == 2) { result = "позапрошлый месяц"; }
-			else if(months == 6) { result = "пол года назад"; }
-			else { result  = months + " " + GetMonthsSpelling(months) + " назад"; }
-		}
-		else if(diffMonths)
-		{
-			months = (timestampNow.getMonth() + 1) - (timestampEvent.getMonth() + 1);
-
-			if(months == 1) { result = "прошлый месяц"; }
-			else if(months == 2) { result = "позапрошлый месяц"; }
-			else if(months == 6) { result = "пол года назад"; }
-			else { result  = months + " " + GetMonthsSpelling(months) + " назад"; }
-		}
-
-		result = result + " назад";
-
-		return result;
-	};
-
-	// --- returns DST offset in minutes between NOW() and Jan 1
-	var GetDSTOffsetNow = function()
-	{
-		var tsNow = new Date();
-		var tsJan = new Date(tsNow.getFullYear(), 0, 1);
-
-		return tsJan.getTimezoneOffset() - tsNow.getTimezoneOffset();
-	};
-
-
 	// --- private !!! don't use it from outside classes
 	var	GetMsecSinceEpoch = function(seconds)
 	{
 		var		result = ((typeof(seconds) == "string") ? parseInt(seconds) : seconds) * 1000;
-
-		// --- DST fixing
-		// --- Explanation:
-		// --- JavaScript returning timedifference taking DST into consideration
-		// --- MySQL  returning timedifference doesn't taking DST into consideration
-		// --- discrepancy appears between MySQL and JavaScript
-		// result -= GetDSTOffsetNow() * 60 * 1000;
 
 		return 	result;
 	};
@@ -1020,14 +951,14 @@ system_calls = (function()
 										$("#user-requests-ahref").append(badgeSpan);
 									}
 
-									navMenu_userNotification.InitilizeData(data.userNotificationsArray);
+									navMenu_userNotification.InitializeData(data.userNotificationsArray);
 									navMenu_userNotification.BuildUserNotificationList();
 
 									if(data.userNotificationsArray.length > 0)
 									{
+										// --- user notifications exists
 									}
 
-									userRequestList = data;
 
 									// window.setTimeout(BuildUserRequestList, 1000);
 								}
@@ -1059,111 +990,12 @@ system_calls = (function()
 		// console.debug('system_calls.GetUserRequestNotifications: end');
 	};
 
-
-	var BuildUserRequestList = function()
-	{
-		var		resultDOM = $();
-		var		userCounter = 0;
-
-		var CutUserName19Symbols = function(userName)
-		{
-		 	if(userName.length > 19)
-		 	{
-		 		return userName.substr(0, 19) + "...";
-		 	}
-
-		 	return userName;
-		};
-
-		userRequestList.friendshipNotificationsArray.forEach(
-			function(item, i, arr)
-			{
-
-				$.getJSON
-				(
-					"/cgi-bin/system.cgi",
-					{ action: "GetUserInfo", userID: item.friendID }
-				)
-				.done(
-					function(result)
-					{
-						var		userInfo = result.userArray[0];
-						var		userSpan = $("<span/>").addClass("RequestUserListSpan");
-						var		buttonSpan = $("<span/>");
-						var		liUser = $("<li/>").addClass("dropdown-menu-li-higher");
-						var		liDivider = $("<li/>").addClass("divider");
-						var		buttonAccept = $("<button>").addClass("btn btn-primary")
-															.append("Принять")
-															.data("action", "confirm");
-						var		buttonReject = $("<button>").addClass("btn btn-default")
-															.append("Отказаться")
-															.data("action", "disconnect");
-						var		canvasAvatar = $("<canvas/>")	.attr("width", "30")
-																.attr("height", "30")
-																.addClass("canvas-big-avatar")
-																.addClass("RequestUserListOverrideCanvasSize");
-
-						// --- update cache with this user
-						userCache.UpdateWithUser(userInfo);
-
-						// --- use the global counter due to getJSON may be returned not in right order
-						// --- firstly for user #2
-						// --- secondly for user #1
-						userCounter++;
-
-						Object.keys(userInfo).forEach(function(itemChild, i, arr) {
-							buttonReject.data(itemChild, userInfo[itemChild]);
-							buttonAccept.data(itemChild, userInfo[itemChild]);
-						});
-
-						buttonReject.on("click", FriendshipButtonClickHandler);
-						buttonAccept.on("click", FriendshipButtonClickHandler);
-
-
-						resultDOM = resultDOM.add(liUser);
-
-						var hrefTemp = $("<a/>").attr("href", "/userprofile/" + userInfo.id)
-												.addClass("RequestUserListHrefLineHeigh")
-												.append(CutUserName19Symbols(userInfo.name + " " + userInfo.nameLast));
-						userSpan.append(canvasAvatar)
-								.append(hrefTemp)
-								.append(buttonSpan);
-						buttonSpan
-								.append(buttonAccept)
-								.append(" ")
-								.append(buttonReject);
-
-						DrawUserAvatar(canvasAvatar[0].getContext("2d"), userInfo.avatar, userInfo.name, userInfo.nameLast);
-
-						liUser.append(userSpan);
-
-						if(userCounter < arr.length)
-						{
-							resultDOM = resultDOM.add(liDivider);
-						}
-
-						if(userCounter == arr.length)
-						{
-							$("#user-requests-ul").empty()
-													.append(resultDOM);
-						}
-
-					}
-				);
-
-
-			}
-		); // --- data.notofocationsArray.forEach()
-	};
-
 	var	ScrollWindowToElementID = function(elementID)
 	{
 		if($(elementID).length)
 		{
 			var	elementOffset 			= $(elementID).position().top;
-			var	elementClientHeight 	= $(elementID)[0].clientHeight;
 			var	windowScrollTop			= $(window).scrollTop();
-			var	windowHeight			= $(window).height();
 
 			console.debug("ScrollWindowToElementID: prevOffset[" + globalScrollPrevOffset + "] == scroll len to elem = " + (elementOffset - windowScrollTop));
 
@@ -1191,7 +1023,10 @@ system_calls = (function()
 	{
 		if($(scrollTo_elementID).length)
 		{
-			if($(highlight_elementID).length) {}
+			if($(highlight_elementID).length) 
+			{
+				// --- hoghlight element that scroll to
+			}
 			else { highlight_elementID = scrollTo_elementID; }
 
 			setTimeout(function() { $(highlight_elementID).addClass("highlight_with_marker"); }, 250);
@@ -1204,7 +1039,7 @@ system_calls = (function()
 	var	GetParamFromURL = function(paramName)
 	{
 		var result = "";
-		var	tmp = new RegExp("[\?&]" + paramName + "=([^&#]*)").exec(window.location.href);
+		var	tmp = new RegExp("[?&]" + paramName + "=([^&#]*)").exec(window.location.href);
 
 		if(tmp && tmp.length) result = tmp[1];
 
@@ -1220,7 +1055,7 @@ system_calls = (function()
 		var		buttonCompany1;
 
 		buttonCompany1 = $("<button/>").data("action", "");
-		Object.keys(companyInfo).forEach(function(itemChild, i, arr) {
+		Object.keys(companyInfo).forEach(function(itemChild) {
 			buttonCompany1.data(itemChild, companyInfo[itemChild]);
 		});
 
@@ -1287,7 +1122,7 @@ system_calls = (function()
 		var		buttonEvent1;
 
 		buttonEvent1 = $("<button/>").data("action", "");
-		Object.keys(eventInfo).forEach(function(itemChild, i, arr) {
+		Object.keys(eventInfo).forEach(function(itemChild) {
 			buttonEvent1.data(itemChild, eventInfo[itemChild]);
 		});
 
@@ -1316,7 +1151,7 @@ system_calls = (function()
 		var		buttonGroup1;
 
 		buttonGroup1 = $("<button/>").data("action", "");
-		Object.keys(groupInfo).forEach(function(itemChild, i, arr) {
+		Object.keys(groupInfo).forEach(function(itemChild) {
 			buttonGroup1.data(itemChild, groupInfo[itemChild]);
 		});
 
@@ -1340,9 +1175,7 @@ system_calls = (function()
 	//            callbackFunc - function called on click event
 	var	BuildCompanySingleBlock = function(item, i, arr, callbackFunc)
 	{
-		var 	divContainer, divRow, divColLogo, tagA3, tagImg3, divInfo, tagA5, spanSMButton, tagCanvas3, tagUl5;
-		var		tagButtonFriend1;
-		var		tagButtonFriend2;
+		var 	divContainer, divRow, divColLogo, tagA3, tagImg3, divInfo, tagA5, spanSMButton, tagCanvas3;
 		var		divRowXSButtons, divColXSButtons;
 
 		divContainer= $("<div/>").addClass("container");
@@ -1366,7 +1199,7 @@ system_calls = (function()
 		divContainer.append(divRow)
 					.append(divRowXSButtons.append(divColXSButtons));
 		divRow 		.append(divColLogo)
-				    .append(divInfo);
+						.append(divInfo);
 		divColLogo	.append(tagA3);
 		tagA3		.append(tagImg3);
 		tagA3		.append(tagCanvas3);
@@ -1385,9 +1218,7 @@ system_calls = (function()
 	//            callbackFunc - function called on click event
 	var	BuildEventSingleBlock = function(item, i, arr, callbackFunc)
 	{
-		var		container, divRow, divColLogo, tagCanvasLink, tagImg3, divInfo, tagA5, spanSMButton, tagCanvas3, tagUl5;
-		var		tagButtonFriend1;
-		var		tagButtonFriend2;
+		var		container, divRow, divColLogo, tagCanvasLink, divInfo, tagA5, spanSMButton, tagCanvas3;
 		var		divRowXSButtons, divColXSButtons;
 
 		container	= $("");
@@ -1414,7 +1245,7 @@ system_calls = (function()
 		container = container	.add(divRow)
 								.add(divRowXSButtons.append(divColXSButtons));
 		divRow 		.append(divColLogo)
-				    .append(divInfo);
+						.append(divInfo);
 		divColLogo	.append(tagCanvasLink);
 		// tagCanvasLink.append(tagImg3);
 
@@ -1450,9 +1281,7 @@ system_calls = (function()
 	//            callbackFunc - function called on click event
 	var	BuildGroupSingleBlock = function(item, i, arr, callbackFunc)
 	{
-		var 	divContainer, divRow, divColLogo, tagA3, tagImg3, divInfo, tagA5, spanSMButton, tagCanvas3, tagUl5;
-		var		tagButtonFriend1;
-		var		tagButtonFriend2;
+		var 	divContainer, divRow, divColLogo, tagA3, tagImg3, divInfo, tagA5, spanSMButton, tagCanvas3;
 		var		divRowXSButtons, divColXSButtons;
 
 		divContainer= $("<div/>").addClass("container");
@@ -1476,7 +1305,7 @@ system_calls = (function()
 		divContainer.append(divRow)
 					.append(divRowXSButtons.append(divColXSButtons));
 		divRow 		.append(divColLogo)
-				    .append(divInfo);
+						.append(divInfo);
 		divColLogo	.append(tagA3);
 		tagA3		.append(tagImg3);
 		tagA3		.append(tagCanvas3);
@@ -1489,7 +1318,7 @@ system_calls = (function()
 		return divContainer;
 	};
 
-	// --- build "frindship" buttons and put them into DOM-model
+	// --- build "friendship" buttons and put them into DOM-model
 	// --- input
 	// ---		friendInfo - info from GetUserListInJSONFormat
 	// ---		housingTag - tag where buttons have to be placed to
@@ -1501,7 +1330,7 @@ system_calls = (function()
 
 			tagButtonFriend1 = $("<button/>").data("action", "");
 			tagButtonFriend2 = $("<button/>").data("action", "");
-			Object.keys(friendInfo).forEach(function(itemChild, i, arr) {
+			Object.keys(friendInfo).forEach(function(itemChild) {
 				tagButtonFriend1.data(itemChild, friendInfo[itemChild]);
 				tagButtonFriend2.data(itemChild, friendInfo[itemChild]);
 			});
@@ -1551,7 +1380,7 @@ system_calls = (function()
 				tagButtonFriend1.addClass("btn btn-primary form-control friendshipButton")
 								.append("Добавить в друзья")
 								.data("action", "requested");
-				console.error("BuildFoundFriendSingleBlock: ERROR: unknown friendship status [" + item.userFriendship + "]");
+				console.error("BuildFoundFriendSingleBlock: ERROR: unknown friendship status [" + friendInfo.userFriendship + "]");
 			}
 
 			tagButtonFriend1.on("click", FriendshipButtonClickHandler);
@@ -1567,7 +1396,7 @@ system_calls = (function()
 
 	}; // --- RenderFriendshipButtons
 
-	var FriendshipButtonClickHandler = function(e)
+	var FriendshipButtonClickHandler = function()
 	{
 		var		handlerButton = $(this);
 
@@ -1636,10 +1465,10 @@ system_calls = (function()
 						{
 							console.debug("AJAX_setFindFriend_FriendshipStatus.done(): " + data.result + " [" + data.description + "]");
 
-							handlerButton.text("Ошибка");
-							handlerButton.removeClass("btn-default")
-										 .removeClass("btn-primary")
-										 .addClass("btn-danger", 300);
+							handlerButton	.text("Ошибка");
+							handlerButton	.removeClass("btn-default")
+											.removeClass("btn-primary")
+											.addClass("btn-danger", 300);
 
 							console.debug("AJAX_setFindFriend_FriendshipStatus.done(): need to notify the Requester");
 						}
@@ -1648,33 +1477,9 @@ system_calls = (function()
 		}
 	};
 
-	// --- private function
-	// --- build "chat" buttons and put them into DOM-model
-	// --- input
-	// ---		friendInfo - info from GetUserListInJSONFormat
-	// ---		housingTag - tag where buttons have to be placed to
-	var RenderChatButton = function(friendInfo, housingTag)
-	{
-		// var		buttonChat = $("<button>").append($("<img>").attr("src", "/images/pages/common/chat.png").addClass("width_18"))
-		var		buttonChat = $("<button>").append($("<span>").addClass("fa fa-comment-o fa-lg width_18"))
-											.addClass("btn btn-primary");
-
-		Object.keys(friendInfo).forEach(function(itemChild, i, arr) {
-			buttonChat.data(itemChild, friendInfo[itemChild]);
-		});
-
-		buttonChat.on("click", function() {
-			window.location.href = "/chat/" + $(this).data("id") + "?rand=" + Math.floor(Math.random() * 1000000000);
-		});
-
-		housingTag.append(buttonChat);
-	};
-
-	var GlobalBuildFoundFriendSingleBlock = function(item, i, arr)
+	var GlobalBuildFoundFriendSingleBlock = function(item)
 	{
 		var 	tagDiv1, tagDiv2, tagDiv3, tagA3, tagImg3, tagDiv4, tagA5, tagSpan5, tagCanvas3, tagCity;
-		var		tagButtonFriend1;
-		var		tagButtonFriend2;
 		var		tagDivButtons;
 
 		tagDiv1 	= $("<div/>").addClass("container");
@@ -1700,7 +1505,7 @@ system_calls = (function()
 		tagDiv1.append(tagDiv2);
 		tagDiv2 .append(tagDiv3)
 				.append(tagDivButtons)
-			    .append(tagDiv4);
+					.append(tagDiv4);
 		tagDiv3.append(tagA3);
 		tagA3.append(tagImg3);
 		tagA3.append(tagCanvas3);
@@ -1725,7 +1530,7 @@ system_calls = (function()
 	var DrawCompanyImage = function(context, imageURL, avatarSize)
 	{
 
-		var x1 = 0, x2 = avatarSize, y1 = 0, y2 = avatarSize, radius = avatarSize / 8;
+		var		x2 = avatarSize, y2 = avatarSize, radius = avatarSize / 8;
 		var		pic = new Image();
 
 		pic.onload = function() {
@@ -1759,7 +1564,7 @@ system_calls = (function()
 		pic.src = imageURL;
 	};
 
-	var RenderCompanyLogo = function(canvas, logoPath, company_name, not_used_param)
+	var RenderCompanyLogo = function(canvas, logoPath, company_name)
 	{
 
 		if((logoPath == "empty") || (logoPath === ""))
@@ -1782,7 +1587,7 @@ system_calls = (function()
 	// --- output: DOMmodel
 	var	RenderRating = function(additionalClass, initValue, callbackFunc)
 	{
-		var		RatingSelectionItem = function(e)
+		var		RatingSelectionItem = function()
 		{
 			var		currTag = $(this);
 			var		currRating = currTag.data("rating");
@@ -1855,8 +1660,6 @@ system_calls = (function()
 	// --- start avatar piece
 	var	DrawCompanyLogoAvatar = function(context, imageURL, avatarSize)
 	{
-
-		var x1 = 0, x2 = avatarSize, y1 = 0, y2 = avatarSize, radius = avatarSize / 8;
 		var		pic = new Image();
 
 		pic.src = imageURL;
@@ -1891,7 +1694,7 @@ system_calls = (function()
 	var DrawPictureAvatar = function(context, imageURL, avatarSize)
 	{
 
-		var x1 = 0, x2 = avatarSize, y1 = 0, y2 = avatarSize, radius = avatarSize / 8;
+		var x2 = avatarSize, y2 = avatarSize, radius = avatarSize / 8;
 		var		pic = new Image();
 
 		pic.src = imageURL;
@@ -2082,7 +1885,7 @@ system_calls = (function()
 		text = text.replace(/https?:\/\/[^\s<]+/g, "");
 		wordsArr = text.match(/[^\s]+/g) || [""];
 
-		wordsArr.forEach(function (item, i, arr) { if(item.length >= lenghtyWord.length) { lenghtyWord = item; lenghtyWordIdx = i; } });
+		wordsArr.forEach(function (item, i) { if(item.length >= lenghtyWord.length) { lenghtyWord = item; lenghtyWordIdx = i; } });
 
 		return wordsArr[lenghtyWordIdx];
 	};
@@ -2208,7 +2011,7 @@ system_calls = (function()
 		return	result;
 	};
 
-	var	Position_InputHandler = function(e)
+	var	Position_InputHandler = function()
 	{
 		var	curr_tag = $(this);
 		var	currentValue = curr_tag.val();
@@ -2232,7 +2035,7 @@ system_calls = (function()
 						console.debug(curr_tag, "Ошибка: " + data.description);
 					}
 				})
-				.fail(function(e)
+				.fail(function()
 				{
 					console.error(curr_tag, "Ошибка ответа сервера");
 				});
@@ -2257,17 +2060,17 @@ system_calls = (function()
 					source: srcData,
 					minLength: 1,
 					select: selectCallback,
-					close: function (event, ui)
+					close: function ()
 					{
 						// console.debug ("CreateAutocompleteWithSelectCallback: close event handler");
 					},
 					create: function () {
 						// console.debug ("CreateAutocompleteWithSelectCallback: _create event handler");
 					},
-					_renderMenu: function (ul, items)  // --- requres plugin only
+					_renderMenu: function (ul, items)  // --- requires plugin only
 					{
 						var	that = this;
-						currentCategory = "";
+						var currentCategory = "";
 						$.each( items, function( index, item ) {
 							var li;
 							if ( item.category != currentCategory ) {
@@ -2326,18 +2129,6 @@ system_calls = (function()
 		return result;
 	};
 
-	var	RemoveCompanyTypeFromSpelling = function(full_name)
-	{
-		var		result = full_name;
-
-		companyTypes.forEach(function(company_type)
-		{
-			result = result.replace(company_type, "");
-		});
-
-		return result;
-	};
-
 	var FillArrayWithNumbers = function(n) 
 	{
         var arr = Array.apply(null, Array(n));
@@ -2370,7 +2161,6 @@ system_calls = (function()
 
 			var		col_company_name1			= $("<div>").addClass("col-xs-2 col-md-1");
 			var		col_company_name2			= $("<div>").addClass("col-xs-9 col-md-10 col-md-offset-1  col-xs-offset-1");
-			var		col_company_desc1			= $("<div>").addClass("col-xs-3 col-md-2");
 			var		col_company_desc2			= $("<div>").addClass("col-xs-9 col-md-10 col-md-offset-1 col-xs-offset-1");
 			var		col_company_weblink1		= $("<div>").addClass("col-xs-3 col-md-2");
 			var		col_company_weblink2		= $("<div>").addClass("col-xs-9 col-md-10");
@@ -2402,18 +2192,16 @@ system_calls = (function()
 													.attr("width", "80")
 													.attr("height", "80")
 													.addClass("canvas-big-logo");
-			var		logo_path					= (company_obj.logo_filename.length ? "/images/companies/" + company_obj.logo_folder + "/" + company_obj.logo_filename : "");
-			var		company_logo				= system_calls.RenderCompanyLogo(logo_canvas[0].getContext("2d"), logo_path, company_obj.name, "fake");
 
 			row_company_bank_address.hide();
 			row_company_ogrn_info.hide();
 			row_company_kpp_info.hide();
 			bank_address_info_button
-				.on("click", function(e) { $("#company_bank_address").show(200); setTimeout(function() {$("#company_bank_address").hide(200);}, 5000); });
+				.on("click", function() { $("#company_bank_address").show(200); setTimeout(function() {$("#company_bank_address").hide(200);}, 5000); });
 			ogrn_info_button
-				.on("click", function(e) { $("#company_ogrn_info_row").show(200); GetOGRNInfo_DOM(company_obj.ogrn, RenderOGRN, $(this)); setTimeout(function() {$("#company_ogrn_info_row").hide(200);}, 5000); });
+				.on("click", function() { $("#company_ogrn_info_row").show(200); GetOGRNInfo_DOM(company_obj.ogrn, RenderOGRN, $(this)); setTimeout(function() {$("#company_ogrn_info_row").hide(200);}, 5000); });
 			kpp_info_button
-				.on("click", function(e) { $("#company_kpp_info_row").show(200); GetKPPInfo_DOM(company_obj.kpp, RenderKPP, $(this)); setTimeout(function() {$("#company_kpp_info_row").hide(200);}, 5000); });
+				.on("click", function() { $("#company_kpp_info_row").show(200); GetKPPInfo_DOM(company_obj.kpp, RenderKPP, $(this)); setTimeout(function() {$("#company_kpp_info_row").hide(200);}, 5000); });
 
 			row_company_name
 				.append(col_company_name1.append(logo_canvas))
@@ -2515,30 +2303,30 @@ system_calls = (function()
 /*
 	var	Exif_FixOrientation = function ($img)
 	{
-	    $img.on('load', function()
-	    {
-	        EXIF.getData($img[0], function()
-	        {
-	            console.log('Exif=', EXIF.getTag(this, "Orientation"));
-	            switch(parseInt(EXIF.getTag(this, "Orientation")))
-	            {
-	                case 2:
-	                    $img.addClass('exif_flip'); break;
-	                case 3:
-	                    $img.addClass('exif_rotate-180'); break;
-	                case 4:
-	                    $img.addClass('exif_flip-and-rotate-180'); break;
-	                case 5:
-	                    $img.addClass('exif_flip-and-rotate-270'); break;
-	                case 6:
-	                    $img.addClass('exif_rotate-90'); break;
-	                case 7:
-	                    $img.addClass('exif_flip-and-rotate-90'); break;
-	                case 8:
-	                    $img.addClass('exif_rotate-270'); break;
-	            }
-	        });
-	    });
+		 $img.on('load', function()
+		 {
+		     EXIF.getData($img[0], function()
+		     {
+		         console.log('Exif=', EXIF.getTag(this, "Orientation"));
+		         switch(parseInt(EXIF.getTag(this, "Orientation")))
+		         {
+		             case 2:
+		                 $img.addClass('exif_flip'); break;
+		             case 3:
+		                 $img.addClass('exif_rotate-180'); break;
+		             case 4:
+		                 $img.addClass('exif_flip-and-rotate-180'); break;
+		             case 5:
+		                 $img.addClass('exif_flip-and-rotate-270'); break;
+		             case 6:
+		                 $img.addClass('exif_rotate-90'); break;
+		             case 7:
+		                 $img.addClass('exif_flip-and-rotate-90'); break;
+		             case 8:
+		                 $img.addClass('exif_rotate-270'); break;
+		         }
+		     });
+		 });
 	};
 */
 	//--- timecard part
@@ -2658,7 +2446,7 @@ system_calls = (function()
 									.addClass("text_align_center padding_sides_5")
 									.addClass((tempDate.getDay() % 6) ? "weekday" : "weekend")
 									.addClass((day_hours == 8) ? "even_report" :
-											  (day_hours  > 8) ? "over_report" : "")
+												(day_hours  > 8) ? "over_report" : "")
 									.append(day_hours || "")
 										);
 
@@ -2739,7 +2527,7 @@ system_calls = (function()
 						.addClass("text_align_center padding_sides_5")
 						.addClass((tempDate.getDay() % 6) ? "weekday" : "weekend")
 						.addClass((day_hours == 8) ? "even_report" :
-								  (day_hours  > 8) ? "over_report" : "")
+									(day_hours  > 8) ? "over_report" : "")
 						.append(day_hours || ""));
 
 
@@ -3005,7 +2793,7 @@ system_calls = (function()
 
 		var		actual_work_hours;
 		var		total_work_hours;
-		var		timecard_start_date, timecard_end_date, now, actual_work_days;
+		var		timecard_start_date, timecard_end_date, actual_work_days;
 		var		temp = [];
 
 		temp = timecard.period_start.split("-");
@@ -3021,6 +2809,7 @@ system_calls = (function()
 			.append("Отработано " + actual_work_hours + " часов / " + actual_work_days + " дней или " + Math.round(actual_work_hours / total_work_hours * 100) + "% рабочего времени");
 		if(strip_br)
 		{
+			// --- don't add caret return
 		}
 		else
 			result.append("<br><br>");
@@ -3033,14 +2822,14 @@ system_calls = (function()
 		var		result = "";
 
 		for (var i = 0; i < expense_line_templates.length; i++) {
-		 	if(expense_line_templates[i].id == template_id)
-		 	{
-		 		result = expense_line_templates[i];
-		 		break;
-		 	}
-		 }
+			if(expense_line_templates[i].id == template_id)
+			{
+				result = expense_line_templates[i];
+				break;
+			}
+		}
 
-		 return result;
+		return result;
 	};
 
 	var	SetExpenseItemDocTagAttributes = function(tag, url_str, file_obj)
@@ -3130,7 +2919,7 @@ system_calls = (function()
 															.append(template_obj.title);
 						var		img_tag = $("<img>")
 															.addClass("width_100percent_100px_cover niceborder cursor_pointer")
-															.on("click", function(e)
+															.on("click", function()
 															{
 																var		currTag = $(this);
 
@@ -3238,7 +3027,6 @@ system_calls = (function()
 	var GetTextedBT_DOM = function(bt_item)
 	{
 		var		result = $();
-		var		total_amount = 0;
 		var		dest_row = $("<div>").addClass("row");
 		var		dest_col = $("<div>").addClass("col-xs-12");
 		var		expense_tag = $();
@@ -3399,195 +3187,6 @@ system_calls = (function()
 		return result;
 	};
 
-	var	GetExistingTemplateLink_DOM = function(link, upload_file_type)
-	{
-		var	result = $();
-
-		if(link.length)
-		{
-			result = $("<a>")
-							.attr("href", "/" + upload_file_type + "/" + link + "?rand=" + Math.random() * 765432345678)
-							.append("текущий фаил");
-
-		}
-
-		return result;
-	};
-
-	var	GetEditableCustomField_DOM = function(custom_field, action, upload_file_type)
-	{
-		var	result = $();
-
-		if((typeof custom_field == "object") && (typeof custom_field.title == "string") && (typeof custom_field.var_name == "string") && (typeof custom_field.value == "string"))
-		{
-			var	row 			= $("<div>").addClass("row");
-			var	col_title 		= $("<div>").addClass("col-xs-4 col-md-2");
-			var	col_value 		= $("<div>").addClass("col-xs-8 col-md-10");
-			var	title_content	= $();
-			var	value_content	= $();
-
-			// --- value part
-			if(custom_field.type == "input")
-			{
-				var	input_field		= $("<input>").addClass("transparent __sow_custom_field_input");
-				var	label_field		= $("<label>");
-
-				input_field
-					.attr("data-id", custom_field.id)
-					.attr("data-sow_id", custom_field.contract_sow_id || custom_field.contract_psow_id)
-					.attr("data-db_value", custom_field.value)
-					.attr("data-var_name", custom_field.var_name)
-					.attr("data-action", action)
-					.val(ConvertHTMLToText(custom_field.value))
-					.on("change", system_calls.UpdateInputFieldOnServer);
-
-				value_content = value_content.add(input_field);
-				value_content = value_content.add(label_field);
-			}
-			else if(custom_field.type == "file")
-			{
-				var	input_file		= $("<input>").addClass("__sow_custom_field_file");
-				var	current_file	= GetExistingTemplateLink_DOM(custom_field.value, upload_file_type);
-
-				input_file
-					.attr("type", "file")
-					.attr("data-id", custom_field.id)
-					.attr("data-sow_id", custom_field.contract_sow_id || custom_field.contract_psow_id)
-					.attr("data-db_value", custom_field.value)
-					.attr("data-var_name", custom_field.var_name)
-					.attr("data-item_type", upload_file_type)
-					.attr("data-action", action)
-					.on("change", SoWFileUploader_ChangeHandler);
-					// .on("change", system_calls.UpdateInputFieldOnServer);
-
-				value_content = value_content.add(input_file);
-
-				value_content = value_content.add(current_file);
-			}
-			else
-			{
-				value_content = $("<span>").append("неизвестный тип");
-				console.error("unknown cutom_field.type(" + custom_field.type + ")");
-			}
-
-
-			// --- title part
-			title_content = title_content.add($("<span>").append(custom_field.title + " "));
-			if(custom_field.description.length)
-			{
-				var		info_button = $("<span>")	.addClass("fa fa-info-circle")
-													.attr("aria-hidden", "true")
-													.on("click", function() { system_calls.PopoverInfo($(this), custom_field.description); });
-				title_content = title_content.add(info_button);
-			}
-
-
-			// --- DOM building part
-			row
-				.append(col_title	.append(title_content))
-				.append(col_value	.append(value_content));
-
-			result = result.add(row);
-		}
-		else
-		{
-			console.error("custom_field object is broken");
-		}
-
-		return result;
-	};
-
-	var	GetEditableCompanyCustomField_DOM = function(custom_field)
-	{
-		return GetEditableCustomField_DOM(custom_field, "AJAX_updateCompanyCustomField", "template_company");
-	};
-
-	var	GetEditableSoWCustomField_DOM = function(custom_field)
-	{
-		return GetEditableCustomField_DOM(custom_field, "AJAX_updateSoWCustomField", "template_sow");
-	};
-
-	var	GetEditablePSoWCustomField_DOM = function(custom_field)
-	{
-		return GetEditableCustomField_DOM(custom_field, "AJAX_updatePSoWCustomField", "template_psow");
-	};
-
-	var	GetEditableCostCenterCustomField_DOM = function(custom_field)
-	{
-		return GetEditableCustomField_DOM(custom_field, "AJAX_updateCostCenterCustomField", "template_costcenter");
-	};
-
-	var	SoWFileUploader_ChangeHandler = function(e)
-	{
-		var		currTag = $(this);
-		if(e.target.files.length)
-		{
-			var		tmpURLObj = URL.createObjectURL(e.target.files[0]);
-			var		target_element_id = currTag.data("target_element_id");
-			var		formData = new FormData();
-
-			formData.append("id", currTag.attr("data-id"));
-			formData.append("type", currTag.attr("data-item_type"));
-			formData.append("cover", e.target.files[0], e.target.files[0].name);
-
-			$.ajax({
-				url: "/cgi-bin/generalimageuploader.cgi",
-				cache: false,
-				contentType: false,
-				processData: false,
-				async: true,
-				data: formData,
-				type: "post",
-				success: function(raw_data) {
-					var		jsonObj = (
-								function(raw)
-								{
-									try
-									{
-										return JSON.parse(raw);
-									}
-									catch(e)
-									{
-										return false;
-									}
-								})(raw_data);
-
-					if(jsonObj)
-					{
-						if((typeof jsonObj[0] != "undefined") && (typeof jsonObj[0].result != "undefined") && (jsonObj[0].result == "success"))
-						{
-							// --- update "current file" link
-							var	new_link = GetExistingTemplateLink_DOM(jsonObj[0].value || jsonObj[0].filename, currTag.attr("data-item_type"));
-							if(currTag.next()) currTag.next().remove();
-							currTag.after(new_link);
-						}
-						else
-						{
-							system_calls.PopoverError(currTag, jsonObj.textStatus);
-						}
-					}
-					else
-					{
-						setTimeout(function() { RecoverOriginalImage(); }, 500);
-						system_calls.PopoverError(currTag, "Ошибка ответа сервера");
-						console.error("ERROR parsing json server response");
-					}
-
-				},
-				error: function(data, textStatus, errorThrown ) {
-					var		jsonObj = JSON.parse(data);
-					setTimeout(function() { RecoverOriginalImage(); }, 500);
-					console.debug("::upload:failHandler:ERROR: " + jsonObj.textStatus);
-				}
-			});
-		}
-		else
-		{
-			// --- "cancel" pressed in image upload window
-		}
-	};
-
-
 	var	BTCollapsible_ClickHandler = function(currTag)
 	{
 		var		bt_id = currTag.data("bt_id");
@@ -3601,13 +3200,13 @@ system_calls = (function()
 			}
 			else
 			{
-				if($(".__controll_button_" + bt_id).first().attr("disabled"))
+				if($(".__control_button_" + bt_id).first().attr("disabled"))
 				{
 					// --- do nothing, because buttons were disabled
 				}
 				else
 				{
-					$(".__controll_button_" + bt_id).button("loading");
+					$(".__control_button_" + bt_id).button("loading");
 					reenable = true;
 				}
 
@@ -3637,18 +3236,18 @@ system_calls = (function()
 							system_calls.PopoverError(currTag.attr("id"), "Ошибка: " + data.description);
 						}
 					})
-					.fail(function(data)
+					.fail(function()
 					{
 						setTimeout(function() {
 							system_calls.PopoverError(currTag.attr("id"), "Ошибка ответа сервера");
 						}, 500);
 					})
-					.always(function(data)
+					.always(function()
 					{
 						if(reenable)
 						{
 							setTimeout(function() {
-								$(".__controll_button_" + bt_id).button("reset");
+								$(".__control_button_" + bt_id).button("reset");
 							}, 150);
 						}
 					});
@@ -3748,7 +3347,7 @@ system_calls = (function()
 
 		result = result.add(title_row);
 
-		sow.bt_expense_templates.forEach(function(expense_template, i)
+		sow.bt_expense_templates.forEach(function(expense_template)
 		{
 			var		expense_name_row = $("<div>").addClass("row highlight_row");
 			var		expense_name_col = $("<div>").addClass("col-xs-12 col-md-3");
@@ -3766,7 +3365,7 @@ system_calls = (function()
 
 			if(typeof bt_expense_assignments != "undefined")
 			{
- 				expense_assignee_obj = GetBTExpenseAssignmentObjByTemplateID(expense_template.id, bt_expense_assignments);
+				expense_assignee_obj = GetBTExpenseAssignmentObjByTemplateID(expense_template.id, bt_expense_assignments);
 				expense_assignee_content = expense_assignee_obj.assignee_user[0].name + " " + expense_assignee_obj.assignee_user[0].nameLast;
 			}
 
@@ -3782,7 +3381,7 @@ system_calls = (function()
 									.append(table_expense_line_header_col3.append("карта"))
 								);
 
-			expense_template.line_templates.forEach(function(expense_line_template, i)
+			expense_template.line_templates.forEach(function(expense_line_template)
 			{
 				var		table_expense_line_row = $("<div>").addClass("row highlight_onhover");
 				var		table_expense_line_col1 = $("<div>").addClass("col-xs-6 col-md-3");
@@ -3878,7 +3477,6 @@ system_calls = (function()
 		var		__GetTagValue = function(__tag)
 		{
 			var	curr_value = "";
-			var	input_tag; 
 
 			if(__tag[0].tagName == "LABEL") 
 			{
@@ -3946,12 +3544,12 @@ system_calls = (function()
 								system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 							}
 						})
-						.fail(function(e)
+						.fail(function()
 						{
 							__Revert_To_Prev_Value();
 							system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
 						})
-						.always(function(e)
+						.always(function()
 						{
 							curr_tag.removeAttr("disabled");
 						});
@@ -3973,7 +3571,7 @@ system_calls = (function()
 	// --- input: kpp
 	//            callback - function(html_formatted_text)
 	//            curr_tag - error message anchor
-	var	GetOGRNInfo_DOM = function(ogrn_input, callback)
+	var	GetOGRNInfo_DOM = function(ogrn_input, callback, curr_tag)
 	{
 		var	ogrn_text = "";
 		var	GetOGRNParsingText = function(ogrn, region_name)
@@ -3981,13 +3579,11 @@ system_calls = (function()
 			var		result = "";
 			var		year;
 			var		crc;
-			var		original_ogrn;
 			var		partial_ogrn;
 
 			if((ogrn.length == 15) && (ogrn[0] == "3") || (ogrn[0] == "4"))
 			{
 				crc = parseInt(ogrn[14]);
-				original_ogrn = parseInt(ogrn);
 				partial_ogrn = parseInt(ogrn.substr(0, 14));
 
 				if((partial_ogrn - Math.floor(partial_ogrn / 13) * 13) == crc)
@@ -4013,7 +3609,6 @@ system_calls = (function()
 			else if((ogrn.length == 13) && (ogrn[0] == "1") || (ogrn[0] == "2"))
 			{
 				crc = parseInt(ogrn[12]);
-				original_ogrn = parseInt(ogrn);
 				partial_ogrn = parseInt(ogrn.substr(0, 12));
 
 				if((partial_ogrn - Math.floor(partial_ogrn / 11) * 11) == crc)
@@ -4067,7 +3662,7 @@ system_calls = (function()
 						system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 					}
 				})
-				.fail(function(e)
+				.fail(function()
 				{
 					system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
 				});
@@ -4151,7 +3746,7 @@ system_calls = (function()
 						system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 					}
 				})
-				.fail(function(e)
+				.fail(function()
 				{
 					system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
 				});
@@ -4178,7 +3773,10 @@ system_calls = (function()
 
 			result += "Адрес: " + bank.geo_zip_id[0].zip + ", ";
 			result += bank.geo_zip_id[0].locality.region.country.title + " ";
-			if(bank.geo_zip_id[0].locality.region.title.toLowerCase() == bank.geo_zip_id[0].locality.title.toLowerCase()) {}
+			if(bank.geo_zip_id[0].locality.region.title.toLowerCase() == bank.geo_zip_id[0].locality.title.toLowerCase()) 
+			{
+				// --- region is the same as locality (for ex: Moscow / Moscow)
+			}
 			else { result += bank.geo_zip_id[0].locality.region.title + " "; }
 			result += bank.geo_zip_id[0].locality.title + ", ";
 			result += bank.address;
@@ -4270,12 +3868,10 @@ system_calls = (function()
 	{
 		sow_list.sort(function(a, b)
 		{
-			var		arrA = a.end_date.split(/\-/);
-			var		arrB = b.end_date.split(/\-/);
+			var		arrA = a.end_date.split(/-/);
+			var		arrB = b.end_date.split(/-/);
 			var 	timeA, timeB;
 			var		result = 0;
-			var		statusA = a.status;
-			var		statusB = b.status;
 
 			timeA = new Date(parseInt(arrA[0]), parseInt(arrA[1]) - 1, parseInt(arrA[2]));
 			timeB = new Date(parseInt(arrB[0]), parseInt(arrB[1]) - 1, parseInt(arrB[2]));
@@ -4366,7 +3962,7 @@ system_calls = (function()
 		return result;
 	};
 
-	var	GetAgreemntArchiveLinkFromSoWObj_DOM = function(sow)
+	var	GetAgreementArchiveLinkFromSoWObj_DOM = function(sow)
 	{
 		// var	result = $("<a>").attr("href", "/agreements_sow/" + sow.agreement_filename + "&rand=" + Math.random() * 87346865893);
 		var	result = $("<a>").attr("href", "/agreements_sow/" + sow.agreement_filename + "?rand=" + Math.random() * 87346865893);
@@ -4417,7 +4013,7 @@ system_calls = (function()
 						.attr("data-html", "true")
 						.attr("data-placement", "top")
 						.attr("title", "закончатся в течение 30 дней")
-						.on("click", function(e) { window.location.href = "/cgi-bin/" + type + ".cgi?action=" + type + "_sow_list_template&rand=" + Math.random() * 35987654678923; });
+						.on("click", function() { window.location.href = "/cgi-bin/" + type + ".cgi?action=" + type + "_sow_list_template&rand=" + Math.random() * 35987654678923; });
 
 		timecard_counter_dom.tooltip({ animation: "animated bounceIn"});
 
@@ -4429,7 +4025,7 @@ system_calls = (function()
 						.attr("data-html", "true")
 						.attr("data-placement", "top")
 						.attr("title", "закончатся от 30 до 60 дней")
-						.on("click", function(e) { window.location.href = "/cgi-bin/" + type + ".cgi?action=" + type + "_sow_list_template&rand=" + Math.random() * 35987654678923; });
+						.on("click", function() { window.location.href = "/cgi-bin/" + type + ".cgi?action=" + type + "_sow_list_template&rand=" + Math.random() * 35987654678923; });
 
 		sow_counter_dom.tooltip({ animation: "animated bounceIn"});
 
@@ -4455,7 +4051,7 @@ system_calls = (function()
 
 		if(temp.length == 3)
 		{
-			var		__date_to_check = new Date(parseInt(temp[0]), parseInt(temp[1]) - 1, parseInt(temp[2]));
+			__date_to_check = new Date(parseInt(temp[0]), parseInt(temp[1]) - 1, parseInt(temp[2]));
 
 			if((__date_to_check >= month_ago_date))
 			{
@@ -4629,10 +4225,6 @@ system_calls = (function()
 		RoundedTwoDigitDiv: RoundedTwoDigitDiv,
 		RoundedTwoDigitSum: RoundedTwoDigitSum,
 		GetSoWCustomFieldObject: GetSoWCustomFieldObject,
-		GetEditableCompanyCustomField_DOM: GetEditableCompanyCustomField_DOM,
-		GetEditableSoWCustomField_DOM: GetEditableSoWCustomField_DOM,
-		GetEditablePSoWCustomField_DOM: GetEditablePSoWCustomField_DOM,
-		GetEditableCostCenterCustomField_DOM: GetEditableCostCenterCustomField_DOM,
 		shouldIActOnObject: shouldIActOnObject,
 		GetSumRublesFromBT: GetSumRublesFromBT,
 		GetBTDurationInDays: GetBTDurationInDays,
@@ -4653,11 +4245,10 @@ system_calls = (function()
 		SortSoWList: SortSoWList,
 		GetSoWBadge_DOM: GetSoWBadge_DOM,
 		GetLinkFromCompanyObj_DOM: GetLinkFromCompanyObj_DOM,
-		GetAgreemntArchiveLinkFromSoWObj_DOM: GetAgreemntArchiveLinkFromSoWObj_DOM,
+		GetAgreementArchiveLinkFromSoWObj_DOM: GetAgreementArchiveLinkFromSoWObj_DOM,
 		GetLinkFromSoWObj_DOM: GetLinkFromSoWObj_DOM,
 		willSoWExpire: willSoWExpire,
 		RenderSoWExpiration_DashboardApplet_DOM: RenderSoWExpiration_DashboardApplet_DOM,
-		SoWFileUploader_ChangeHandler: SoWFileUploader_ChangeHandler,
 		SetExpenseItemDocTagAttributes: SetExpenseItemDocTagAttributes,
 		isDateInFutureOrMonthAgo: isDateInFutureOrMonthAgo,
 		GetSOWSelectBox: GetSOWSelectBox,
@@ -4673,7 +4264,7 @@ system_calls = (function()
 var userCache = (function()
 {
 	"use strict";
-	var		cache = []; // --- main sotage
+	var		cache = []; // --- main storage
 	var		userCacheFutureUpdateArr = []; // --- used for update userCache object with new users
 	var		callbackRunAfterUpdateArr = [];
 	var		runLock = false; // --- semaphore for racing conditions
@@ -4682,7 +4273,7 @@ var userCache = (function()
 	{
 		var		updatedFlag = false;
 
-		cache.forEach(function(item, i, arr)
+		cache.forEach(function(item, i)
 			{
 				if(cache[i].id == userObj.id)
 				{
@@ -4698,7 +4289,7 @@ var userCache = (function()
 	{
 		var		result = {};
 
-		cache.forEach(function(item, i, arr)
+		cache.forEach(function(item)
 			{
 				if(item.id == userID)
 				{
@@ -4713,7 +4304,7 @@ var userCache = (function()
 	{
 		var		result = false;
 
-		cache.forEach(function(item, i, arr)
+		cache.forEach(function(item)
 			{
 				if(item.id == userID)
 				{
@@ -4734,7 +4325,7 @@ var userCache = (function()
 		var		updateFlag = true;
 
 		// --- add callback function just in case userscache not empty
-		// --- otherwise there is no value to runn callback without any changes
+		// --- otherwise there is no value to run callback without any changes
 		if(userCacheFutureUpdateArr.length)
 		{
 			callbackRunAfterUpdateArr.forEach(function(item)
@@ -4765,12 +4356,12 @@ var userCache = (function()
 						{
 							if((result.session == "true") && (result.user == "true") && (result.type == "UserInfo"))
 							{
-								result.userArray.forEach(function(item, i, arr)
+								result.userArray.forEach(function(item)
 								{
 									UpdateWithUser(item);
 								});
 
-								callbackRunAfterUpdateArr.forEach(function(item, i, arr)
+								callbackRunAfterUpdateArr.forEach(function(item)
 								{
 									item();
 								});
@@ -4783,7 +4374,7 @@ var userCache = (function()
 			}
 			else
 			{
-				callbackRunAfterUpdateArr.forEach(function(item, i, arr)
+				callbackRunAfterUpdateArr.forEach(function(item)
 				{
 					item();
 				});
@@ -4824,7 +4415,7 @@ var DrawUserAvatar = function(canvas, avatarPath, userName, userNameLast)
 // --- company log - fit into quad with longest side (no crop)
 // --- INPUT:
 //            usually userNameLast = ""
-var DrawCompanyAvatar = function(canvas, avatarPath, company_name, userNameLast)
+var DrawCompanyAvatar = function(canvas, avatarPath, company_name)
 {
 	"use strict";
 
@@ -4851,7 +4442,7 @@ navMenu_search = (function()
 		var	selectedID = ui.item.id;
 		var selectedLabel = ui.item.label;
 
-		console.debug("navMenu_search.AutocompleteSelectHandler: start. (seletedID=" + selectedID + ", selectedLabel=" + selectedLabel + ")");
+		console.debug("navMenu_search.AutocompleteSelectHandler: start. (selectedID=" + selectedID + ", selectedLabel=" + selectedLabel + ")");
 
 		window.location.href = "/userprofile/" + selectedID;
 
@@ -4870,7 +4461,7 @@ navMenu_search = (function()
 				{action:"JSON_getFindFriendsListAutocomplete", lookForKey:inputValue})
 				.done(function(data) {
 						AutocompleteList = [];
-						data.forEach(function(item, i, arr)
+						data.forEach(function(item)
 							{
 								AutocompleteList.push({id:item.id , label:item.name + " " + item.nameLast + " " + item.currentCity});
 							});
@@ -4880,29 +4471,29 @@ navMenu_search = (function()
 							delay : 300,
 							source: AutocompleteList,
 							select: AutocompleteSelectHandler,
-							change: function (event, ui) {
+							change: function () {
 								console.debug ("navMenu_search.OnInputHandler autocomplete.change: change event handler");
 							},
-							close: function (event, ui)
+							close: function ()
 							{
 								console.debug ("navMenu_search.OnInputHandler autocomplete.close: close event handler");
 							},
 							create: function () {
 								console.debug ("navMenu_search.OnInputHandler autocomplete.create: _create event handler");
 							},
-							_renderMenu: function (ul, items)  // --- requres plugin only
+							_renderMenu: function (ul, items)  // --- requires plugin only
 							{
 								var	that = this;
 								var currentCategory = "";
 								$.each( items, function( index, item ) {
 									var li;
-								    if ( item.category != currentCategory ) {
-								    	ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
-								        currentCategory = item.category;
-								    }
+										if ( item.category != currentCategory ) {
+											ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+											currentCategory = item.category;
+										}
 									li = that._renderItemData( ul, item );
 									if ( item.category ) {
-									    li.attr( "aria-label", item.category + " : " + item.label + item.login );
+											li.attr( "aria-label", item.category + " : " + item.label + item.login );
 									} // --- getJSON.done() autocomplete.renderMenu foreach() if(item.category)
 								}); // --- getJSON.done() autocomplete.renderMenu foreach()
 							} // --- getJSON.done() autocomplete.renderMenu
@@ -4939,7 +4530,7 @@ navMenu_search = (function()
 		console.debug("navMenu_search.OnKeyupHandler: end");
 	};
 
-	var OnSubmitClickHandler = function(event)
+	var OnSubmitClickHandler = function()
 	{
 		var		searchText = $("#navMenuSearchText").val();
 
@@ -4969,17 +4560,11 @@ navMenu_chat = (function()
 {
 	"use strict";
 
-	var	chatUserList;
 	var	userArray = [];
 	var	unreadMessagesArray = [];
 
 	var	UnreadMessageButtonClickHandler = function()
 	{
-	};
-
-	var	GetUserInfoByID = function(messageID)
-	{
-
 	};
 
 	var CutLongMultilineMessages = function(message)
@@ -4988,16 +4573,16 @@ navMenu_chat = (function()
 		var		cutMessage = [];
 
 		lineList = message;
-		lineList = lineList.replace(/\&ishort\;/g, "й");
-		lineList = lineList.replace(/\&euml\;/g, "ё");
-		lineList = lineList.replace(/\&zsimple\;/g, "з");
-		lineList = lineList.replace(/\&Ishort\;/g, "Й");
-		lineList = lineList.replace(/\&Euml\;/g, "Ё");
-		lineList = lineList.replace(/\&Zsimple\;/g, "З");
-		lineList = lineList.replace(/\&Norder;\;/g, "№");
+		lineList = lineList.replace(/&ishort;/g, "й");
+		lineList = lineList.replace(/&euml;/g, "ё");
+		lineList = lineList.replace(/&zsimple;/g, "з");
+		lineList = lineList.replace(/&Ishort;/g, "Й");
+		lineList = lineList.replace(/&Euml;/g, "Ё");
+		lineList = lineList.replace(/&Zsimple;/g, "З");
+		lineList = lineList.replace(/&Norder;;/g, "№");
 		lineList = lineList.replace(/<br>/g, "\n").replace(/\r/g, "").split("\n");
 
-		lineList.forEach(function(item, i, arr)
+		lineList.forEach(function(item, i)
 			{
 				if(i < 3)
 				{
@@ -5030,7 +4615,7 @@ navMenu_chat = (function()
 				{
 
 					var		messageInfo = item;
-					var		userInfo = jQuery.grep(userArray, function(n, i) { return (n.id == messageInfo.fromID); });
+					var		userInfo = jQuery.grep(userArray, function(n) { return (n.id == messageInfo.fromID); });
 							userInfo = userInfo[0];
 					var		userSpan = $("<div/>").addClass("UnreadChatListSpan");
 					var		buttonSpan = $("<span/>").addClass("UnreadChatListButtonSpan");
@@ -5079,7 +4664,7 @@ navMenu_chat = (function()
 
 					messageCounter++;
 
-					Object.keys(messageInfo).forEach(function(itemChild, i, arr) {
+					Object.keys(messageInfo).forEach(function(itemChild) {
 						buttonClose.data(itemChild, messageInfo[itemChild]);
 						buttonReply.data(itemChild, messageInfo[itemChild]);
 					});
@@ -5167,8 +4752,6 @@ navMenu_chat = (function()
 									$("#user-chat-ahref .badge").remove();
 									$("#user-chat-ahref").append(badgeSpan);
 
-									chatUserList = data;
-
 									BuildUnreadMessageList();
 								}
 								else
@@ -5224,11 +4807,11 @@ navMenu_userNotification = (function()
 
 	var		userNotificationsArray = []; // --- storing all notifications
 
-	var	InitilizeData = function (data)
+	var	InitializeData = function (data)
 	{
 		userNotificationsArray = data;
 
-		userNotificationsArray.forEach(function(item, i, arr)
+		userNotificationsArray.forEach(function(item, i)
 		{
 			if(((item.notificationTypeID == "67") || (item.notificationTypeID == "68") || (item.notificationTypeID == "69") || (item.notificationTypeID == "70")) && (item.notificationEvent[0].isBlocked == "Y"))
 			{
@@ -5237,11 +4820,6 @@ navMenu_userNotification = (function()
 			}
 		});
 	};
-
-	var	DeleteButtonClickHandler = function()
-	{
-	};
-
 
 	var	ReplaceUserIDTagsToUserName = function(src)
 	{
@@ -5269,9 +4847,9 @@ navMenu_userNotification = (function()
 				});
 		}
 
-		Object.keys(userArray).forEach(function(item)
+		Object.keys(userArray).forEach(function()
 		{
-			function convert(str, match, offset, s)
+			function convert(str, match)
 			{
 				return "<i>" + userArray[match] + "</i>";
 			}
@@ -5338,6 +4916,7 @@ navMenu_userNotification = (function()
 				{
 					if(notificationCounter < 6)
 					{
+						var		avatarLink, hrefTemp;
 
 						var		notificationInfo = item;
 						var		userSpan = $("<div/>").addClass("UnreadChatListSpan");
@@ -5365,6 +4944,7 @@ navMenu_userNotification = (function()
 																					{
 																						if(data.result == "success")
 																						{
+																							// --- good2go
 																						}
 																						else
 																						{
@@ -5372,7 +4952,7 @@ navMenu_userNotification = (function()
 																						}
 																					});
 
-																	userNotificationsArray.forEach(function(item2, i2, arr2)
+																	userNotificationsArray.forEach(function(item2, i2)
 																		{
 																			if(userNotificationsArray[i2].notificationID == item.notificationID)
 																			{
@@ -5400,7 +4980,7 @@ navMenu_userNotification = (function()
 						{
 								var		notificationBody = "";
 
-								Object.keys(notificationInfo).forEach(function(itemChild, i, arr) {
+								Object.keys(notificationInfo).forEach(function(itemChild) {
 									buttonClose.data(itemChild, notificationInfo[itemChild]);
 									buttonReply.data(itemChild, notificationInfo[itemChild]);
 								});
@@ -5410,8 +4990,8 @@ navMenu_userNotification = (function()
 
 								if((typeof item.notificationFriendUserID != "undefined") || (typeof item.notificationFriendUserNameLast != "undefined") || (typeof item.notificationFriendUserNameLast != "undefined"))
 								{
-									var avatarLink = "/userprofile/" + item.notificationFriendUserID + "?rand=" + system_calls.GetUUID();
-									var hrefTemp = $("<a>").attr("href", avatarLink)
+									avatarLink = "/userprofile/" + item.notificationFriendUserID + "?rand=" + system_calls.GetUUID();
+									hrefTemp = $("<a>").attr("href", avatarLink)
 											.addClass("UnreadChatListHrefLineHeigh")
 											.append(system_calls.CutLongMessages(item.notificationFriendUserName + " " + item.notificationFriendUserNameLast));
 
@@ -5438,8 +5018,8 @@ navMenu_userNotification = (function()
 								}
 								else if((typeof item.notificationFromCompany != "undefined") && (typeof item.notificationFromCompany[0].id != "undefined"))
 								{
-									var	avatarLink = "/companyprofile/" + item.notificationFromCompany[0].id + "?rand=" + system_calls.GetUUID();
-									var hrefTemp = $("<a>").attr("href", avatarLink)
+									avatarLink = "/companyprofile/" + item.notificationFromCompany[0].id + "?rand=" + system_calls.GetUUID();
+									hrefTemp = $("<a>").attr("href", avatarLink)
 											.addClass("UnreadChatListHrefLineHeigh")
 											.append(system_calls.CutLongMessages(item.notificationFromCompany[0].name));
 
@@ -5535,16 +5115,16 @@ navMenu_userNotification = (function()
 		var		cutMessage = [];
 
 		lineList = message;
-		lineList = lineList.replace(/\&ishort\;/g, "й");
-		lineList = lineList.replace(/\&euml\;/g, "ё");
-		lineList = lineList.replace(/\&zsimple\;/g, "з");
-		lineList = lineList.replace(/\&Ishort\;/g, "Й");
-		lineList = lineList.replace(/\&Euml\;/g, "Ё");
-		lineList = lineList.replace(/\&Zsimple\;/g, "З");
-		lineList = lineList.replace(/\&Norder;\;/g, "№");
+		lineList = lineList.replace(/&ishort;/g, "й");
+		lineList = lineList.replace(/&euml;/g, "ё");
+		lineList = lineList.replace(/&zsimple;/g, "з");
+		lineList = lineList.replace(/&Ishort;/g, "Й");
+		lineList = lineList.replace(/&Euml;/g, "Ё");
+		lineList = lineList.replace(/&Zsimple;/g, "З");
+		lineList = lineList.replace(/&Norder;;/g, "№");
 		lineList = lineList.replace(/<br>/g, "\n").replace(/\r/g, "").split("\n");
 
-		lineList.forEach(function(item, i, arr)
+		lineList.forEach(function(item, i)
 			{
 				if(i < 3)
 				{
@@ -5562,227 +5142,13 @@ navMenu_userNotification = (function()
 
 
 	return {
-		InitilizeData: InitilizeData,
+		InitializeData: InitializeData,
 		BuildUserNotificationList: BuildUserNotificationList,
 		GetAdditionalTitle: GetAdditionalTitle
 	};
 })();
 
-CustomersProjectsTasks_Select = function (suffix, task_list)
-{
-	"use strict";
-
-    var	CONST_CHOOSE_CUSTOMER = "выберите заказчика";
-    var	CONST_CHOOSE_PROJECT = "выберите проект";
-    var	CONST_CHOOSE_TASK = "выберите задачу";
-
-	var	task_list_global = task_list;
-	var	row_random_id = suffix;
-
-	var	Init = function()
-	{
-		$("select.customer[data-random=\"" + row_random_id + "\"]")	.on("change", Select_Customer_ChangeHandler);
-		$("select.project[data-random=\"" + row_random_id + "\"]")	.on("change", Select_Project_ChangeHandler);
-		$("select.task[data-random=\"" + row_random_id + "\"]")		.on("change", Select_Task_ChangeHandler);
-	};
-
-	var	SetGlobalData = function(data)
-	{
-		task_list_global = data;
-	};
-
-	var	GetCustomerIDByProjectID = function(activeProjectID)
-	{
-		var		result = "0";
-
-		for(var i = 0; (i < task_list_global.length) && (result == "0"); ++i)
-		{
-			for(var j = 0; (j < task_list_global[i].projects.length) && (result == "0"); ++j)
-			{
-				if(task_list_global[i].projects[j].id == activeProjectID) result = task_list_global[i].projects[j].customers[0].id;
-			}
-		}
-
-		return result;
-	};
-
-	var	GetProjectIDByTaskID = function(activeTaskID)
-	{
-		var 	result = "0";
-
-		for(var i = 0; (i < task_list_global.length) && (result == "0"); ++i)
-		{
-			if(task_list_global[i].id == activeTaskID) result = task_list_global[i].projects[0].id;
-		}
-
-		return result;
-	};
-
-	var	GetCustomerList_DOM = function(activeCustomerID, activeProjectID, activeTaskID)
-	{
-		var	result = $();
-
-		result = result.add($("<option>").append(CONST_CHOOSE_CUSTOMER));
-
-		task_list_global.forEach(function(task)
-		{
-			task.projects.forEach(function(project)
-			{
-					project.customers.forEach(function(customer)
-					{
-						var		customerOption = $("<option>")	.append(customer.title)
-																.attr("data-id", customer.id);
-
-						if(system_calls.isIDInTheJQueryList(customer.id, result))
-						{}
-						else
-						{
-							if((task.id == activeTaskID) || (project.id == activeProjectID) || (customer.id == activeCustomerID))
-								customerOption.attr("selected", "");
-							result = result.add(customerOption);
-						}
-					});
-			});
-		});
-
-		return result;
-	};
-
-	var	GetProjectList_DOM = function(activeCustomerID, activeProjectID, activeTaskID)
-	{
-		var	result = $();
-
-		result = result.add($("<option>").append(CONST_CHOOSE_PROJECT));
-
-		task_list_global.forEach(function(task)
-		{
-				// --- task and timecard overlaps
-
-				task.projects.forEach(function(project)
-				{
-					var		isDisplayed = false;
-					var		projectOption = $("<option>")	.append(project.title)
-															.attr("data-id", project.id);
-
-					project.customers.forEach(function(customer)
-					{
-						if((customer.id == activeCustomerID) || (activeCustomerID == "0")) isDisplayed = true;
-					});
-
-					if(isDisplayed)
-					{
-						if(system_calls.isIDInTheJQueryList(project.id, result))
-						{}
-						else
-						{
-							if((task.id == activeTaskID) || (project.id == activeProjectID)) projectOption.attr("selected", "");
-							result = result.add(projectOption);
-						}
-					}
-				});
-		});
-
-		return result;
-	};
-
-	var	GetTaskList_DOM = function(activeCustomerID, activeProjectID, activeTaskID)
-	{
-		var	result = $();
-
-		result = result.add($("<option>").append(CONST_CHOOSE_TASK));
-
-		task_list_global.forEach(function(task)
-		{
-			var		isDisplayed = true;
-			var		taskOption = $("<option>")	.append(task.title)
-												.attr("data-id", task.id);
-
-			{
-				// --- task and timecard overlaps
-				task.projects.forEach(function(project)
-				{
-
-					project.customers.forEach(function(customer)
-					{
-						if((customer.id == activeCustomerID) || (activeCustomerID == "0")) isDisplayed &= true;
-						else isDisplayed &= false;
-					});
-
-					if((project.id == activeProjectID) || (activeProjectID == "0")) isDisplayed &= true;
-					else isDisplayed &= false;
-				});
-			}
-
-			if(isDisplayed)
-			{
-				if(system_calls.isIDInTheJQueryList(task.id, result)) {}
-				else
-				{
-					if(task.id == activeTaskID) taskOption.attr("selected", "");
-					result = result.add(taskOption);
-				}
-			}
-		});
-
-		return result;
-	};
-
-
-	var	Select_Customer_ChangeHandler = function(e)
-	{
-		var		row_random_id = $(this).data("random");
-		var		custSelectBox = $("select.customer[data-random=\"" + row_random_id + "\"]");
-		var		projSelectBox = $("select.project[data-random=\"" + row_random_id + "\"]");
-		var		taskSelectBox = $("select.task[data-random=\"" + row_random_id + "\"]");
-		var		custID = $("select.customer[data-random=\"" + row_random_id + "\"] option:selected").data("id") || "0";
-
-		custSelectBox.empty().append(GetCustomerList_DOM(custID, "0", "0"));
-		projSelectBox.empty().append(GetProjectList_DOM(custID, "0", "0"));
-		taskSelectBox.empty().append(GetTaskList_DOM(custID, "0", "0"));
-
-	};
-
-	var	Select_Project_ChangeHandler = function(e)
-	{
-		var		row_random_id = $(this).data("random");
-		var		custSelectBox = $("select.customer[data-random=\"" + row_random_id + "\"]");
-		var		projSelectBox = $("select.project[data-random=\"" + row_random_id + "\"]");
-		var		taskSelectBox = $("select.task[data-random=\"" + row_random_id + "\"]");
-		var		projectID = $("select.project[data-random=\"" + row_random_id + "\"] option:selected").data("id") || "0";
-		var		customerID = GetCustomerIDByProjectID(projectID);
-
-		custSelectBox.empty().append(GetCustomerList_DOM(customerID, projectID, "0"));
-		projSelectBox.empty().append(GetProjectList_DOM(customerID, projectID, "0"));
-		taskSelectBox.empty().append(GetTaskList_DOM(customerID, projectID, "0"));
-	};
-
-	var	Select_Task_ChangeHandler = function(e)
-	{
-		var		row_random_id = $(this).data("random");
-		var		custSelectBox = $("select.customer[data-random=\"" + row_random_id + "\"]");
-		var		projSelectBox = $("select.project[data-random=\"" + row_random_id + "\"]");
-		var		taskSelectBox = $("select.task[data-random=\"" + row_random_id + "\"]");
-		var		taskID = $("select.task[data-random=\"" + row_random_id + "\"] option:selected").data("id") || "0";
-		var		projectID = GetProjectIDByTaskID(taskID);
-		var		customerID = GetCustomerIDByProjectID(projectID);
-
-		custSelectBox.empty().append(GetCustomerList_DOM(customerID, projectID, taskID));
-		projSelectBox.empty().append(GetProjectList_DOM(customerID, projectID, taskID));
-		taskSelectBox.empty().append(GetTaskList_DOM(customerID, projectID, taskID));
-
-		// UpdateTimeRowEntriesDisableStatus(row_random_id, taskID);
-	};
-
-	return {
-		Init: Init,
-		SetGlobalData: SetGlobalData,
-		GetCustomerList_DOM: GetCustomerList_DOM,
-		GetProjectList_DOM: GetProjectList_DOM,
-		GetTaskList_DOM: GetTaskList_DOM
-	};
-};
-
-system_notifications = (function ()
+var system_notifications = (function ()
 {
 	"use strict";
 
@@ -5808,21 +5174,21 @@ system_notifications = (function ()
 
 						if((currTimestamp - notificationShownTimestamp) > 24 * 3600)
 						{
-							var		notify, prononciation;
+							var		notify, pronunciation;
 
 							localStorage.setItem("notificationShownTimestamp", currTimestamp);
 
-							if(numberOfChatMessages == 1) { prononciation = " новое сообщение"; }
-							if(numberOfChatMessages == 2) { prononciation = " новых сообщения"; }
-							if(numberOfChatMessages == 3) { prononciation = " новых сообщения"; }
-							if(numberOfChatMessages == 4) { prononciation = " новых сообщения"; }
-							if(numberOfChatMessages >= 5) { prononciation = " новых сообщений"; }
-							if(((numberOfChatMessages % 10) == 1) && (numberOfChatMessages > 19)) { prononciation = " новое сообщение"; }
-							if(((numberOfChatMessages % 10) == 2) && (numberOfChatMessages > 19)) { prononciation = " новых сообщения"; }
-							if(((numberOfChatMessages % 10) > 2) && (numberOfChatMessages > 19)) { prononciation = " новых сообщений"; }
-							if(((numberOfChatMessages % 10) > 0) && (numberOfChatMessages > 19)) { prononciation = " новых сообщений"; }
+							if(numberOfChatMessages == 1) { pronunciation = " новое сообщение"; }
+							if(numberOfChatMessages == 2) { pronunciation = " новых сообщения"; }
+							if(numberOfChatMessages == 3) { pronunciation = " новых сообщения"; }
+							if(numberOfChatMessages == 4) { pronunciation = " новых сообщения"; }
+							if(numberOfChatMessages >= 5) { pronunciation = " новых сообщений"; }
+							if(((numberOfChatMessages % 10) == 1) && (numberOfChatMessages > 19)) { pronunciation = " новое сообщение"; }
+							if(((numberOfChatMessages % 10) == 2) && (numberOfChatMessages > 19)) { pronunciation = " новых сообщения"; }
+							if(((numberOfChatMessages % 10) > 2) && (numberOfChatMessages > 19)) { pronunciation = " новых сообщений"; }
+							if(((numberOfChatMessages % 10) > 0) && (numberOfChatMessages > 19)) { pronunciation = " новых сообщений"; }
 
-							notify = new Notification("Вам письмо !", { icon: "/images/pages/chat/chat_notification_" + (Math.floor(Math.random() * 18) + 1) + ".png", body: "Вам прислали " + numberOfChatMessages + prononciation } );
+							notify = new Notification("Вам письмо !", { icon: "/images/pages/chat/chat_notification_" + (Math.floor(Math.random() * 18) + 1) + ".png", body: "Вам прислали " + numberOfChatMessages + pronunciation } );
 							notify.onclick = function() {
 								notify.close();
 								window.location.href = "/chat?rand=" + Math.random()*98765432123456;
@@ -5839,7 +5205,7 @@ system_notifications = (function ()
 				{
 					if (Notification.permission !== "denied")
 					{
-					    Notification.requestPermission();
+							Notification.requestPermission();
 					}
 					else
 					{
@@ -5863,16 +5229,16 @@ system_notifications = (function ()
 	};
 })();
 
-preview_modal = (function ()
+var preview_modal = (function ()
 {
 	var		rotation;
 	var		scaleX, scaleY;
 
 	var	Init = function()
 	{
-		$("#ImagePreviewModal").on("show.bs.modal", function(e)
+		$("#ImagePreviewModal").on("show.bs.modal", function()
 		{
-			var regex = /exif_rotate\-(\d+)/;
+			var regex = /exif_rotate-(\d+)/;
 			var	regex_match = $("#ImagePreviewModal_Img").attr("class").match(regex);
 
 			rotation = 0;
@@ -5950,12 +5316,12 @@ troubleshooting = (function ()
 		var	traceback = "";
 
 		var callback = function(stackframes) {
-		  var stringifiedStack = stackframes.map(function(sf) {
-		    return sf.toString();
-		  }).join("\n");
-		  traceback += stringifiedStack + "\n";
+			var stringifiedStack = stackframes.map(function(sf) {
+				return sf.toString();
+			}).join("\n");
+			traceback += stringifiedStack + "\n";
 
-		  return traceback;
+			return traceback;
 		};
 
 		var errback = function(err) { console.log(err.message); };
@@ -6157,7 +5523,7 @@ $.fn.selectRange = function(start, end) {
 
 $.urlParam = function(name)
 {
-    var results = new RegExp("[\?&]" + name + "=([^&#]*)").exec(window.location.href);
+    var results = new RegExp("[?&]" + name + "=([^&#]*)").exec(window.location.href);
     if (results === null){
        return "";
     }
