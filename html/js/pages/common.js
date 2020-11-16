@@ -1025,7 +1025,7 @@ var system_calls = (function()
 		{
 			if($(highlight_elementID).length) 
 			{
-				// --- hoghlight element that scroll to
+				// --- highlight element that scroll to
 			}
 			else { highlight_elementID = scrollTo_elementID; }
 
