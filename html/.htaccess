@@ -7,7 +7,6 @@ RewriteRule ^password_recovery(.*)$ /cgi-bin/index.cgi?action=password_recovery_
 RewriteRule ^email_change(.*)$ /cgi-bin/account.cgi?action=email_change_template&$1 [QSA]
 RewriteRule ^autologin(.*)$ /cgi-bin/index.cgi?action=autologin$1 [QSA]
 RewriteRule ^login(.*)$ /cgi-bin/index.cgi?action=login$1 [QSA]
-# RewriteRule ^showmain$ /cgi-bin/index.cgi?action=showmain$1 [QSA]		# remove Jun 1
 RewriteRule ^logout(.*)$ /cgi-bin/index.cgi?action=logout$1
 #
 # Deprecated rule
@@ -36,6 +35,7 @@ RewriteRule ^cookie_policy(.*)$ /cgi-bin/index.cgi?action=cookie_policy_wrapper_
 #
 RewriteRule ^doctor_dashboard$ /cgi-bin/doctor.cgi?action=doctor_dashboard [QSA]
 RewriteRule ^initial_wizard$ /cgi-bin/index.cgi?action=initial_wizard [QSA]
+RewriteRule ^helpdesk_dashboard$ /cgi-bin/helpdesk.cgi?action=helpdesk_dashboard_template [QSA]
 
 #
 # profile by id (number)
