@@ -7,12 +7,7 @@ RewriteRule ^password_recovery(.*)$ /cgi-bin/index.cgi?action=password_recovery_
 RewriteRule ^email_change(.*)$ /cgi-bin/account.cgi?action=email_change_template&$1 [QSA]
 RewriteRule ^autologin(.*)$ /cgi-bin/index.cgi?action=autologin$1 [QSA]
 RewriteRule ^login(.*)$ /cgi-bin/index.cgi?action=login$1 [QSA]
-# RewriteRule ^showmain$ /cgi-bin/index.cgi?action=showmain$1 [QSA]		# remove Jun 1
 RewriteRule ^logout(.*)$ /cgi-bin/index.cgi?action=logout$1
-#
-# Deprecated rule
-#
-# RewriteRule ^edit_profile(.*)$ /cgi-bin/index.cgi?action=edit_profile&$1
 
 RewriteRule ^news_feed(.*)$ /cgi-bin/index.cgi?action=news_feed&$1 [QSA]
 RewriteRule ^feed(.*)$ /cgi-bin/index.cgi?action=news_feed&$1
@@ -36,6 +31,12 @@ RewriteRule ^cookie_policy(.*)$ /cgi-bin/index.cgi?action=cookie_policy_wrapper_
 #
 RewriteRule ^doctor_dashboard$ /cgi-bin/doctor.cgi?action=doctor_dashboard [QSA]
 RewriteRule ^initial_wizard$ /cgi-bin/index.cgi?action=initial_wizard [QSA]
+RewriteRule ^helpdesk_dashboard$ /cgi-bin/helpdesk.cgi?action=helpdesk_dashboard_template [QSA]
+
+#
+# Helpdesk actions
+#
+RewriteRule ^helpdesk_edit_profile$ /cgi-bin/index.cgi?action=edit_profile&$1 [QSA]
 
 #
 # profile by id (number)
@@ -62,3 +63,4 @@ RewriteRule ^invoices_cc/(.*)$			https://devimages.infomed-stat.ru/invoices_cc/$
 RewriteRule ^invoices_subc/(.*)$		https://devimages.infomed-stat.ru/invoices_subc/$1		[L,R=301,NC]
 RewriteRule ^smartway_vouchers/(.*)$	https://devimages.infomed-stat.ru/smartway_vouchers/$1	[L,R=301,NC]
 RewriteRule ^template_(.*)$				https://devimages.infomed-stat.ru/templates_$1			[L,R=301,NC]
+RewriteRule ^helpdesk_ticket_attaches/(.*)$		https://devimages.infomed-stat.ru/helpdesk_ticket_attaches/$1       [L,R=301,NC]

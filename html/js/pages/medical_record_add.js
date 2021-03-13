@@ -1,19 +1,13 @@
-var	medical_record_add = medical_record_add || {};
+/*exported medical_record_add*/
+/*globals medical_record_add:off*/
 
 var	medical_record_add = (function()
 {
-	'use strict';
+	"use strict";
 
 	var		DATE_FORMAT_GLOBAL				= "yy-mm-dd";
 
 	var		current_tab_global				= 0;
-	var		submit_obj_global;
-	var		company_arr_global				= [];
-	var		counties_obj_global;
-
-	var		call_stack_global				= [];
-	var		call_stack_pointer_global		= 0;
-
 	var		patient_could_be_created_or_updated_global	= false;
 	var		patient_id_from_url_global		= $.urlParam("patient_id");
 
@@ -27,9 +21,9 @@ var	medical_record_add = (function()
 		BuildStepIndicators(0);
 
 		$("input.___zip_code")		.on("input", UpdateZipCode_InputHandler);
-		$("input.___first_name")	.on("change", CheckPatientExistance_ChangeHandler);
-		$("input.___last_name")		.on("change", CheckPatientExistance_ChangeHandler);
-		$("input.___birthdate")		.on("change", CheckPatientExistance_ChangeHandler);
+		$("input.___first_name")	.on("change", CheckPatientExistence_ChangeHandler);
+		$("input.___last_name")		.on("change", CheckPatientExistence_ChangeHandler);
+		$("input.___birthdate")		.on("change", CheckPatientExistence_ChangeHandler);
 
 		InitPatientID(patient_id_from_url_global);
 	};
@@ -39,7 +33,7 @@ var	medical_record_add = (function()
 		if(patient_id.length)
 		{
 			$.getJSON(
-				'/cgi-bin/doctor.cgi',
+				"/cgi-bin/doctor.cgi",
 				{
 					action:		"AJAX_getMedicalRecords",
 					patient_id:	patient_id,
@@ -55,13 +49,13 @@ var	medical_record_add = (function()
 					}
 					else
 					{
-						system_calls.PopoverError(currTag, "Ошибка: " + data.description);
+						system_calls.PopoverError($("nav").eq(0), "Ошибка: " + data.description);
 					}
 				})
-				.fail(function(data)
+				.fail(function()
 				{
 					setTimeout(function() {
-						system_calls.PopoverError(currTag, "Ошибка ответа сервера");
+						system_calls.PopoverError($("nav").eq(0), "Ошибка ответа сервера");
 					}, 500);
 				});
 		}
@@ -98,13 +92,11 @@ var	medical_record_add = (function()
 
 	var	ResetDataStructureAndGUI = function()
 	{
-		submit_obj_global = {};
+		// --- stub function
 	};
 
 	var	ShowTab = function(tab_id)
 	{
-		var	algorithm = $(".__tab[data-tab_id='" + tab_id + "']").attr("data-algorithm");
-
 		setTimeout(function()
 		{
 			$(".__tab[data-tab_id='" + tab_id + "']").show(200);
@@ -118,7 +110,7 @@ var	medical_record_add = (function()
 		else
 		{
 			$("#navigate_prev").show();
-			HighlighStepIndicator(tab_id);
+			HighlightStepIndicator(tab_id);
 		}
 
 		if($(".__tab[data-tab_id='" + tab_id + "']").attr("data-next_tab_id") == "-1")
@@ -174,9 +166,6 @@ var	medical_record_add = (function()
 	{
 		var	result		= false;
 		var	algorithm	= $(".__tab[data-tab_id='" + tab_id + "']").attr("data-algorithm");
-		var	first_name_tag, last_name_tag, middle_name_tag, company_tin_tag;
-		var	passport_series_tag, passport_number_tag, passport_issue_date_tag, passport_issue_authority_tag;
-		var	i;
 
 		if(algorithm)
 		{
@@ -212,7 +201,7 @@ var	medical_record_add = (function()
 		}
 		else
 		{
-			// --- if algorithm not difined, nothing to check
+			// --- if algorithm not defined, nothing to check
 			result = true;
 		}
 
@@ -221,7 +210,7 @@ var	medical_record_add = (function()
 		return result;
 	};
 
-	var	CheckPatientExistance_ChangeHandler = function(e)
+	var	CheckPatientExistence_ChangeHandler = function()
 	{
 		{
 			let	selectors			= ["input.___first_name", "input.___last_name", "input.___middle_name", "input.___birthdate"];
@@ -240,7 +229,7 @@ var	medical_record_add = (function()
 				birthdate.val().length
 			)
 			{
-				$.getJSON('/cgi-bin/doctor.cgi', 
+				$.getJSON("/cgi-bin/doctor.cgi", 
 				{
 					action: 			"AJAX_checkPatientExistence",
 					___first_name:		first_name_tag.val(),
@@ -260,7 +249,7 @@ var	medical_record_add = (function()
 						system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 					}
 				})
-				.fail(function(data)
+				.fail(function()
 				{
 					setTimeout(function() {
 						system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
@@ -300,7 +289,7 @@ var	medical_record_add = (function()
 		$("#step_indicators .step[data-tab_id=\"" + tab_id + "\"]").addClass("complete");
 	};
 
-	var	HighlighStepIndicator = function(tab_id)
+	var	HighlightStepIndicator = function(tab_id)
 	{
 		$("#step_indicators .step[data-tab_id=\"" + tab_id + "\"]").addClass("active");
 	};
@@ -333,7 +322,7 @@ var	medical_record_add = (function()
 
 		curr_tag.button("loading");
 
-		$.getJSON('/cgi-bin/doctor.cgi', params)
+		$.getJSON("/cgi-bin/doctor.cgi", params)
 		.done(function(data)
 		{
 			if(data.result == "success")
@@ -345,7 +334,7 @@ var	medical_record_add = (function()
 				system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 			}
 		})
-		.fail(function(data)
+		.fail(function()
 		{
 			setTimeout(function() {
 				system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
@@ -367,7 +356,7 @@ var	medical_record_add = (function()
 		if(zip.length == 6)
 		{
 			$.getJSON(
-				'/cgi-bin/ajax_anyrole_1.cgi',
+				"/cgi-bin/ajax_anyrole_1.cgi",
 				{
 					action:"AJAX_getRussianLocalityByZip",
 					zip: zip,
@@ -384,7 +373,7 @@ var	medical_record_add = (function()
 						system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 					}
 				})
-				.fail(function(data)
+				.fail(function()
 				{
 					setTimeout(function() {
 						system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
@@ -440,7 +429,6 @@ var	medical_record_add = (function()
 			if(result.length === 0)
 			{
 				console.error("medical class not found on element " + tag);
-				debugger;
 			}
 		}
 		else
@@ -553,7 +541,7 @@ var	medical_record_add = (function()
 
 		if(tag.prop("tagName") == "SELECT")
 		{
-			if(tag.val().search("Не опр") == 0) {}
+			if(tag.val().search("Не опр") == 0) { /* nothing to do */ }
 			else result = tag.val();
 		}
 		else if((tag.prop("tagName") == "INPUT") && tag.attr("type") && (tag.attr("type") == "checkbox"))
@@ -585,7 +573,7 @@ var	medical_record_add = (function()
 	var	GetTagMedicalObject = function(tag)
 	{
 		let	dom_chain = GetDomParentsChain(tag);
-		let	input_collapse_chain = GetInputCollapseChain(dom_chain)
+		let	input_collapse_chain = GetInputCollapseChain(dom_chain);
 
 		input_collapse_chain.unshift(tag);
 
@@ -622,12 +610,11 @@ var	medical_record_add = (function()
 			}
 		});
 
-		return tag_names
+		return tag_names;
 	};
 
 	var	PlacePatientDataToForm = function(patient_data)
 	{
-		var a = 0;
 		for(const [name, value_const] of Object.entries(patient_data[0]))
 		{
 			if(name.search("___") === 0)

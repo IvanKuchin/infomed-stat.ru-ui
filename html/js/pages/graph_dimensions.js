@@ -1,8 +1,9 @@
-var	graph_dimensions = graph_dimensions || {};
+/* exported graph_dimensions */
+/* globals infomed_stat,Plotly */
 
 var	graph_dimensions = (function()
 {
-	'use strict';
+	"use strict";
 
 	var	data_global;
 
@@ -21,7 +22,7 @@ var	graph_dimensions = (function()
 
 
 		$.getJSON(
-			'/cgi-bin/doctor.cgi',
+			"/cgi-bin/doctor.cgi",
 			{
 				"action":"AJAX_getMedicalRecords",
 			})
@@ -31,14 +32,14 @@ var	graph_dimensions = (function()
 				{
 					data_global = data;
 
-					RenderGrpah(data_global.medical_records);
+					RenderGraph(data_global.medical_records);
 				}
 				else
 				{
 					system_calls.PopoverError(currTag, "Ошибка: " + data.description);
 				}
 			})
-			.fail(function(data)
+			.fail(function()
 			{
 				setTimeout(function() {
 					system_calls.PopoverError(currTag, "Ошибка ответа сервера");
@@ -58,15 +59,15 @@ var	graph_dimensions = (function()
 			{
 				if(name.search("___") === 0) // --- medical record
 				{
-					if(name == "___first_name") {}
-					else if(name == "___middle_name") {}
-					else if(name == "___zip_code") {}
-					else if(name == "___locality") {}
-					else if(name == "___region") {}
-					else if(name == "___birthdate") {}
-					else if(name == "___medical_history_number") {}
-					else if(name == "___phone") {}
-					else if(name == "___op_done___invasion_date") {}
+					if(name == "___first_name") { /* good2go */ }
+					else if(name == "___middle_name") { /* good2go */ }
+					else if(name == "___zip_code") { /* good2go */ }
+					else if(name == "___locality") { /* good2go */ }
+					else if(name == "___region") { /* good2go */ }
+					else if(name == "___birthdate") { /* good2go */ }
+					else if(name == "___medical_history_number") { /* good2go */ }
+					else if(name == "___phone") { /* good2go */ }
+					else if(name == "___op_done___invasion_date") { /* good2go */ }
 					else if(value.length) // --- value has been defined
 					{
 						result[name] = "";
@@ -80,8 +81,6 @@ var	graph_dimensions = (function()
 
 	var	BuildDimensionNames = function(medical_records, dimension_names)
 	{
-		let	result = [];
-
 			for(const [name, value] of Object.entries(dimension_names))
 			{
 				let	obj = 	{
@@ -96,8 +95,6 @@ var	graph_dimensions = (function()
 
 	var	BuildDimensionValues = function(medical_records, dimension_names)
 	{
-		let	result = [];
-
 			for(const [name, value] of Object.entries(dimension_names))
 			{
 				let	val_array = [];
@@ -127,10 +124,10 @@ var	graph_dimensions = (function()
 					// if(name == "___lymph_node_damage___number_lymph_node_damage")
 						// debugger;
 
-					val_array.forEach(function(item, idx)
+					val_array.forEach(function(item)
 						{
 							if(item == "") item = "неизв.";
-							if(values_hash[item]) {}
+							if(values_hash[item]) { /* good2go */ }
 							else values_hash[item] = curr_idx++;
 
 							values.push(values_hash[item]);
@@ -156,16 +153,14 @@ var	graph_dimensions = (function()
 	var	GetGraphSrcData = function(medical_records)
 	{
 		let	result = [{
-						type: 'parcoords',
+						type: "parcoords",
 						line: {
 /*							color: [0, 1],
 							colorscale: [[0, 'red'], [1, 'green']],
 */
-							color: 'green',
+							color: "green",
 						},
 						labelangle: -20,
-
-						    
 						dimensions: [],
 					}];
 
@@ -184,7 +179,7 @@ var	graph_dimensions = (function()
 		return result;
 	};
 
-	var	RenderGrpah = function(medical_records)
+	var	RenderGraph = function(medical_records)
 	{
 		let	data = GetGraphSrcData(medical_records);
 

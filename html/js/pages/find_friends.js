@@ -57,7 +57,7 @@ var find_friends = (function()
 		if(inputValue.length == 3)
 		{
 			$.getJSON(
-				'/cgi-bin/index.cgi',
+				"/cgi-bin/index.cgi",
 				{action:"JSON_getFindFriendsListAutocomplete", lookForKey:inputValue})
 				.done(function(data) {
 						JSON_FindFriendsList_Autocomplete = [];
@@ -81,7 +81,7 @@ var find_friends = (function()
 							create: function () {
 								console.debug ("FindFriendsOnInputHandler autocomplete.create: _create event handler");
 							},
-							_renderMenu: function (ul, items)  // --- requres plugin only
+							_renderMenu: function (ul, items)  // --- requires plugin only
 							{
 								var	that = this;
 								currentCategory = "";
@@ -113,7 +113,7 @@ var find_friends = (function()
 	var	SendRequestAndRefreshList = function(action, lookForKey)
 	{
 
-		$.getJSON('/cgi-bin/index.cgi', {action:action, lookForKey:lookForKey})
+		$.getJSON("/cgi-bin/index.cgi", {action:action, lookForKey:lookForKey})
 			.done(function(data)
 			{
 				JSON_FindFriendsList = data;

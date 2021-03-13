@@ -309,7 +309,7 @@ var	hospitals_list = (function()
 
 	};
 
-	var	GetHospitalAcessList_DOM = function(companies_id)
+	var	GetHospitalAccessList_DOM = function(companies_id)
 	{
 		let		result = $();
 
@@ -337,7 +337,7 @@ var	hospitals_list = (function()
 
 	var	RenderHospitalsAccessList = function(companies_id)
 	{
-		$("#DataSharing .modal-body").empty().append(GetHospitalAcessList_DOM(companies_id));
+		$("#DataSharing .modal-body").empty().append(GetHospitalAccessList_DOM(companies_id));
 	};
 
 

@@ -677,7 +677,7 @@
 
         <div class="row form-group">
           <div class="col-xs-12 col-md-2">Дата выбытия из исследования:</div>
-          <div class="col-xs-6 col-md-2 form-group"><input class="transparent ___study_retirment_date __date_picker" placeholder="Дата выбытия"><label></label></div>
+          <div class="col-xs-6 col-md-2 form-group"><input class="transparent ___study_retirement_date __date_picker" placeholder="Дата выбытия"><label></label></div>
 
           <div class="col-xs-12 col-md-2 col-md-offset-2">Дата смерти:</div>
           <div class="col-xs-6 col-md-2"><input class="transparent ___death_date __date_picker" placeholder="Дата смерти"><label></label></div>

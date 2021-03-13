@@ -1,3 +1,5 @@
+/* exported hospitals_arr, hospitals_obj */
+
 var	hospital_obj = function()
 {
 	'use strict';
