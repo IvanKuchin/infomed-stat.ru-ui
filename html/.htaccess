@@ -56,11 +56,9 @@ RewriteRule ^companyprofile/(.*)$ /cgi-bin/ajax_anyrole_1.cgi?action=view_compan
 #
 # redirect devimages.videos to unencrypted site to reduce https load
 #
-RewriteRule ^images/(.*)$				https://devimages.infomed-stat.ru/images/$1				[L,R=301,NC]
-RewriteRule ^video/(.*)$				https://devimages.infomed-stat.ru/video/$1				[L,R=301,NC]
-RewriteRule ^agreements_sow/(.*)$		https://devimages.infomed-stat.ru/agreements_sow/$1		[L,R=301,NC]
-RewriteRule ^invoices_cc/(.*)$			https://devimages.infomed-stat.ru/invoices_cc/$1		[L,R=301,NC]
-RewriteRule ^invoices_subc/(.*)$		https://devimages.infomed-stat.ru/invoices_subc/$1		[L,R=301,NC]
-RewriteRule ^smartway_vouchers/(.*)$	https://devimages.infomed-stat.ru/smartway_vouchers/$1	[L,R=301,NC]
-RewriteRule ^template_(.*)$				https://devimages.infomed-stat.ru/templates_$1			[L,R=301,NC]
-RewriteRule ^helpdesk_ticket_attaches/(.*)$		https://devimages.infomed-stat.ru/helpdesk_ticket_attaches/$1       [L,R=301,NC]
+RewriteRule ^images/(.*)$				/media/images/$1				[L,R=301,NC]
+RewriteRule ^video/(.*)$				/media/video/$1				[L,R=301,NC]
+RewriteRule ^helpdesk_ticket_attaches/(.*)$		/media/helpdesk_ticket_attaches/$1       [L,R=301,NC]
+#RewriteRule ^images/(.*)$				https://devimages.infomed-stat.ru/images/$1				[L,R=301,NC]
+#RewriteRule ^video/(.*)$				https://devimages.infomed-stat.ru/video/$1				[L,R=301,NC]
+#RewriteRule ^helpdesk_ticket_attaches/(.*)$		https://devimages.infomed-stat.ru/helpdesk_ticket_attaches/$1       [L,R=301,NC]
