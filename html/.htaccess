@@ -54,11 +54,8 @@ RewriteRule ^companyprofile/(.*)$ /cgi-bin/ajax_anyrole_1.cgi?action=view_compan
 # RewriteRule ^invite/(.*)$	/cgi-bin/event.cgi?action=check_initial_action&id=$1 [QSA]
 
 #
-# redirect devimages.videos to unencrypted site to reduce https load
+# redirect images/videos to unencrypted site to reduce https load
 #
 RewriteRule ^images/(.*)$				/media/images/$1				[L,R=301,NC]
 RewriteRule ^video/(.*)$				/media/video/$1				[L,R=301,NC]
 RewriteRule ^helpdesk_ticket_attaches/(.*)$		/media/helpdesk_ticket_attaches/$1       [L,R=301,NC]
-#RewriteRule ^images/(.*)$				https://devimages.infomed-stat.ru/images/$1				[L,R=301,NC]
-#RewriteRule ^video/(.*)$				https://devimages.infomed-stat.ru/video/$1				[L,R=301,NC]
-#RewriteRule ^helpdesk_ticket_attaches/(.*)$		https://devimages.infomed-stat.ru/helpdesk_ticket_attaches/$1       [L,R=301,NC]
