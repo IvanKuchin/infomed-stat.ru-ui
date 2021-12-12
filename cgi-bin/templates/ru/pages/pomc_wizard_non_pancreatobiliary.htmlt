@@ -4,7 +4,7 @@
           <div class="row form-group">
             <div class="col-xs-6 col-md-4">Список:</div>
             <div class="col-xs-6 col-md-4">
-              <select class="transparent __non_pancreatobiliary_sickness">
+              <select class="transparent ___non_pancreatobiliary_sickness">
                 <option>Не определено</option>
                 <option>Рак желудка</option>
                 <option>Метастазы колоректального рака</option>
