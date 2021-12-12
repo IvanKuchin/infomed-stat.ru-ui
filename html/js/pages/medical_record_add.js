@@ -44,9 +44,9 @@ var	medical_record_add = (function()
 					{
 						patient_data_global = data.medical_records;
 
+						ActivateDOMHandlers();
 						GetTagMedicalObjects_AndAssignUniqDataID();
 						PlacePatientDataToForm(patient_data_global);
-						ActivateDOMHandlers();
 					}
 					else
 					{
