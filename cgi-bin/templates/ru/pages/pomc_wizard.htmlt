@@ -51,7 +51,7 @@
           </div>
         </div>
         <<template:templates/ru/pages/pomc_wizard_non_pancreatobiliary.htmlt>>
-        <div class="row">
+        <div class="row form-group">
           <div class="col-xs-6 col-md-4">Резектабельность:</div>
           <div class="col-xs-6 col-md-4">
             <select class="transparent ___resectability">
@@ -62,6 +62,17 @@
             </select>
           </div>
         </div>
+        <div class="row form-group">
+          <div class="col-xs-6 col-md-4">BRCA:</div>
+          <div class="col-xs-6 col-md-4">
+            <select data-medical_tag="Y" class="transparent ___brca">
+              <option>Не определено</option>
+              <option data-toggle="collapse" data-target=".__brca_localization">Есть</option>
+              <option>Нет</option>
+            </select>
+          </div>
+        </div>
+        <<template:templates/ru/pages/pomc_wizard_brca_localization.htmlt>>
       </div>
     </div>
 
