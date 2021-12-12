@@ -46,6 +46,7 @@ var	medical_record_add = (function()
 
 						GetTagMedicalObjects_AndAssignUniqDataID();
 						PlacePatientDataToForm(patient_data_global);
+						ActivateDOMHandlers();
 					}
 					else
 					{
@@ -656,6 +657,26 @@ var	medical_record_add = (function()
 			}
 		}
 	};
+
+	var	ActivateDOMHandlers = function()
+	{
+		$('select[data-medical_tag="Y"]').on("change", SelectHandler_onchange);
+	};
+
+	var	SelectHandler_onchange = function(e)
+	{
+		let curr_select_tag = $(this);
+		let	curr_option_tag = curr_select_tag.find("option:selected");
+
+		// --- hide all options with toggle attribute
+		let hide_selector	= curr_select_tag.find('option[data-toggle="collapse"]').attr("data-target");
+		if(hide_selector) $("div.collapse" + hide_selector).hide(100);
+
+		// --- show only selected
+		let show_selector	= curr_select_tag.find('option:selected[data-toggle="collapse"]').attr("data-target");
+		if(show_selector) $("div.collapse" + show_selector).show(100);
+
+	}
 
 	return {
 		Init: Init,

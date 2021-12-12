@@ -39,16 +39,18 @@
         <div class="row form-group">
           <div class="col-xs-6 col-md-4">Гистологический тип опухоли:</div>
           <div class="col-xs-6 col-md-4">
-            <select class="transparent ___cancer_type">
+            <select data-medical_tag="Y" class="transparent ___cancer_type">
               <option>Не определено</option>
               <option>Аденокарцинома поджелудочной железы</option>
               <option>Нейроэндокринная опухоль поджелудочной железы</option>
               <option>Аденокарцинома 12-ти перстной кишки</option>
               <option>Аденокарцинома БДС</option>
               <option>Аденокарцинома холедоха</option>
+              <option data-toggle="collapse" data-target=".__non_pancreatobiliary">Не панкреатобидиарные</option>
             </select>
           </div>
         </div>
+        <<template:templates/ru/pages/pomc_wizard_non_pancreatobiliary.htmlt>>
         <div class="row">
           <div class="col-xs-6 col-md-4">Резектабельность:</div>
           <div class="col-xs-6 col-md-4">
