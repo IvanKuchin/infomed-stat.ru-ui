@@ -230,7 +230,7 @@ var	medical_record_add = (function()
 				birthdate.val().length
 			)
 			{
-				$.getJSON("/cgi-bin/doctor.cgi", 
+				$.post("/cgi-bin/doctor.cgi", 
 				{
 					action: 			"AJAX_checkPatientExistence",
 					___first_name:		first_name_tag.val(),
@@ -241,13 +241,15 @@ var	medical_record_add = (function()
 				})
 				.done(function(data)
 				{
-					if(data.result == "success")
+					let obj = json.parse(data);
+
+					if(obj.result == "success")
 					{
 						patient_could_be_created_or_updated_global = true;
 					}
 					else
 					{
-						system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
+						system_calls.PopoverError(curr_tag, "Ошибка: " + obj.description);
 					}
 				})
 				.fail(function()
@@ -456,6 +458,20 @@ var	medical_record_add = (function()
 		return parents;
 	};
 
+	var	GetPointerInputTag = function(parent_tag, tag_class)
+	{
+		// --- first check input fields as well as checkboxes
+		let	result_tag = parent_tag.find("input[data-target*=\"" + tag_class + "\"]");
+
+		if(result_tag.length == 0)
+		{
+			// --- check select -> option tag
+			result_tag = parent_tag.find("option[data-target*=\"" + tag_class + "\"]");
+		}
+
+		return result_tag;
+	};
+
 	var	GetInputCollapseChain = function(chain)
 	{
 		let	medical_class = "";
@@ -480,7 +496,7 @@ var	medical_record_add = (function()
 					for (var i = 1; i < chain.length; ++i) 
 					{
 						let	curr_tag = chain[i];
-						let	pointer_elem = curr_tag.find("input[data-target*=\"" + pointer_class + "\"]");
+						let	pointer_elem = GetPointerInputTag(curr_tag, pointer_class);
 
 						if(pointer_elem.length > 1)
 						{
@@ -517,7 +533,7 @@ var	medical_record_add = (function()
 							{
 								let tag_name = item.prop("tagName");
 
-								return (tag_name == "SELECT") || (tag_name == "INPUT") || (tag_name == "TEXTAREA");
+								return (tag_name == "SELECT") || (tag_name == "OPTION") || (tag_name == "INPUT") || (tag_name == "TEXTAREA");
 							});
 		let input_chain = [];
 
