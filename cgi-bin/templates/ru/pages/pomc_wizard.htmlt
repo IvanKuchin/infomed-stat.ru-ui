@@ -79,30 +79,22 @@
     <div class="__tab tab_hidden" data-prev_tab_id="11" data-tab_id="12" data-next_tab_id="13">
       <div class="container single_block __preoperative">
         <div class="row">
-          <div class="col-xs-12"><h3><center>Данные дооперационной КТ</center></h3></div>
+          <div class="col-xs-12"><h3><center>Предоперационные лучевые исследования</center></h3></div>
         </div>
-        <div class="row">
-          <div class="col-xs-6 col-md-2">Инвазия вен</div>
+
+        <div class="row form-group">
+          <div class="col-xs-6 col-md-4">Тип КТ:</div>
           <div class="col-xs-6 col-md-4">
-            <label style="font-weight: normal;"><input type="checkbox" class="___portal_vein" data-toggle="collapse" data-target=".__preoperative .collapse.___portal_vein"> Воротная вена</label><br>
-            <label style="font-weight: normal;"><input type="checkbox" class="___sup_mesent_vein" data-toggle="collapse" data-target=".__preoperative .collapse.___sup_mesent_vein"> Верхнебрыжеечная вена</label><br>
-            <label style="font-weight: normal;"><input type="checkbox" class="___venous_confluence" data-toggle="collapse" data-target=".__preoperative .collapse.___venous_confluence"> Венозный конфлюенс</label><br>
-            <label style="font-weight: normal;"><input type="checkbox" class="___top_branches"  data-toggle="collapse" data-target=".__preoperative .collapse.___top_branches"> Ветви верхней брыжеечной вены</label><br>
+            <select data-medical_tag="Y" class="transparent ___pre_op">
+              <option>Не определено</option>
+              <option data-toggle="collapse" class="___pre_op_ct" data-target=".collapse.___pre_op_ct">КТ</option>
+              <option data-toggle="collapse" class="___pre_op_petct" data-target=".collapse.___pre_op_petct">ПЭТ КТ</option>
+            </select>
           </div>
         </div>
 
-        <<template:templates/ru/pages/pomc_wizard_lesion_vein.htmlt>>
-
-        <div class="row">
-          <div class="col-xs-6 col-md-2">Инвазия артерий</div>
-          <div class="col-xs-6 col-md-4">
-            <label style="font-weight: normal;"><input type="checkbox" class="___sup_mesent_artery"  data-toggle="collapse" data-target=".__preoperative .collapse.___sup_mesent_artery"> Верхнебрыжеечная артерия</label><br>
-            <label style="font-weight: normal;"><input type="checkbox" class="___celiac_trunk" data-toggle="collapse" data-target=".__preoperative .collapse.___celiac_trunk"> Чревный ствол</label><br>
-            <label style="font-weight: normal;"><input type="checkbox" class="___common_hepatic_art" data-toggle="collapse" data-target=".__preoperative .collapse.___common_hepatic_art"> Общая печеночная артерия</label><br>
-          </div>
-        </div>
-
-        <<template:templates/ru/pages/pomc_wizard_lesion_artery.htmlt>>
+        <<template:templates/ru/pages/pomc_wizard_pre_operation_ct.htmlt>>
+        <<template:templates/ru/pages/pomc_wizard_pre_operation_petct.htmlt>>
 
       </div>
     </div>
