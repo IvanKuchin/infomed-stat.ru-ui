@@ -717,7 +717,7 @@
           <div class="col-xs-12"><h3><center>Отправление данных</center></h3></div>
         </div>
         <div class="row">
-          <div class="col-xs-12">Может занять несколько до одной минуты.</div>
+          <div class="col-xs-12">Данные отправляются не дольше 10 сек. Если вы ждете дольше - это проблема, откройте <a href="/cgi-bin/helpdesk.cgi?action=cases_list_template&rand=<<vars:random>>">кейс</a></div>
         </div>
       </div>
     </div>
