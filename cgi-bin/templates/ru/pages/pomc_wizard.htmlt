@@ -219,7 +219,7 @@
     <div class="__tab tab_hidden" data-prev_tab_id="14" data-tab_id="15" data-next_tab_id="16">
       <div class="container single_block">
         <div class="row">
-          <div class="col-xs-12"><h3><center>Неоадъювантная полихимиотерапия</center></h3></div>
+          <div class="col-xs-12"><h3><center>Неоадъювантная терапия</center></h3></div>
         </div>
 
         <div class="row form-group">
@@ -229,6 +229,8 @@
         </div>
 
         <div class="collapse ___neoadj_chemo">
+          <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
+
           <div class="row">
             <div class="col-xs-6 col-md-2">Название схемы</div>
             <div class="col-xs-6 col-md-4">
@@ -237,6 +239,7 @@
                 <option>Nab-паклитаксел +гемцитабин</option>
                 <option>Гемцитабин</option>
                 <option>GEMOX</option>
+                <option>GemCap</option>
               </select>
               <label></label>
             </div>
@@ -268,34 +271,79 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-xs-12"><h3><center>Данные КТ после проведения неоадъювантной полихимиотерапии</center></h3></div>
-          </div>
+          <<template:templates/ru/pages/pomc_wizard_ct_dates_and_adverse.htmlt>>
 
-          <div class="row">
-            <div class="col-xs-6 col-md-2">Инвазия вен</div>
-            <div class="col-xs-6 col-md-4">
-              <label style="font-weight: normal;"><input type="checkbox" class="___portal_vein" data-toggle="collapse" data-target=".___neoadj_chemo .collapse.___portal_vein"> Воротная вена</label><br>
-              <label style="font-weight: normal;"><input type="checkbox" class="___sup_mesent_vein" data-toggle="collapse" data-target=".___neoadj_chemo .collapse.___sup_mesent_vein"> Верхнебрыжеечная вена</label><br>
-              <label style="font-weight: normal;"><input type="checkbox" class="___venous_confluence" data-toggle="collapse" data-target=".___neoadj_chemo .collapse.___venous_confluence"> Венозный конфлюенс</label><br>
-              <label style="font-weight: normal;"><input type="checkbox" class="___top_branches"  data-toggle="collapse" data-target=".___neoadj_chemo .collapse.___top_branches"> Ветви верхней брыжеечной вены</label><br>
-            </div>
-          </div>
+          <<template:templates/ru/pages/pomc_wizard_ct_after_neoadj_therapy.htmlt>>
 
-          <<template:templates/ru/pages/pomc_wizard_lesion_vein.htmlt>>
-
-          <div class="row">
-            <div class="col-xs-6 col-md-2">Инвазия артерий</div>
-            <div class="col-xs-6 col-md-4">
-              <label style="font-weight: normal;"><input type="checkbox" class="___sup_mesent_artery"  data-toggle="collapse" data-target=".___neoadj_chemo .collapse.___sup_mesent_artery"> Верхнебрыжеечная артерия</label><br>
-              <label style="font-weight: normal;"><input type="checkbox" class="___celiac_trunk" data-toggle="collapse" data-target=".___neoadj_chemo .collapse.___celiac_trunk"> Чревный ствол</label><br>
-              <label style="font-weight: normal;"><input type="checkbox" class="___common_hepatic_art" data-toggle="collapse" data-target=".___neoadj_chemo .collapse.___common_hepatic_art"> Общая печеночная артерия</label><br>
-            </div>
-          </div>
-
-          <<template:templates/ru/pages/pomc_wizard_lesion_artery.htmlt>>
-
+          <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
         </div>
+
+        <!-- ray therapy -->
+        <div class="row form-group">
+          <div class="col-xs-12">
+            <label style="font-weight: normal;"><input type="checkbox" class="___ray_therapy"  data-toggle="collapse" data-target=".collapse.___ray_therapy"> Проведение лучевой терапии</label><br>
+          </div>
+        </div>
+
+        <div class="collapse ___ray_therapy">
+          <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
+
+          <div class="row form-group">
+            <div class="col-xs-4 col-md-2">
+              Описание:
+            </div>
+            <div class="col-xs-8 col-md-10">
+              <textarea class="transparent ___another_option"></textarea>
+            </div>
+          </div>
+    
+          <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
+        </div>
+
+        <!-- brachi therapy -->
+        <div class="row form-group">
+          <div class="col-xs-12">
+            <label style="font-weight: normal;"><input type="checkbox" class="___brachi_therapy"  data-toggle="collapse" data-target=".collapse.___brachi_therapy"> Проведение брахитерапии</label><br>
+          </div>
+        </div>
+
+        <div class="collapse ___brachi_therapy">
+          <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
+
+          <div class="row form-group">
+            <div class="col-xs-4 col-md-2">
+              Описание:
+            </div>
+            <div class="col-xs-8 col-md-10">
+              <textarea class="transparent ___another_option"></textarea>
+            </div>
+          </div>
+    
+          <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
+        </div>
+
+        <!-- brachi therapy -->
+        <div class="row form-group">
+          <div class="col-xs-12">
+            <label style="font-weight: normal;"><input type="checkbox" class="___loko_therapy"  data-toggle="collapse" data-target=".collapse.___loko_therapy"> Проведение локорегионарной терапии</label><br>
+          </div>
+        </div>
+
+        <div class="collapse ___loko_therapy">
+          <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
+
+          <div class="row form-group">
+            <div class="col-xs-4 col-md-2">
+              Описание:
+            </div>
+            <div class="col-xs-8 col-md-10">
+              <textarea class="transparent ___another_option"></textarea>
+            </div>
+          </div>
+    
+          <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
+        </div>
+
       </div>
     </div>
 
@@ -389,13 +437,7 @@
               <label style="font-weight: normal;"><input type="checkbox" class="___other" data-toggle="collapse" data-target=".__operation_other_info .collapse.___other"> Свой вариант</label><br>
             </div>
           </div>
-          <div class="row">
-            <div class="col-xs-6 col-xs-offset-6 col-md-4 col-md-offset-2">
-              <div class="collapse ___other">
-                <textarea class="transparent ___another_option"></textarea>
-              </div>
-            </div>
-          </div>
+          <<template:templates/ru/pages/pomc_wizard_textfield.htmlt>>
         </div>
 
 
@@ -611,7 +653,7 @@
     <div class="__tab tab_hidden"  data-prev_tab_id="17" data-tab_id="18" data-next_tab_id="19">
       <div class="container single_block">
         <div class="row">
-          <div class="col-xs-12"><h3><center>Адъювантная полихимиотерапия</center></h3></div>
+          <div class="col-xs-12"><h3><center>Адъювантная терапия</center></h3></div>
         </div>
 
         <div class="row form-group">
@@ -657,6 +699,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -691,13 +734,7 @@
               <label style="font-weight: normal;"><input type="checkbox" class="___other" data-toggle="collapse" data-target=".__remote_results .collapse.___other"> Свой вариант</label><br>
             </div>
           </div>
-          <div class="row">
-            <div class="col-xs-6 col-xs-offset-6 col-md-4 col-md-offset-2">
-              <div class="collapse ___other">
-                <textarea class="transparent ___another_option"></textarea>
-              </div>
-            </div>
-          </div>
+          <<template:templates/ru/pages/pomc_wizard_textfield.htmlt>>
         </div>
 
         <div class="row form-group">
