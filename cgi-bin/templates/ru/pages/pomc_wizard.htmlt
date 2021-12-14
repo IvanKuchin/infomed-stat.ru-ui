@@ -378,6 +378,11 @@
               <select class="transparent ___operation_class">
                 <option>Стандартная</option>
                 <option>Расширенная</option>
+                <option>Энуклеация</option>
+                <option>Изолированная резекция</option>
+                <option>Anterior RAMPS</option>
+                <option>Posterior RAMPS</option>
+                <option>Панкреатэктомия</option>
               </select>
             </div>
           </div>
