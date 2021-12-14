@@ -176,6 +176,26 @@
             </select>
  -->          </div>
         </div>
+        <div class="row form-group">
+          <div class="col-xs-6 col-md-2">Уровень РЭА:</div>
+          <div class="col-xs-6 col-md-4">
+            <input type="number" step="100" class="transparent ___pre_op_lab_rea" placeholder="Уровень РЭА"><label></label>
+          </div>
+          <div class="col-xs-6 col-md-2">Уровень NSE:</div>
+          <div class="col-xs-6 col-md-4">
+            <input type="number" step="10" class="transparent ___pre_op_lab_nse " placeholder="Уровень NSE"><label></label>
+          </div>
+        </div>
+        <div class="row form-group">
+          <div class="col-xs-6 col-md-2">Уровень Хромогранин А:</div>
+          <div class="col-xs-6 col-md-4">
+            <input type="number" step="100" class="transparent ___pre_op_lab_chromo" placeholder="Уровень Хромогранин А"><label></label>
+          </div>
+          <div class="col-xs-6 col-md-2">Уровень Серотонина:</div>
+          <div class="col-xs-6 col-md-4">
+            <input type="number" step="10" class="transparent ___pre_op_lab_serot " placeholder="Уровень Серотонина"><label></label>
+          </div>
+        </div>
 
         <div class="row form-group">
           <div class="col-xs-6 col-md-offset-2 col-md-4">
