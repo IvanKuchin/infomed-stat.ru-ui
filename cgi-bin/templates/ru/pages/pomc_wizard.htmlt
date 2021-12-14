@@ -152,8 +152,8 @@
         <div class="row form-group">
           <div class="col-xs-6 col-md-2">Уровень СА 19.9:</div>
           <div class="col-xs-6 col-md-4">
-            <input type="number" step="100" class="transparent ___ca_level_19" placeholder="Уровень СА 19.9"><label></label>
-<!--             <select class="transparent ___ca_level_19">
+            <input type="number" step="100" class="transparent ___pre_op_lab_ca_level_19" placeholder="Уровень СА 19.9"><label></label>
+<!--             <select class="transparent ___pre_op_lab_ca_level_19">
               <option>Не определено</option>
               <option>Норма</option>
               <option>От нормы до 500</option>
