@@ -652,13 +652,27 @@
           </div>
         </div>
 
+        <div class="row form-group">
+          <div class="col-xs-12 col-md-2">Степень патоморфоза (iDworak):</div>
+          <div class="col-xs-12 col-md-4">
+            <select class="transparent ___neoadj_chemo___idworak">
+              <option>Не определена</option>
+              <option>0</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+            </select>
+          </div>
+        </div>
+
       </div>
     </div>
 
     <div class="__tab tab_hidden"  data-prev_tab_id="17" data-tab_id="18" data-next_tab_id="19">
       <div class="container single_block">
         <div class="row">
-          <div class="col-xs-12"><h3><center>Адъювантная терапия</center></h3></div>
+          <div class="col-xs-12"><h3><center>Послеоперационная полихимиотерапия</center></h3></div>
         </div>
 
         <div class="row form-group">
@@ -703,6 +717,9 @@
               </select>
             </div>
           </div>
+
+          <<template:templates/ru/pages/pomc_wizard_ct_dates_and_adverse.htmlt>>
+
         </div>
 
       </div>
@@ -723,13 +740,18 @@
           <div class="col-xs-6 col-md-2">Рецидив:</div>
           <div class="col-xs-6 col-md-4">
             <label style="font-weight: normal;"><input type="checkbox" class="___relapse_biochemical" data-toggle="collapse" data-target=".__remote_results .collapse.___relapse_biochemical"> Биохимический рецидив</label><br>
-            <label style="font-weight: normal;"><input type="checkbox" class="___relapse_metastases" data-toggle="collapse" data-target=".__remote_results .collapse.___metastases_collapse"> Метастазы</label><br>
-            <label style="font-weight: normal;"><input type="checkbox" class="___relapse_local" data-toggle="collapse" data-target=".__remote_results .collapse.___relapse_local"> Местный рецидив</label><br>
           </div>
         </div>
 
-
+        <div class="row">
+          <div class="col-xs-6 col-md-2"></div>
+          <div class="col-xs-6 col-md-2">
+            <label style="font-weight: normal;"><input type="checkbox" class="___relapse_metastases" data-toggle="collapse" data-target=".__remote_results .collapse.___metastases_collapse"> Метастазы</label><br>
+          </div>
+        </div>
         <div class="collapse ___metastases_collapse">
+          <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
+
           <div class="row">
             <div class="col-xs-6 col-md-2">Пораженные органы:</div>
             <div class="col-xs-6 col-md-4">
@@ -740,7 +762,53 @@
             </div>
           </div>
           <<template:templates/ru/pages/pomc_wizard_textfield.htmlt>>
+
+          <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
         </div>
+
+        <div class="row">
+          <div class="col-xs-6 col-md-2"></div>
+          <div class="col-xs-6 col-md-2">
+            <label style="font-weight: normal;"><input type="checkbox" class="___relapse_local" data-toggle="collapse" data-target=".__remote_results .collapse.___relapse_local"> Местный рецидив</label><br>
+          </div>
+        </div>
+        <div class="collapse ___relapse_local">
+          <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
+
+          <div class="row">
+            <div class="col-xs-6 col-md-2">Лечение:</div>
+            <div class="col-xs-6 col-md-4">
+              <label style="font-weight: normal;"><input type="checkbox" class="___polichemo_therapy" data-toggle="collapse" data-target=".__remote_results .collapse.___polichemo_therapy_random_wdkjnsdckjsdc"> Полихимиотерапия</label><br>
+            </div>
+          </div>
+
+          <div class="collapse ___polichemo_therapy_random_wdkjnsdckjsdc">
+            <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
+
+            <div class="row">
+            </div>
+            
+            <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-6 col-md-2"></div>
+            <div class="col-xs-6 col-md-4">
+              <label style="font-weight: normal;"><input type="checkbox" class="___syrgical_treatment" data-toggle="collapse" data-target=".__remote_results .collapse.___syrgical_treatment_random_wdkjnsdckjsdc"> Хирургическое лечение </label><br>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-6 col-md-2"></div>
+            <div class="col-xs-6 col-md-4">
+              <label style="font-weight: normal;"><input type="checkbox" class="___xray_therapy" data-toggle="collapse" data-target=".__remote_results .collapse.___xray_therapy_random_wdkjnsdckjsdc"> Лучевая терапия </label><br>
+            </div>
+          </div>
+
+          <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
+        </div>
+
+
 
         <div class="row form-group">
           <div class="col-xs-12 col-md-2">Дата выбытия из исследования:</div>
