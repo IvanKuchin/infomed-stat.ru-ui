@@ -677,7 +677,7 @@ var	medical_record_add = (function()
 
 	var	ActivateDOMHandlers = function()
 	{
-		$('select[data-medical_tag="Y"]').on("change", SelectHandler_onchange);
+		$('select[data-medical_tag="Y"]').on("change", Select_ChangeHandler);
 	};
 
 	var	ResetAndHideInputFieldsFromParentTag = function(tag)
@@ -719,7 +719,7 @@ var	medical_record_add = (function()
 		tag.hide(100);
 	};
 
-	var	SelectHandler_onchange = function(e)
+	var	Select_ChangeHandler = function(e)
 	{
 		let curr_select_tag = $(this);
 		let	curr_option_tag = curr_select_tag.find("option:selected");
