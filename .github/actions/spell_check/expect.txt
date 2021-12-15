@@ -26,6 +26,7 @@ callbacklist
 cgi
 charlist
 checkbox
+checkboxes
 Checkreg
 codeflow
 companyid

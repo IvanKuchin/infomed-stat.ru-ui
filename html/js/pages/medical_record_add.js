@@ -44,6 +44,7 @@ var	medical_record_add = (function()
 					{
 						patient_data_global = data.medical_records;
 
+						ActivateDOMHandlers();
 						GetTagMedicalObjects_AndAssignUniqDataID();
 						PlacePatientDataToForm(patient_data_global);
 					}
@@ -229,7 +230,7 @@ var	medical_record_add = (function()
 				birthdate.val().length
 			)
 			{
-				$.getJSON("/cgi-bin/doctor.cgi", 
+				$.post("/cgi-bin/doctor.cgi", 
 				{
 					action: 			"AJAX_checkPatientExistence",
 					___first_name:		first_name_tag.val(),
@@ -240,13 +241,15 @@ var	medical_record_add = (function()
 				})
 				.done(function(data)
 				{
-					if(data.result == "success")
+					let obj = JSON.parse(data);
+
+					if(obj.result == "success")
 					{
 						patient_could_be_created_or_updated_global = true;
 					}
 					else
 					{
-						system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
+						system_calls.PopoverError(curr_tag, "Ошибка: " + obj.description);
 					}
 				})
 				.fail(function()
@@ -322,16 +325,18 @@ var	medical_record_add = (function()
 
 		curr_tag.button("loading");
 
-		$.getJSON("/cgi-bin/doctor.cgi", params)
+		$.post("/cgi-bin/doctor.cgi", params)
 		.done(function(data)
 		{
-			if(data.result == "success")
+			let	obj = JSON.parse(data);
+
+			if(obj.result == "success")
 			{
 				window.location.href = "/cgi-bin/doctor.cgi?action=medical_record_add_template&rand=" + Math.random()*98765432123456;
 			}
 			else
 			{
-				system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
+				system_calls.PopoverError(curr_tag, "Ошибка: " + obj.description);
 			}
 		})
 		.fail(function()
@@ -455,16 +460,29 @@ var	medical_record_add = (function()
 		return parents;
 	};
 
+	var	GetPointerInputTag = function(parent_tag, tag_class)
+	{
+		// --- first check input fields as well as checkboxes
+		let	result_tag = parent_tag.find("input[data-target*=\"" + tag_class + "\"]");
+
+		if(result_tag.length == 0)
+		{
+			// --- check select -> option tag
+			result_tag = parent_tag.find("option[data-target=\"" + tag_class + "\"]");
+		}
+
+		return result_tag;
+	};
+
 	var	GetInputCollapseChain = function(chain)
 	{
-		let	medical_class = "";
 		let result = [];
 
 		if(chain.length && (IsClassAssigned(chain[0], /\b__tab/) == false))
 		{
-				medical_class = GetMedicalClass(chain[0]);
-				let	is_collapse = IsClassAssigned(chain[0], /collapse/);
-				let pointer_class = (is_collapse ? ".collapse" : "") + "." + medical_class;
+				let medical_class	= GetMedicalClass(chain[0]);
+				let	is_collapse		= IsClassAssigned(chain[0], /collapse/);
+				let pointer_class	= (is_collapse ? ".collapse" : "") + "." + medical_class;
 
 				if(medical_class.length === 0)
 				{
@@ -476,10 +494,10 @@ var	medical_record_add = (function()
 				}
 				else
 				{
-					for (var i = 1; i < chain.length; ++i) 
+					for (let i = 1; i < chain.length; ++i) 
 					{
 						let	curr_tag = chain[i];
-						let	pointer_elem = curr_tag.find("input[data-target*=\"" + pointer_class + "\"]");
+						let	pointer_elem = GetPointerInputTag(curr_tag, pointer_class);
 
 						if(pointer_elem.length > 1)
 						{
@@ -516,7 +534,7 @@ var	medical_record_add = (function()
 							{
 								let tag_name = item.prop("tagName");
 
-								return (tag_name == "SELECT") || (tag_name == "INPUT") || (tag_name == "TEXTAREA");
+								return (tag_name == "SELECT") || (tag_name == "OPTION") || (tag_name == "INPUT") || (tag_name == "TEXTAREA");
 							});
 		let input_chain = [];
 
@@ -656,6 +674,75 @@ var	medical_record_add = (function()
 			}
 		}
 	};
+
+	var	ActivateDOMHandlers = function()
+	{
+		$('select[data-medical_tag="Y"]').on("change", Select_ChangeHandler);
+	};
+
+	var	ResetAndHideInputFieldsFromParentTag = function(tag)
+	{
+		tag.find("[data-medical_tag=\"Y\"]").each(function()
+		{
+			let	curr_tag = $(this);
+
+			if(curr_tag.prop("tagName") == "INPUT")
+			{
+				if(curr_tag.attr("type") && (curr_tag.attr("type") == "checkbox"))
+				{
+					if(curr_tag.prop("checked"))	curr_tag.click();
+				}
+				else
+				{
+					curr_tag.val("");
+				}
+
+				curr_tag.trigger("change");
+			}
+
+			if(curr_tag.prop("tagName") == "TEXTAREA")
+			{
+				curr_tag 
+					.val("")
+					.trigger("change");
+			}
+
+			if(curr_tag.prop("tagName") == "SELECT")
+			{
+				curr_tag 
+					.find("option:eq(0)")
+					.prop("selected", "true")
+					.trigger("change");
+			}
+		});
+
+		tag.hide(100);
+	};
+
+	var	Select_ChangeHandler = function(e)
+	{
+		let curr_select_tag = $(this);
+		let	curr_option_tag = curr_select_tag.find("option:selected");
+
+		// --- hide all options with toggle attribute
+		curr_select_tag.find('option[data-toggle="collapse"]').each(function()
+				{
+					let		hide_selector = $(this).attr("data-target");
+
+					if(hide_selector)
+					{
+						ResetAndHideInputFieldsFromParentTag($(hide_selector));
+					}
+
+				}
+			);
+			
+
+		// --- show only selected
+		let show_selector	= curr_select_tag.find('option:selected[data-toggle="collapse"]').attr("data-target");
+		if(show_selector) $("div.collapse" + show_selector).show(100);
+
+	}
 
 	return {
 		Init: Init,
