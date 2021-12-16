@@ -273,8 +273,6 @@
 
           <<template:templates/ru/pages/pomc_wizard_ct_dates_and_adverse.htmlt>>
 
-          <<template:templates/ru/pages/pomc_wizard_ct_after_neoadj_therapy.htmlt>>
-
           <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
         </div>
 
@@ -345,6 +343,22 @@
         </div>
 
       </div>
+
+      <div class="container single_block">
+
+        <div class="row">
+          <div class="col-xs-12">
+            <label style="font-weight: normal;"><input type="checkbox" class="___ct_post_adj_therapy"  data-toggle="collapse" data-target=".collapse.___ct_post_adj_therapy"> Данные КТ после проведения неоадъювантной терапии</label><br>
+          </div>
+        </div>
+
+        <div class="collapse ___ct_post_adj_therapy">
+          <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
+            <<template:templates/ru/pages/pomc_wizard_ct_after_neoadj_therapy.htmlt>>
+          <div class="row collapse-bottom-shadow margin_top_20"><p></p></div>
+        </div>
+      </div>
+
     </div>
 
 

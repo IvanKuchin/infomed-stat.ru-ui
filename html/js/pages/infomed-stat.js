@@ -52,6 +52,7 @@ infomed_stat = (function()
 		dictionary.medical_history_number			= "история болезни";
 		dictionary.middle_name						= "отчество";
 		dictionary.neoadj_chemo						= "неоадъювантная полихимиотерапия";
+		dictionary.non_pancreatobiliary_sickness	= "не панкреатобидиарные";
 		dictionary.number_lymph_node_damage			= "количество пораженных лимф. узлов";
 		dictionary.op_done							= "проведение операции";
 		dictionary.operation_class					= "объем операции";
