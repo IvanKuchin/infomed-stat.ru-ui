@@ -768,11 +768,11 @@
 
             <div class="row">
               <div class="col-xs-12">
-                <label style="font-weight: normal;"><input type="checkbox" class="___2nd_line" data-toggle="collapse" data-target=".__remote_results .collapse.___2nd_line_random_sdckjnwepokd"> 2-я линия</label><br>
+                <label style="font-weight: normal;"><input type="checkbox" class="___second_line" data-toggle="collapse" data-target=".__remote_results .collapse.___second_line_random_sdckjnwepokd"> 2-я линия</label><br>
               </div>
             </div>
 
-            <div class="collapse ___2nd_line_random_sdckjnwepokd">
+            <div class="collapse ___second_line_random_sdckjnwepokd">
               <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
 
               <<template:templates/ru/pages/pomc_wizard_post_invasion_polichemo_therapy.htmlt>>
@@ -782,11 +782,11 @@
 
             <div class="row">
               <div class="col-xs-12">
-                <label style="font-weight: normal;"><input type="checkbox" class="___3rd_line" data-toggle="collapse" data-target=".__remote_results .collapse.___3nd_line_random_sdckjnwepokd"> 3-я линия</label><br>
+                <label style="font-weight: normal;"><input type="checkbox" class="___third_line" data-toggle="collapse" data-target=".__remote_results .collapse.___third_line_random_sdckjnwepokd"> 3-я линия</label><br>
               </div>
             </div>
 
-            <div class="collapse ___3nd_line_random_sdckjnwepokd">
+            <div class="collapse ___third_line_random_sdckjnwepokd">
               <div class="row collapse-top-shadow margin_bottom_20"><p></p></div>
 
               <<template:templates/ru/pages/pomc_wizard_post_invasion_polichemo_therapy.htmlt>>
