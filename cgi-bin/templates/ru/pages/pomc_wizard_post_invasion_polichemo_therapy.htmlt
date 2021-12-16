@@ -2,9 +2,10 @@
             <div class="col-xs-6 col-md-4 col-md-offset-2">
               <select class="transparent ___scheme_name" placeholder="Название схемы">
                 <option>mFOLFIRINOX</option>
-                <option>GEMCAP</option>
+                <option>GemCap</option>
                 <option>Гемцитабин</option>
                 <option>Капецитабин</option>
+                <option>Olaparib</option>
               </select>
               <label></label>
             </div>
