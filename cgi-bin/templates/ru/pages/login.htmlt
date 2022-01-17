@@ -33,8 +33,14 @@
   <<template:templates/ru/pages/login_1.htmlt>>
         </div>
         <div class="col-md-6" id="registrationForm">
-            <h3 class="form-signin-heading"><center>Зарегистрироваться</center></h2>
+            <h3 class="form-signin-heading"><center>Регистрация</center></h2>
 
+            <div>Для создания аккаунта, необходимо запросить доступ у администратора</div>
+            <br>
+            <div class="font_size_tiny margin_bottom_5">
+              Регистрируясь, вы принимаете <a href="/eula">Условия</a>, <a href="/privacy_policy">Политику конфиденциальности</a> и <a href="/cookie_policy">Политику cookie</a>.
+            </div>
+<!-- 
             <div class="form-group has-feedback "  id="regDivEmail">
               <label for="inputEmail" class="sr-only">E-mail</label>
               <div class="input-group margin_bottom_5">
@@ -57,9 +63,8 @@
               Нажимая кнопку Зарегистрироваться, вы принимаете <a href="/eula">Условия</a>, <a href="/privacy_policy">Политику конфиденциальности</a> и <a href="/cookie_policy">Политику cookie</a>.
             </div>
 
-
-
             <button class="btn btn-lg btn-primary btn-block dynamic_shadow" id="regSubmit" type="submit" data-loading-text="Регистрация...">Зарегистрироваться</button>
+ -->
         </div>
 
       </div>
