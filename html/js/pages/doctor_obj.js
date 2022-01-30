@@ -225,85 +225,108 @@ var	doctor_obj = function()
 	{
 		var		result = $();
 
-		var		row	 				= $("<div>")	.addClass("row __doctor highlight_onhover zebra_painting doctor_" + data_global.id);
-		var		open_button			= $("<i>")		.addClass("fa fa-expand padding_close cursor_pointer animate_scale_onhover " + expand_button_state_global);
-		var		input_name_first	= $("<input>")	.addClass("transparent __doctor __name_first")			.attr("placeholder", "Имя");
-		var		input_name_middle	= $("<input>")	.addClass("transparent __doctor __name_middle")			.attr("placeholder", "Отчество");
-		var		input_name_last		= $("<input>")	.addClass("transparent __doctor __name_last")			.attr("placeholder", "Фамилия");
-		var		input_login			= $("<input>")	.addClass("transparent __doctor __login")				.attr("placeholder", "Логин");
-		var		input_email			= $("<input>")	.addClass("transparent __doctor __email")				.attr("placeholder", "email");
-		var		input_phone			= $("<input>")	.addClass("transparent __doctor __phone")				.attr("placeholder", "Телефон");
-		var		input_pass			= $("<input>")	.addClass("transparent __doctor __password")			.attr("placeholder", "Пароль");
-		var		remove_button		= $("<i>")		.addClass("fa fa-times-circle padding_close float_right cursor_pointer animate_close_onhover  " + remove_button_state_global);
-		var		open_col	 		= $("<div>")	.addClass("col-xs-2 col-md-1");
-		var		col_login	 		= $("<div>")	.addClass("col-xs-4 col-md-2 __doctor_collapsible_login_" + random_global);
-		var		col_email	 		= $("<div>")	.addClass("hidden-xs hidden-sm col-md-2 __doctor_collapsible_email_" + random_global);
-		var		col_phone	 		= $("<div>")	.addClass("hidden-xs hidden-sm col-md-2 __doctor_collapsible_phone_" + random_global);
-		var		col_pass			= $("<div>")	.addClass("col-xs-4 col-md-2 col-xs-offset-1 col-md-offset-0");
-		// var		comment_col = 		$("<div>")	.addClass("col-xs-4 col-md-8");
-		var		remove_col			= $("<div>")	.addClass("col-xs-1 col-md-1 col-md-offset-2");
-		var		reset_form_button	= $("<button>")	.addClass("btn btn-default form-control " + reset_form_button_global).append("Сбросить");
-		var		submit_button		= $("<button>")	.addClass("btn btn-primary form-control " + submit_button_global).append("Сохранить");
+		var		row	 					= $("<div>")	.addClass("row __doctor highlight_onhover zebra_painting doctor_" + data_global.id);
+		var		open_button				= $("<i>")		.addClass("fa fa-expand padding_close cursor_pointer animate_scale_onhover " + expand_button_state_global);
+		var		input_name_first		= $("<input>")	.addClass("transparent __doctor __name_first")			.attr("placeholder", "Имя");
+		var		input_name_middle		= $("<input>")	.addClass("transparent __doctor __name_middle")			.attr("placeholder", "Отчество");
+		var		input_name_last			= $("<input>")	.addClass("transparent __doctor __name_last")			.attr("placeholder", "Фамилия");
+		var		input_login				= $("<input>")	.addClass("transparent __doctor __login")				.attr("placeholder", "Логин");
+		var		input_email				= $("<input>")	.addClass("transparent __doctor __email")				.attr("placeholder", "email");
+		var		input_phone				= $("<input>")	.addClass("transparent __doctor __phone")				.attr("placeholder", "Телефон");
+		var		input_pass				= $("<input>")	.addClass("transparent __doctor __password")			.attr("placeholder", "Пароль");
+		var		remove_button			= $("<i>")		.addClass("fa fa-times-circle padding_close float_right cursor_pointer animate_close_onhover  " + remove_button_state_global);
+		var		open_col	 			= $("<div>")	.addClass("col-xs-2 col-md-1");
+		var		col_login	 			= $("<div>")	.addClass("col-xs-4 col-md-2 __doctor_collapsible_login_" + random_global);
+		var		col_email	 			= $("<div>")	.addClass("hidden-xs hidden-sm col-md-2 __doctor_collapsible_email_" + random_global);
+		var		col_phone	 			= $("<div>")	.addClass("hidden-xs hidden-sm col-md-2 __doctor_collapsible_phone_" + random_global);
+		var		col_pass				= $("<div>")	.addClass("col-xs-4 col-md-2 col-xs-offset-1 col-md-offset-0");
+		// var		comment_col 		= $("<div>")	.addClass("col-xs-4 col-md-8");
+		var		remove_col				= $("<div>")	.addClass("col-xs-1 col-md-1 col-md-offset-2");
+		var		reset_form_button		= $("<button>")	.addClass("btn btn-default form-control " + reset_form_button_global).append("Сбросить");
+		var		submit_button			= $("<button>")	.addClass("btn btn-primary form-control " + submit_button_global).append("Сохранить");
 
 		// --- render collapsible part
-		var		row_collapsible 	= $("<div>")	.addClass("row collapse " + details_area_state_global);
-		var		col_collapsible_content = $("<div>").addClass("col-xs-12");
-		var		row_submit 			= $("<div>")	.addClass("row __doctor_submit hospital" + data_global.id);
-		var		reset_form_col 		= $("<div>")	.addClass("col-xs-6 col-md-offset-8 col-md-2");
-		var		submit_col 			= $("<div>")	.addClass("col-xs-6 col-md-2");
+		var		row_collapsible 		= $("<div>")	.addClass("row collapse " + details_area_state_global);
+		var		col_collapsible_content = $("<div>")	.addClass("col-xs-12");
+		var		row_submit 				= $("<div>")	.addClass("row __doctor_submit hospital" + data_global.id);
+		var		reset_form_col 			= $("<div>")	.addClass("col-xs-6 col-md-offset-8 col-md-2");
+		var		submit_col 				= $("<div>")	.addClass("col-xs-6 col-md-2");
 
-		var		collapsible_row_1	= $("<div>")	.addClass("row highlight_onhover zebra_painting doctor_" + data_global.id);
-		var		col_name_first 		= $("<div>")	.addClass("col-xs-3 col-md-2");
-		var		col_name_middle		= $("<div>")	.addClass("col-xs-3 col-md-2");
-		var		col_name_last 		= $("<div>")	.addClass("col-xs-3 col-md-2 col-xs-offset-2 col-md-offset-1");
-		var		col_admin			= $("<div>")	.addClass("col-xs-2 col-xs-offset-2 col-md-1 col-md-offset-0");
-		var		col_admin_hint		= $("<div>")	.addClass("col-xs-3 col-md-1");
-		var		col_active			= $("<div>")	.addClass("col-xs-2 col-md-1");
-		var		col_active_hint		= $("<div>")	.addClass("col-xs-3 col-md-1");
+		var		collapsible_row_1		= $("<div>")	.addClass("row highlight_onhover");
+		var		col_name_last 			= $("<div>")	.addClass("col-xs-4 col-md-2 col-md-offset-1");
+		var		col_name_first 			= $("<div>")	.addClass("col-xs-4 col-md-2");
+		var		col_name_middle			= $("<div>")	.addClass("col-xs-4 col-md-2");
+		var		col_admin				= $("<div>")	.addClass("col-xs-2 col-md-1 col-md-offset-0");
+		var		col_admin_hint			= $("<div>")	.addClass("col-xs-3 col-md-1");
+		var		col_active				= $("<div>")	.addClass("col-xs-2 col-md-1");
+		var		col_active_hint			= $("<div>")	.addClass("col-xs-3 col-md-1");
 
-		var		admin_switcher		= $("<div>").addClass("form-switcher")
-										.append($("<input>")
-											.attr("id", "admin_switch_edit_" + data_global.id)
-											.attr("name", "admin_switch_edit_" + data_global.id)
-											.attr("type", "checkbox")
-											.prop("checked", (data_global.aaa == "admin" ? "checked" : ""))
-										)
-										.append($("<label>")
-											.addClass("switcher")											
-											.attr("id", "label_admin_switch_edit_" + data_global.id)
-											.attr("for", "admin_switch_edit_" + data_global.id)
-											.attr("data-id", data_global.id)
-											.attr("data-action", "AJAX_updateUserType_SwitcherInitiated")
-											.attr("data-toggle", "tooltip")
-											.attr("data-placement", "top")
-											.attr("title", "Редактирование прав пользователя")
-											.attr("data-hint_positive", "admin")
-											.attr("data-hint_negative", "обычный")
-											.attr("data-hint_selector", "#hint_admin_switch_edit_" + data_global.id)
-											.on("click", Switcher_ClickHandler)
-										);
+		var		collapsible_row_2		= $("<div>")	.addClass("row highlight_onhover");
+		var		col_visibility_desc		= $("<div>")	.addClass("col-xs-6 col-md-2 col-md-offset-1");
+		var		col_visibility_scope	= $("<div>")	.addClass("col-xs-6 col-md-2");
+
+		var		admin_switcher			= $("<div>")	.addClass("form-switcher")
+														.append($("<input>")
+															.attr("id", "admin_switch_edit_" + data_global.id)
+															.attr("name", "admin_switch_edit_" + data_global.id)
+															.attr("type", "checkbox")
+															.prop("checked", (data_global.aaa == "admin" ? "checked" : ""))
+														)
+														.append($("<label>")
+															.addClass("switcher")											
+															.attr("id", "label_admin_switch_edit_" + data_global.id)
+															.attr("for", "admin_switch_edit_" + data_global.id)
+															.attr("data-id", data_global.id)
+															.attr("data-action", "AJAX_updateUserType_SwitcherInitiated")
+															.attr("data-toggle", "tooltip")
+															.attr("data-placement", "top")
+															.attr("title", "Редактирование прав пользователя")
+															.attr("data-hint_positive", "admin")
+															.attr("data-hint_negative", "обычный")
+															.attr("data-hint_selector", "#hint_admin_switch_edit_" + data_global.id)
+															.on("click", Switcher_ClickHandler)
+														);
 
 		var		user_active_switcher	= $("<div>").addClass("form-switcher")
-										.append($("<input>")
-											.attr("id", "user_active_switch_edit_" + data_global.id)
-											.attr("name", "user_active_switch_edit_" + data_global.id)
-											.attr("type", "checkbox")
-											.prop("checked", (data_global.isblocked == "N" ? "checked" : ""))
-										)
-										.append($("<label>")
-											.addClass("switcher")											
-											.attr("id", "label_user_active_switch_edit_" + data_global.id)
-											.attr("for", "user_active_switch_edit_" + data_global.id)
-											.attr("data-id", data_global.id)
-											.attr("data-action", "AJAX_updateUserBlock")
-											.attr("data-toggle", "tooltip")
-											.attr("data-placement", "top")
-											.attr("title", "Блокировка пользователя")
-											.attr("data-hint_positive", "активен")
-											.attr("data-hint_negative", "заблокирован")
-											.attr("data-hint_selector", "#hint_user_active_switch_edit_" + data_global.id)
-											.on("click", Switcher_ClickHandler)
-										);
+													.append($("<input>")
+														.attr("id", "user_active_switch_edit_" + data_global.id)
+														.attr("name", "user_active_switch_edit_" + data_global.id)
+														.attr("type", "checkbox")
+														.prop("checked", (data_global.isblocked == "N" ? "checked" : ""))
+													)
+													.append($("<label>")
+														.addClass("switcher")											
+														.attr("id", "label_user_active_switch_edit_" + data_global.id)
+														.attr("for", "user_active_switch_edit_" + data_global.id)
+														.attr("data-id", data_global.id)
+														.attr("data-action", "AJAX_updateUserBlock")
+														.attr("data-toggle", "tooltip")
+														.attr("data-placement", "top")
+														.attr("title", "Блокировка пользователя")
+														.attr("data-hint_positive", "активен")
+														.attr("data-hint_negative", "заблокирован")
+														.attr("data-hint_selector", "#hint_user_active_switch_edit_" + data_global.id)
+														.on("click", Switcher_ClickHandler)
+													);
+
+		var		visibility_scope_select	= $("<select>")
+												.addClass("form-control")
+												.attr("data-id", data_global.id)
+												.attr("data-script", "doctor.cgi")
+												.attr("data-action", "AJAX_updateDoctorVisibilityScope")
+												.attr("data-db_value", data_global.visibility_scope)
+												.append(
+													$("<option>")
+														.attr("value", "local")
+														.append("Свой центр")
+													)
+												.append(
+													$("<option>")
+														.attr("value", "global")
+														.append("Все центры")
+													)
+												.on("change", system_calls.UpdateInputFieldOnServer)
+												.val(data_global.visibility_scope);
 
 		col_admin_hint		.attr("id", "hint_admin_switch_edit_" + data_global.id);
 		col_active_hint		.attr("id", "hint_user_active_switch_edit_" + data_global.id);
@@ -314,7 +337,8 @@ var	doctor_obj = function()
 							.append($("<div>").addClass("col-xs-12 collapse-bottom-shadow margin_top_20").append("<p>"));
 
 		col_collapsible_content
-							.append(collapsible_row_1);
+							.append(collapsible_row_1)
+							.append(collapsible_row_2);
 
 		collapsible_row_1
 							.append(col_name_last		.append(input_name_last)	.append($("<label>")))
@@ -324,6 +348,10 @@ var	doctor_obj = function()
 							.append(col_admin_hint)
 							.append(col_active			.append(user_active_switcher))
 							.append(col_active_hint);
+
+		collapsible_row_2
+							.append(col_visibility_desc	.append("Доступ к мед. записям:"))
+							.append(col_visibility_scope.append(visibility_scope_select));
 
 		open_button			.attr("data-target", "collapsible_doctor_" + data_global.id)
 							.attr("data-toggle", "collapse");
