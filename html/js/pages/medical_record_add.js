@@ -360,31 +360,37 @@ var	medical_record_add = (function()
 
 		if(zip.length == 6)
 		{
-			$.getJSON(
-				"/cgi-bin/ajax_anyrole_1.cgi",
-				{
-					action:"AJAX_getRussianLocalityByZip",
-					zip: zip,
-				})
-				.done(function(data)
-				{
-					if(data.result == "success")
+			if(zip.match(/\d{6}/))
+			{
+				$.getJSON(
+					"/cgi-bin/ajax_anyrole_1.cgi",
 					{
-						$("input.___region")	.val(data.zip.locality.region.title);
-						$("input.___locality")	.val(data.zip.locality.title);
-					}
-					else
+						action:"AJAX_getRussianLocalityByZip",
+						zip: zip,
+					})
+					.done(function(data)
 					{
-						system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
-					}
-				})
-				.fail(function()
-				{
-					setTimeout(function() {
-						system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
-					}, 500);
-				});
-
+						if(data.result == "success")
+						{
+							$("input.___region")	.val(data.zip.locality.region.title);
+							$("input.___locality")	.val(data.zip.locality.title);
+						}
+						else
+						{
+							system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
+						}
+					})
+					.fail(function()
+					{
+						setTimeout(function() {
+							system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
+						}, 500);
+					});
+			}
+			else
+			{
+				system_calls.PopoverError(curr_tag, "Индекс должен быть 6 цифр");
+			}
 		}
 	};
 
