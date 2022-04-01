@@ -9,7 +9,7 @@
 
     <script src="/js/pages/pd/survival_analysis/survival_analysis.js" type="module"></script>
 
-    
+
 
   </head>
 
@@ -36,7 +36,13 @@
       </div>
     </div>
 
-    <div dataset-group="0"></div>
+
+    <div class="container single_block box-shadow--6dp">
+      <div class="row form-group">
+        <div class="col-xs-12" dataset-group="0">
+        </div>
+      </div>
+    </div>
 
     <div id="scrollerToShow"></div>
 
