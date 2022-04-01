@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <<template:templates/ru/pages/header.htmlt>>
+
+    <title><<vars:title_head>></title>
+
+    <script src="/js/pages/pd/survival_analysis/survival_analysis.js" type="module"></script>
+
+    
+
+  </head>
+
+  <body>
+  <<template:templates/ru/pages/<<vars:user_type>>_navigation_menu.htmlt>>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <h3>
+            <center>
+              Kaplan-Meier, Log-rank tests
+            </center>
+          </h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 form-group">
+          <button id="create_dataset" class="btn btn-primary float_right __loading_indicator">Новая группа</button>
+        </div>
+      </div>
+    </div>
+
+    <div dataset-group="0"></div>
+
+    <div id="scrollerToShow"></div>
+
+  <<template:templates/ru/pages/footer.htmlt>>
+
+  </body>
+</html>
