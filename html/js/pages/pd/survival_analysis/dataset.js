@@ -7,7 +7,7 @@ export default class Dataset {
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
-		this._indices = Array.from(Array(records.length).keys()); // --- initialize indicies w/o filters
+		this._indices = Array.from(Array(records.length).keys()); // --- initialize indices w/o filters
 
 		this._km = km;
 	}
@@ -105,8 +105,8 @@ export default class Dataset {
 			let record_id = indices.Censored[i];
 
 			let neoadj_chemo_date = this._records[record_id].___neoadj_chemo___start_date;
-			let adj_chemo_date = this._records[record_id].___adjuvant_chemotherapy_conduct___start_date;
 			let invasion_date = this._records[record_id].___op_done___invasion_date;
+			let adj_chemo_date = this._records[record_id].___adjuvant_chemotherapy_conduct___start_date;
 
 			let censoring_date = this._records[record_id].___study_retirement_date;
 
@@ -120,13 +120,13 @@ export default class Dataset {
 		let number_at_risk = [];
 		let number_of_death = [];
 		let number_censored = [];
-		let surv_proba = [];
+		let survival_probability = [];
 
-		let temp_indecies = this._GetEventCensorIndexes();
-		let temp_time = this._GetTimeDtCtOfEventCensor(temp_indecies);
+		let temp_indices = this._GetEventCensorIndexes();
+		let temp_time = this._GetTimeDtCtOfEventCensor(temp_indices);
 
 
-		return {Time: time, Survival: surv_proba};
+		return {Time: time, Survival: survival_probability};
 	}
 
 	Indices_ChangeHandler() {

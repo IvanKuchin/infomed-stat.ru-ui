@@ -11,7 +11,7 @@ export default class KaplanMeier {
 	_data = {
 		labels: this._labels,
 		datasets: [{
-			parentid: 0,
+			parent_id: 0,
 			stepped: true,
 			label: 'My First dataset',
 			backgroundColor: 'rgb(255, 99, 132)',
