@@ -34,7 +34,6 @@
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Статистика <span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu">
 						<li><a href="/cgi-bin/doctor.cgi?action=graph_dimensions_template&rand=<<vars:rand>>">Parallel coordinates</a></li>
-						<li><a href="/cgi-bin/doctor.cgi?action=survival_analysis_template&rand=<<vars:rand>>">Survival analysis</a></li>
 					</ul>
 				</li>
 			</ul>
