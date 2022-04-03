@@ -86,13 +86,13 @@ export default class Dataset {
 		return panel;
 	}
 
-	ToggleCollapsible() {
+	_ToggleCollapsible() {
 		$("[dataset='" + this.id + "'] .collapse").collapse("toggle");
 	}
 
 	AddToParent(parentDOM) {
 		parentDOM.appendChild(this.GetDOM());
-		this.ToggleCollapsible();
+		this._ToggleCollapsible();
 
 		this.Indices_ChangeHandler();
 	}
@@ -142,12 +142,10 @@ export default class Dataset {
 
 			if(retirement_date.length)	{ censored_idxs.push(record_idx); }
 			else if(death_date.length)	{ event_idxs.push(record_idx); }
-			else						{ alive_idx.push(record_idx); }
+			else						{ alive_idxs.push(record_idx); }
 		}
 
-		let alive = this._indices.length - event_idxs.length - censored_idxs.length;
-
-		return {Event: event_idxs, Censored: censored_idxs, Alive: alive};
+		return {Event: event_idxs, Censored: censored_idxs, Alive: alive_idxs};
 	}
 
 	// Produces Kaplan-Meier metadata 
@@ -162,9 +160,23 @@ export default class Dataset {
 		return {
 				Events:		obj.Event.length, 
 				Censored:	obj.Censored.length, 
-				Alive:		obj.Alive, 
-				Total:		obj.Event.length + obj.Censored.length + obj.Alive,
+				Alive:		obj.Alive.length, 
+				Total:		obj.Event.length + obj.Censored.length + obj.Alive.length,
 			}; 
+	}
+
+	_GetBasicKMObject = function() {
+		return {Censored: 0, Events: 0, Alive: 0, Patients: [] };
+	}
+
+	_GetPatientBriefObj = function(record, status) {
+		return {
+					first_name:		record.___first_name,
+					last_name:		record.___last_name,
+					middle_name:	record.___middle_name,
+					birthdate:		record.___birthdate,
+					status:			status,
+				}
 	}
 
 	// Produces data "ready to be fit" to drawing app.
@@ -181,7 +193,7 @@ export default class Dataset {
 
 			let neoadj_chemo_date	= this._records[record_idx].___neoadj_chemo___start_date;
 			let invasion_date		= this._records[record_idx].___op_done___invasion_date;
-			let adj_chemo_date		= this._records[record_idx].___adjuvant_chemotherapy_conduct___start_date;
+			let adj_chemo_date		= ""; // --- is not important
 
 			let finish_date			= this._records[record_idx].___study_retirement_date;
 
@@ -194,10 +206,12 @@ export default class Dataset {
 
 				let	time = time_map.months;
 				if(km_map.has(time)) {
-					km_map.get(time).Censored++;
 				} else {
-					km_map.set(time, {Censored: 1, Events: 0});
+					km_map.set(time, this._GetBasicKMObject());
 				}
+
+				km_map.get(time).Censored++;
+				km_map.get(time).Patients.push(this._GetPatientBriefObj(this._records[record_idx], "выбыл"));
 			}
 		}
 
@@ -207,7 +221,7 @@ export default class Dataset {
 
 			let neoadj_chemo_date	= this._records[record_idx].___neoadj_chemo___start_date;
 			let invasion_date		= this._records[record_idx].___op_done___invasion_date;
-			let adj_chemo_date		= this._records[record_idx].___adjuvant_chemotherapy_conduct___start_date;
+			let adj_chemo_date		= ""; // --- is not important
 
 			let finish_date			= this._records[record_idx].___death_date;
 
@@ -220,18 +234,47 @@ export default class Dataset {
 
 				let	time = time_map.months;
 				if(km_map.has(time)) {
-					km_map.get(time).Events++;
 				} else {
-					km_map.set(time, {Censored: 0, Events: 1});
+					km_map.set(time, this._GetBasicKMObject());
 				}
+				km_map.get(time).Events++;
+				km_map.get(time).Patients.push(this._GetPatientBriefObj(this._records[record_idx], "умер"));
 
 			}
 		}
 
+		let now_date = new Date();
+		let now_str = now_date.toISOString().slice(0, 10);
+		for (var i = indices_map.Alive.length - 1; i >= 0; i--) {
+			let record_idx = indices_map.Alive[i];
+
+			let neoadj_chemo_date	= this._records[record_idx].___neoadj_chemo___start_date;
+			let invasion_date		= this._records[record_idx].___op_done___invasion_date;
+			let adj_chemo_date		= ""; // --- is not important
+
+			let finish_date			= now_str;
+
+			let time_map			= this._GetMonthsBetweenDates(neoadj_chemo_date, invasion_date, adj_chemo_date, finish_date);
+
+			if(time_map.error instanceof Error) {
+				console.error(`record id: ${this._records[record_idx].id}\n${time_map.error}`);
+			} else {
+				// console.debug(`${this._records[record_idx].id}) start(${neoadj_chemo_date} / ${invasion_date} / ${adj_chemo_date}) - finish(${finish_date}) -> ${time_map.months}`);
+
+				let	time = time_map.months;
+				if(km_map.has(time)) {
+				} else {
+					km_map.set(time, this._GetBasicKMObject());
+				}
+				km_map.get(time).Alive++;
+				km_map.get(time).Patients.push(this._GetPatientBriefObj(this._records[record_idx], "жив"));
+			}
+		}
+
 		// --- Convert map to array
-		let km_arr = [{Time: 0, Censored: 0, Events: 0}];
+		let km_arr = [{Time: 0, Censored: 0, Events: 0, Alive: 0, Patients: []}];
 		km_map.forEach((v, k) => {
-			km_arr.push({Time: k, Censored: v.Censored, Events: v.Events});
+			km_arr.push({Time: k, Censored: v.Censored, Events: v.Events, Alive: v.Alive, Patients: v.Patients});
 		})
 
 		// --- Sort by Time
@@ -240,10 +283,10 @@ export default class Dataset {
 		return km_sorted;
 	}
 
-	_KMaddSurvival(km_base, number_of_alive) {
+	_KMaddSurvival(km_base) {
 		for (let i = km_base.length - 1; i >= 0; i--) {
-			let cumulative_risk = (i < km_base.length - 1) ? km_base[i + 1].AtRisk : number_of_alive;
-			km_base[i].AtRisk = km_base[i].Censored + km_base[i].Events + cumulative_risk;
+			let cumulative_at_risk = (i < km_base.length - 1) ? km_base[i + 1].AtRisk : 0;
+			km_base[i].AtRisk = km_base[i].Censored + km_base[i].Events + km_base[i].Alive + cumulative_at_risk;
 		}
 
 		km_base[0].Survival = 1;
@@ -257,7 +300,7 @@ export default class Dataset {
 	_CalculateKMSurvivalData() {
 		let indices_map		= this._GetEventCensorIndexes();
 		let km_base			= this._GetTimeDtCtOfEventCensor(indices_map);
-		let	km_survival		= this._KMaddSurvival(km_base, indices_map.Alive);
+		let	km_survival		= this._KMaddSurvival(km_base);
 
 		return km_survival;
 	}

@@ -7,7 +7,15 @@ export default class KaplanMeier {
 	_config = {
 		type: 'line',
 		data: this._data,
-		options: {}
+		options: {
+		    plugins: {
+				tooltip: {
+					callbacks: {
+					  footer: this._footer,
+					}
+				}
+		    }
+		}
 	};
 
 	constructor(id) { 
@@ -26,8 +34,33 @@ export default class KaplanMeier {
 						  );
 	}
 
-	rnd() {
-		return Math.random() * 50;
+	_footer(tooltipItems) {
+		let footer	= "";
+
+		tooltipItems.forEach(function(tooltipItem) {
+			let data	= tooltipItem.dataset.data;
+			let label	= tooltipItem.label;
+
+			for (var i = 0; i < data.length; i++) {
+				if(data[i].x == label) {
+					let patients = data[i].Patients;
+
+					footer += `\n`;
+					for (var i = 0; i < patients.length; i++) {
+						let patient = patients[i];
+
+						footer += `${patient.last_name} ${patient.first_name} ${patient.middle_name} гр:${patient.birthdate} (${patient.status})\n`;
+					}
+
+					break;
+				}
+			}
+
+			// console.debug(`parent_id: ${tooltipItem.dataset.parent_id}, label: ${tooltipItem.label}, patients: `);
+
+		});
+
+		return footer;
 	}
 
 	_GetDatasetObject(parent_id) {
@@ -45,6 +78,8 @@ export default class KaplanMeier {
 		}
 	}
 
+	// Replaces dataset with parent_id in datasets array with one provided as a parameter
+	// Output: none 
 	UpdateDataset(parent_id, km_data) {
 		let datasets = this._data.datasets;
 		let ds_idx;
@@ -59,19 +94,31 @@ export default class KaplanMeier {
 			datasets.push(this._GetDatasetObject(parent_id));
 		}
 
-		datasets[ds_idx].data = [
-			{ x: 0, y: this.rnd() }, 
-			{ x: 1, y: this.rnd() }, 
-			{ x: 2, y: this.rnd() }, 
-			{ x: 4, y: this.rnd() }, 
-			{ x: 5, y: this.rnd() }, 
-			{ x: 6, y: this.rnd() }, 
-			{ x: 8, y: this.rnd() },
-		];
+		datasets[ds_idx].data = [];
+		for (var i = 0; i < km_data.length; i++) {
+			let	rec = km_data[i];
+
+			datasets[ds_idx].data.push({ x: rec.Time, y: rec.Survival, Patients: rec.Patients });
+		}
+	}
+
+	// Calculates maximum X and update labels[]
+	_UpdateLabels() {
+		let datasets = this._data.datasets;
+		let max_t = 0;
+
+		for (let i = 0; i < datasets.length; ++i) {
+			let	data = datasets[i].data;
+			max_t = Math.max(max_t, data[data.length - 1].x);
+		}
+
+		this._data.labels = Array.from(Array(max_t).keys());
+
 	}
 
 	UpdateStepFunction() {
-		this._data.labels = Array.from(Array(10).keys());
+		this._UpdateLabels();
+
 		this._myChart.update();
 	}
 }
