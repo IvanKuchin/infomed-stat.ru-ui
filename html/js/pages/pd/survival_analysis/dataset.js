@@ -2,6 +2,7 @@ export default class Dataset {
 	_records = [];
 	_indices = [];
 	_filters = [];
+	_visibility = true;
 
 	constructor(id, records, km) { 
 		this.id = id; // --- forwards it to setter 
@@ -32,6 +33,15 @@ export default class Dataset {
 		let panel_header = document.createElement("div");
 		panel_header.classList.add("panel-heading");
 
+		let panel_header_row = document.createElement("div");
+		panel_header_row.classList.add("row");
+
+		let panel_header_col1 = document.createElement("div");
+		panel_header_col1.classList.add("col-xs-10");
+
+		let panel_header_col2 = document.createElement("div");
+		panel_header_col2.classList.add("col-xs-2");
+
 		let panel_header_total_record_counter = document.createElement("span");
 		panel_header_total_record_counter.setAttribute("total-record-counter", "");
 
@@ -44,11 +54,27 @@ export default class Dataset {
 		let panel_header_alive_record_counter = document.createElement("span");
 		panel_header_alive_record_counter.setAttribute("alive-record-counter", "");
 
+		let panel_header_collapse_button = document.createElement("button");
+		panel_header_collapse_button.setAttribute("data-toggle", "collapse");
+		panel_header_collapse_button.setAttribute("data-target", `[collapse-filters="${this.id}"]`);
+		panel_header_collapse_button.classList.add("btn", "btn_default", "float_right");
+
+		let panel_header_collapse_button_icon = document.createElement("span");
+		panel_header_collapse_button_icon.classList.add("glyphicon", "glyphicon-unchecked");
+
+		let panel_header_hide_button = document.createElement("button");
+		panel_header_hide_button.classList.add("btn", "btn_default", "float_right");
+
+		let panel_header_hide_button_icon = document.createElement("span");
+		panel_header_hide_button_icon.classList.add("glyphicon", "glyphicon-eye-close");
+		panel_header_hide_button_icon.addEventListener("click", this._ToggleDatasetVisibility_ClickHandler.bind(this));
+
 		let panel_body = document.createElement("div");
 		panel_body.classList.add("panel-body");
 
 		let collapse = document.createElement("div");
 		collapse.setAttribute("aria-expanded", true);
+		collapse.setAttribute("collapse-filters", this.id);
 		collapse.classList.add("row", "collapse");
 
 		let collapse_top_shadow = document.createElement("div");
@@ -66,21 +92,28 @@ export default class Dataset {
 		collapse_bottom_shadow.classList.add("col-xs-12", "collapse-bottom-shadow");
 		collapse_bottom_shadow.appendChild(document.createElement("p"));
 
-		panel					.appendChild(panel_header);
-		panel					.appendChild(panel_body);
-		panel_header			.appendChild(document.createTextNode("Группа " + this.id + ". Всего записей: "));
-		panel_header			.appendChild(panel_header_total_record_counter);
-		panel_header			.appendChild(document.createTextNode(". Событий: "));
-		panel_header			.appendChild(panel_header_event_record_counter);
-		panel_header			.appendChild(document.createTextNode(". Выбывших: "));
-		panel_header			.appendChild(panel_header_censored_record_counter);
-		panel_header			.appendChild(document.createTextNode(". Живых: "));
-		panel_header			.appendChild(panel_header_alive_record_counter);
-		panel_body				.appendChild(collapse);
-		collapse				.appendChild(collapse_top_shadow);
-		collapse				.appendChild(collapse_body_row);
-		collapse				.appendChild(collapse_bottom_shadow);
-		collapse_body_row		.appendChild(collapse_body_col);
+		panel							.appendChild(panel_header);
+		panel							.appendChild(panel_body);
+		panel_header					.appendChild(panel_header_row);
+		panel_header_row				.appendChild(panel_header_col1);
+		panel_header_row				.appendChild(panel_header_col2);
+		panel_header_col1				.appendChild(document.createTextNode("Группа " + this.id + ". Всего записей: "));
+		panel_header_col1				.appendChild(panel_header_total_record_counter);
+		panel_header_col1				.appendChild(document.createTextNode(". Событий: "));
+		panel_header_col1				.appendChild(panel_header_event_record_counter);
+		panel_header_col1				.appendChild(document.createTextNode(". Выбывших: "));
+		panel_header_col1				.appendChild(panel_header_censored_record_counter);
+		panel_header_col1				.appendChild(document.createTextNode(". Живых: "));
+		panel_header_col1				.appendChild(panel_header_alive_record_counter);
+		panel_header_col2				.appendChild(panel_header_hide_button);
+		panel_header_col2				.appendChild(panel_header_collapse_button);
+		panel_header_collapse_button	.appendChild(panel_header_collapse_button_icon);
+		panel_header_hide_button		.appendChild(panel_header_hide_button_icon);
+		panel_body						.appendChild(collapse);
+		collapse						.appendChild(collapse_top_shadow);
+		collapse						.appendChild(collapse_body_row);
+		collapse						.appendChild(collapse_bottom_shadow);
+		collapse_body_row				.appendChild(collapse_body_col);
 
 
 		return panel;
@@ -283,12 +316,16 @@ export default class Dataset {
 		return km_sorted;
 	}
 
+	// Add KM-specific data
 	_KMaddSurvival(km_base) {
+
+		// Walk over table from the bottom to the top to calculate cumulative at risk numbers
 		for (let i = km_base.length - 1; i >= 0; i--) {
 			let cumulative_at_risk = (i < km_base.length - 1) ? km_base[i + 1].AtRisk : 0;
 			km_base[i].AtRisk = km_base[i].Censored + km_base[i].Events + km_base[i].Alive + cumulative_at_risk;
 		}
 
+		// Walk ofer table from the top to the bottom to calculate survival rate 
 		km_base[0].Survival = 1;
 		for (let i = 1; i < km_base.length; i++) {
 			km_base[i].Survival = km_base[i - 1].Survival * (km_base[i].AtRisk - km_base[i].Events) / km_base[i].AtRisk;
@@ -303,6 +340,17 @@ export default class Dataset {
 		let	km_survival		= this._KMaddSurvival(km_base);
 
 		return km_survival;
+	}
+
+	_ToggleDatasetVisibility_ClickHandler(e) {
+		this._visibility = !this._visibility;
+
+		if(this._visibility) {
+			this.Indices_ChangeHandler();
+		} else {
+			this._km.RemoveDataset(this.id);
+			this._km.UpdateStepFunction();
+		}
 	}
 
 	Indices_ChangeHandler() {

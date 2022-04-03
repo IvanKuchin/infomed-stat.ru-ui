@@ -49,7 +49,7 @@ export default class KaplanMeier {
 					for (var i = 0; i < patients.length; i++) {
 						let patient = patients[i];
 
-						footer += `${patient.last_name} ${patient.first_name} ${patient.middle_name} гр:${patient.birthdate} (${patient.status})\n`;
+						footer += `${patient.last_name} ${patient.first_name} ${patient.middle_name} гр.${patient.birthdate} (${patient.status})\n`;
 					}
 
 					break;
@@ -71,16 +71,14 @@ export default class KaplanMeier {
 		return {
 			parent_id:			parent_id,
 			stepped:			true,
-			label:				'Dataset' + parent_id,
+			label:				'Группа ' + parent_id,
 			backgroundColor:	`rgb(${red}, ${green}, ${blue})`,
 			borderColor:		`rgb(${red}, ${green}, ${blue})`,
 			data: [],
 		}
 	}
 
-	// Replaces dataset with parent_id in datasets array with one provided as a parameter
-	// Output: none 
-	UpdateDataset(parent_id, km_data) {
+	_FindDSIndexByParentID(parent_id) {
 		let datasets = this._data.datasets;
 		let ds_idx;
 
@@ -89,6 +87,15 @@ export default class KaplanMeier {
 				break;
 			} 
 		}
+
+		return ds_idx;
+	}
+
+	// Replaces dataset with parent_id in datasets array with one provided as a parameter
+	// Output: none 
+	UpdateDataset(parent_id, km_data) {
+		let datasets = this._data.datasets;
+		let ds_idx = this._FindDSIndexByParentID(parent_id);
 
 		if(ds_idx == datasets.length) {
 			datasets.push(this._GetDatasetObject(parent_id));
@@ -99,6 +106,17 @@ export default class KaplanMeier {
 			let	rec = km_data[i];
 
 			datasets[ds_idx].data.push({ x: rec.Time, y: rec.Survival, Patients: rec.Patients });
+		}
+	}
+
+	// Remove dataset from datasets[]
+	RemoveDataset(parent_id) {
+		let datasets = this._data.datasets;
+		let ds_idx = this._FindDSIndexByParentID(parent_id);
+
+		if(ds_idx == datasets.length) {
+		} else {
+			datasets.splice(ds_idx, 1);
 		}
 	}
 
