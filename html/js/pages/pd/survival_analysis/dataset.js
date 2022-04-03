@@ -325,7 +325,7 @@ export default class Dataset {
 			km_base[i].AtRisk = km_base[i].Censored + km_base[i].Events + km_base[i].Alive + cumulative_at_risk;
 		}
 
-		// Walk ofer table from the top to the bottom to calculate survival rate 
+		// Walk over table from the top to the bottom to calculate survival rate 
 		km_base[0].Survival = 1;
 		for (let i = 1; i < km_base.length; i++) {
 			km_base[i].Survival = km_base[i - 1].Survival * (km_base[i].AtRisk - km_base[i].Events) / km_base[i].AtRisk;
