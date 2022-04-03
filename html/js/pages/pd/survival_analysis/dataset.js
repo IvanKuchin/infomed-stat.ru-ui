@@ -133,14 +133,16 @@ export default class Dataset {
 	_GetEventCensorIndexes() {
 		let censored_idxs = [];
 		let event_idxs = [];
+		let alive_idxs = [];
 
 		for (let i = this._indices.length - 1; i >= 0; i--) {
 			let record_idx = this._indices[i];
 			let retirement_date = this._records[record_idx].___study_retirement_date;
 			let death_date = this._records[record_idx].___death_date;
 
-			if(retirement_date.length) { censored_idxs.push(record_idx); }
-			if(death_date.length) { event_idxs.push(record_idx); }
+			if(retirement_date.length)	{ censored_idxs.push(record_idx); }
+			else if(death_date.length)	{ event_idxs.push(record_idx); }
+			else						{ alive_idx.push(record_idx); }
 		}
 
 		let alive = this._indices.length - event_idxs.length - censored_idxs.length;
