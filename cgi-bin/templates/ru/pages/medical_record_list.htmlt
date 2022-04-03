@@ -32,6 +32,19 @@
           </h3>
         </div>
       </div>
+      <div class="row">
+        <div class="col-xs-6 col-md-9">
+          <p></p>
+        </div>
+        <div class="col-xs-6 col-md-3">
+          <select id="status_filter" class="form-group form-control">
+            <option value="all">Все пациенты</option>
+            <option value="alive">Живые</option>
+            <option value="censored">Выбывшие</option>
+            <option value="event">Умершие</option>
+          </select>
+        </div>
+      </div>
       <div id="medical_record_list"></div>
     </div>
 

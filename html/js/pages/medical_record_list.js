@@ -12,6 +12,7 @@ var	medical_record_list = (function()
 
 		GetInitialData();
 
+		$("#status_filter")						.on("change", DisplayFilter_ChangeHandler);
 		$("#AreYouSureRemovePatient .submit")	.on("click", ConfirmPatientRemove_ClickHandler);
 
 	};
@@ -91,6 +92,12 @@ var	medical_record_list = (function()
 		// --- render collapsible part
 		var		row_collapsible 	= $("<div>")	.addClass("row collapse");
 		var		col_collapsible_content = $("<div>").addClass("col-xs-12");
+
+		// --- add status attribute
+		row		.attr("status-all", "");
+		if(medical_record.___death_date.length) 				{ row	.attr("status-event", ""); }
+		else if(medical_record.___study_retirement_date.length)	{ row	.attr("status-censored", ""); }
+		else													{ row	.attr("status-alive", ""); }
 
 		row_collapsible		.attr("id", "collapsible_med_record_" + medical_record.id)
 							.append($("<div>").addClass("col-xs-12 collapse-top-shadow margin_bottom_20").append("<p>"))
@@ -252,7 +259,12 @@ var	medical_record_list = (function()
 			});
 	};
 
+	var	DisplayFilter_ChangeHandler = function(e) {
+		let filter = e.target.value;
 
+		$("[status-all]").hide();
+		$(`[status-${filter}]`).show(750);
+	};
 
 	return {
 		Init: Init
