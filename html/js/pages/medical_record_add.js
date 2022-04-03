@@ -136,7 +136,10 @@ var	medical_record_add = (function()
 
 		tab_id = parseInt(tab_id);
 
-		if((tab_id > current_tab_global) && (ValidateTab(current_tab_global) === false))
+		if(
+			((tab_id > current_tab_global) && (ValidateTab(current_tab_global) === false)) || // validate only forward step
+			((tab_id == -1) && (ValidateTab(current_tab_global) === false)) // validate last step as well
+			)
 		{
 			// --- keep result as false
 		}
@@ -193,6 +196,21 @@ var	medical_record_add = (function()
 				else
 				{
 					system_calls.PopoverError($("#navigate_next"), "Нужно принять условия лицензионного соглашения");
+				}
+			}
+			else if(algorithm == "final_check") {
+				let neoadj_chemo_str	= document.querySelectorAll(".___neoadj_chemo .___start_date")[0].value;
+				let invasion_str		= document.querySelectorAll(".___invasion_date")[0].value;
+				let neoadj_chemo_date	= new Date(neoadj_chemo_str);
+				let invasion_date		= new Date(invasion_str);
+
+				if(isNaN(neoadj_chemo_date) && isNaN(invasion_date))
+				{
+					system_calls.PopoverError($("#navigate_next"), "Требуется дата операции или дата неоадьювантной химиотерапии");
+				}
+				else
+				{
+					result = true;
 				}
 			}
 			else

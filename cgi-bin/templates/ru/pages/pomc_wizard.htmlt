@@ -827,7 +827,7 @@
       </div>
     </div>
 
-    <div class="__tab tab_hidden"  data-prev_tab_id="19" data-tab_id="20" data-next_tab_id="-1">
+    <div class="__tab tab_hidden"  data-prev_tab_id="19" data-tab_id="20" data-next_tab_id="-1"  data-algorithm="final_check">
       <div class="container single_block">
         <div class="row">
           <div class="col-xs-12"><h3><center>Отправление данных</center></h3></div>
