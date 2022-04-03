@@ -166,6 +166,48 @@ var	medical_record_add = (function()
 		return result;
 	};
 
+	var	_isValidDate = function(d_str) {
+		let d = new Date(d_str);
+
+		return isNaN(d) ? false : true;
+	}
+
+	var _FinalCheck1 = function() {
+		let result				= false;
+
+		let neoadj_chemo_str	= document.querySelectorAll(".___neoadj_chemo .___start_date")[0].value;
+		let invasion_str		= document.querySelectorAll(".___invasion_date")[0].value;
+		// let neoadj_chemo_date	= new Date(neoadj_chemo_str);
+		// let invasion_date		= new Date(invasion_str);
+
+		// if(isNaN(neoadj_chemo_date) && isNaN(invasion_date)) {
+		if(_isValidDate(neoadj_chemo_str) || _isValidDate(invasion_str)) {
+			result = true;
+		} else {
+			system_calls.PopoverError($("#navigate_next"), "Требуется дата операции или дата неоадьювантной химиотерапии");
+		}
+
+		return result;		
+	}
+
+	var _FinalCheck2 = function() {
+		let result				= false;
+
+		let censor_str			= document.querySelectorAll(".___study_retirement_date")[0].value;
+		let event_str			= document.querySelectorAll(".___death_date")[0].value;
+		// let censor_date			= new Date(censor_str);
+		// let event_date			= new Date(event_str);
+
+		if(_isValidDate(censor_str) && _isValidDate(event_str)) {
+			system_calls.PopoverError($("#navigate_next"), "Выберите либо дату выбытия из исследования, либо дату смерти (обе даты - это ошибка)");
+		} else {
+			result = true;
+		}
+
+		return result;		
+	}
+
+
 	var	ValidateTab = function(tab_id)
 	{
 		var	result		= false;
@@ -199,17 +241,7 @@ var	medical_record_add = (function()
 				}
 			}
 			else if(algorithm == "final_check") {
-				let neoadj_chemo_str	= document.querySelectorAll(".___neoadj_chemo .___start_date")[0].value;
-				let invasion_str		= document.querySelectorAll(".___invasion_date")[0].value;
-				let neoadj_chemo_date	= new Date(neoadj_chemo_str);
-				let invasion_date		= new Date(invasion_str);
-
-				if(isNaN(neoadj_chemo_date) && isNaN(invasion_date))
-				{
-					system_calls.PopoverError($("#navigate_next"), "Требуется дата операции или дата неоадьювантной химиотерапии");
-				}
-				else
-				{
+				if(_FinalCheck1() && _FinalCheck2()) {
 					result = true;
 				}
 			}
