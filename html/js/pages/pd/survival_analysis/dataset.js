@@ -32,8 +32,17 @@ export default class Dataset {
 		let panel_header = document.createElement("div");
 		panel_header.classList.add("panel-heading");
 
-		let panel_header_record_counter = document.createElement("span");
-		panel_header_record_counter.setAttribute("record-counter", "");
+		let panel_header_total_record_counter = document.createElement("span");
+		panel_header_total_record_counter.setAttribute("total-record-counter", "");
+
+		let panel_header_censored_record_counter = document.createElement("span");
+		panel_header_censored_record_counter.setAttribute("censored-record-counter", "");
+
+		let panel_header_event_record_counter = document.createElement("span");
+		panel_header_event_record_counter.setAttribute("event-record-counter", "");
+
+		let panel_header_alive_record_counter = document.createElement("span");
+		panel_header_alive_record_counter.setAttribute("alive-record-counter", "");
 
 		let panel_body = document.createElement("div");
 		panel_body.classList.add("panel-body");
@@ -59,8 +68,14 @@ export default class Dataset {
 
 		panel					.appendChild(panel_header);
 		panel					.appendChild(panel_body);
-		panel_header			.appendChild(document.createTextNode("Группа " + this.id + ". Количество записей: "));
-		panel_header			.appendChild(panel_header_record_counter);
+		panel_header			.appendChild(document.createTextNode("Группа " + this.id + ". Всего записей: "));
+		panel_header			.appendChild(panel_header_total_record_counter);
+		panel_header			.appendChild(document.createTextNode(". Событий: "));
+		panel_header			.appendChild(panel_header_event_record_counter);
+		panel_header			.appendChild(document.createTextNode(". Выбывших: "));
+		panel_header			.appendChild(panel_header_censored_record_counter);
+		panel_header			.appendChild(document.createTextNode(". Живых: "));
+		panel_header			.appendChild(panel_header_alive_record_counter);
 		panel_body				.appendChild(collapse);
 		collapse				.appendChild(collapse_top_shadow);
 		collapse				.appendChild(collapse_body_row);
@@ -82,56 +97,178 @@ export default class Dataset {
 		this.Indices_ChangeHandler();
 	}
 
+	// Calculate number of months between start dates and finish date
+	//		start dates sorted in order of priority
+	//		start1 - most priority
+	//		start2 - medium
+	//		start3 - least
+	_GetMonthsBetweenDates(start1, start2, start3, _finish) {
+		let error = "";
+		let months = 0;
+
+		let d1 = new Date(start1);
+		let d2 = new Date(start2);
+		let d3 = new Date(start3);
+		let finish = new Date(_finish)
+
+		if(isNaN(d1) && isNaN(d2) && isNaN(d3)) {
+			error = new Error("no valid start date");
+		} else if(isNaN(finish)) {
+			error = new Error("no valid finish date");
+		} else {
+			let start = isNaN(d1) ? isNaN(d2) ? d3 : d2 : d1;
+
+			months = (finish.getFullYear() - start.getFullYear()) * 12 - start.getMonth() + finish.getMonth();
+		}
+
+		return {error: error, months: months};
+	}
+
+
+	// Produces Event indices and Censor indices from indices(general) slice
+	// Output: object with following items
+	//			Event		- [] of record indexes with event happened
+	//			Censored	- [] of record indexes with censoring happened
+	//			Alive		- number of records that alive
 	_GetEventCensorIndexes() {
 		let censored_idxs = [];
 		let event_idxs = [];
 
 		for (let i = this._indices.length - 1; i >= 0; i--) {
-			let record_id = this._indices[i];
-			let retirement_date = this._records[record_id].___study_retirement_date;
-			let death_date = this._records[record_id].___death_date;
+			let record_idx = this._indices[i];
+			let retirement_date = this._records[record_idx].___study_retirement_date;
+			let death_date = this._records[record_idx].___death_date;
 
-			if(retirement_date.length) { censored_idxs.push(record_id); }
-			if(death_date.length) { event_idxs.push(record_id); }
+			if(retirement_date.length) { censored_idxs.push(record_idx); }
+			if(death_date.length) { event_idxs.push(record_idx); }
 		}
 
-		return {Event: event_idxs, Censored: censored_idxs};
+		let alive = this._indices.length - event_idxs.length - censored_idxs.length;
+
+		return {Event: event_idxs, Censored: censored_idxs, Alive: alive};
 	}
 
-	_GetTimeDtCtOfEventCensor(indices) {
+	// Produces Kaplan-Meier metadata 
+	// Output: object
+	//			Events		- number of events
+	//			Censored	- number of censored
+	//			Alive		- number of alive
+	//			Total		- sum of all above
+	_GetKMMetadata() {
+		let obj	= this._GetEventCensorIndexes();
 
-		console.debug("censoring:");
-		for (var i = indices.Censored.length - 1; i >= 0; i--) {
-			let record_id = indices.Censored[i];
+		return {
+				Events:		obj.Event.length, 
+				Censored:	obj.Censored.length, 
+				Alive:		obj.Alive, 
+				Total:		obj.Event.length + obj.Censored.length + obj.Alive,
+			}; 
+	}
 
-			let neoadj_chemo_date = this._records[record_id].___neoadj_chemo___start_date;
-			let invasion_date = this._records[record_id].___op_done___invasion_date;
-			let adj_chemo_date = this._records[record_id].___adjuvant_chemotherapy_conduct___start_date;
+	// Produces data "ready to be fit" to drawing app.
+	// Input: Event indices and Censor indices
+	// Output: sorted[] = Object{ Time: T, Censored: X, Events: Y }
+	// 			Time		- time in montsh till censoring or event
+	//			Censored	- number of events at this time
+	//			Events		- number of events at this time
+	_GetTimeDtCtOfEventCensor(indices_map) {
+		let	km_map = new Map();
 
-			let censoring_date = this._records[record_id].___study_retirement_date;
+		for (var i = indices_map.Censored.length - 1; i >= 0; i--) {
+			let record_idx = indices_map.Censored[i];
 
+			let neoadj_chemo_date	= this._records[record_idx].___neoadj_chemo___start_date;
+			let invasion_date		= this._records[record_idx].___op_done___invasion_date;
+			let adj_chemo_date		= this._records[record_idx].___adjuvant_chemotherapy_conduct___start_date;
 
-			console.debug(record_id + ")", neoadj_chemo_date, "/", invasion_date, "/", adj_chemo_date, "->", censoring_date);
+			let finish_date			= this._records[record_idx].___study_retirement_date;
+
+			let time_map			= this._GetMonthsBetweenDates(neoadj_chemo_date, invasion_date, adj_chemo_date, finish_date);
+
+			if(time_map.error instanceof Error) {
+				console.error(`record id: ${this._records[record_idx].id}\n${time_map.error}`);
+			} else {
+				// console.debug(`${this._records[record_idx].id}) start(${neoadj_chemo_date} / ${invasion_date} / ${adj_chemo_date}) - finish(${finish_date}) -> ${time_map.months}`);
+
+				let	time = time_map.months;
+				if(km_map.has(time)) {
+					km_map.get(time).Censored++;
+				} else {
+					km_map.set(time, {Censored: 1, Events: 0});
+				}
+			}
 		}
+
+
+		for (var i = indices_map.Event.length - 1; i >= 0; i--) {
+			let record_idx = indices_map.Event[i];
+
+			let neoadj_chemo_date	= this._records[record_idx].___neoadj_chemo___start_date;
+			let invasion_date		= this._records[record_idx].___op_done___invasion_date;
+			let adj_chemo_date		= this._records[record_idx].___adjuvant_chemotherapy_conduct___start_date;
+
+			let finish_date			= this._records[record_idx].___death_date;
+
+			let time_map			= this._GetMonthsBetweenDates(neoadj_chemo_date, invasion_date, adj_chemo_date, finish_date);
+
+			if(time_map.error instanceof Error) {
+				console.error(`record id: ${this._records[record_idx].id}\n${time_map.error}`);
+			} else {
+				// console.debug(`${this._records[record_idx].id}) start(${neoadj_chemo_date} / ${invasion_date} / ${adj_chemo_date}) - finish(${finish_date}) -> ${time_map.months}`);
+
+				let	time = time_map.months;
+				if(km_map.has(time)) {
+					km_map.get(time).Events++;
+				} else {
+					km_map.set(time, {Censored: 0, Events: 1});
+				}
+
+			}
+		}
+
+		// --- Convert map to array
+		let km_arr = [{Time: 0, Censored: 0, Events: 0}];
+		km_map.forEach((v, k) => {
+			km_arr.push({Time: k, Censored: v.Censored, Events: v.Events});
+		})
+
+		// --- Sort by Time
+		let km_sorted = km_arr.sort((a, b) => a.Time - b.Time);
+
+		return km_sorted;
 	}
 
-	CalculateKMSurvivalData() {
-		let time = [];
-		let number_at_risk = [];
-		let number_of_death = [];
-		let number_censored = [];
-		let survival_probability = [];
+	_KMaddSurvival(km_base, number_of_alive) {
+		for (let i = km_base.length - 1; i >= 0; i--) {
+			let cummulative_risk = (i < km_base.length - 1) ? km_base[i + 1].AtRisk : number_of_alive;
+			km_base[i].AtRisk = km_base[i].Censored + km_base[i].Events + cummulative_risk;
+		}
 
-		let temp_indices = this._GetEventCensorIndexes();
-		let temp_time = this._GetTimeDtCtOfEventCensor(temp_indices);
+		km_base[0].Survival = 1;
+		for (let i = 1; i < km_base.length; i++) {
+			km_base[i].Survival = km_base[i - 1].Survival * (km_base[i].AtRisk - km_base[i].Events) / km_base[i].AtRisk;
+		}
 
+		return km_base;
+	}
 
-		return {Time: time, Survival: survival_probability};
+	_CalculateKMSurvivalData() {
+		let indices_map		= this._GetEventCensorIndexes();
+		let km_base			= this._GetTimeDtCtOfEventCensor(indices_map);
+		let	km_survival		= this._KMaddSurvival(km_base, indices_map.Alive);
+
+		return km_survival;
 	}
 
 	Indices_ChangeHandler() {
-		let km_data = this.CalculateKMSurvivalData();
-		document.querySelectorAll("[dataset='" + this._id + "'] [record-counter]")[0].innerText = this._indices.length;
+		let km_metadata = this._GetKMMetadata();
+		document.querySelectorAll("[dataset='" + this._id + "'] [total-record-counter]")[0].innerText = km_metadata.Total;
+		document.querySelectorAll("[dataset='" + this._id + "'] [censored-record-counter]")[0].innerText = km_metadata.Censored;
+		document.querySelectorAll("[dataset='" + this._id + "'] [alive-record-counter]")[0].innerText = km_metadata.Alive;
+		document.querySelectorAll("[dataset='" + this._id + "'] [event-record-counter]")[0].innerText = km_metadata.Events;
+
+		let km_data = this._CalculateKMSurvivalData();
+		this._km.UpdateDataset(this.id, km_data);
 		this._km.UpdateStepFunction();
 	}
 }
