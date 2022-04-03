@@ -168,7 +168,7 @@ export default class Dataset {
 	// Produces data "ready to be fit" to drawing app.
 	// Input: Event indices and Censor indices
 	// Output: sorted[] = Object{ Time: T, Censored: X, Events: Y }
-	// 			Time		- time in montsh till censoring or event
+	// 			Time		- time in months till censoring or event
 	//			Censored	- number of events at this time
 	//			Events		- number of events at this time
 	_GetTimeDtCtOfEventCensor(indices_map) {
@@ -240,8 +240,8 @@ export default class Dataset {
 
 	_KMaddSurvival(km_base, number_of_alive) {
 		for (let i = km_base.length - 1; i >= 0; i--) {
-			let cummulative_risk = (i < km_base.length - 1) ? km_base[i + 1].AtRisk : number_of_alive;
-			km_base[i].AtRisk = km_base[i].Censored + km_base[i].Events + cummulative_risk;
+			let cumulative_risk = (i < km_base.length - 1) ? km_base[i + 1].AtRisk : number_of_alive;
+			km_base[i].AtRisk = km_base[i].Censored + km_base[i].Events + cumulative_risk;
 		}
 
 		km_base[0].Survival = 1;
