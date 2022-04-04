@@ -127,7 +127,7 @@ export default class Dataset {
 		let filters_row_button = document.createElement("button");
 		filters_row_button.classList.add("btn", "btn-primary", "float_right");
 		filters_row_button.appendChild(document.createTextNode("+ группа фильтров"));
-		filters_row_button.addEventListener("click", this._AddFirterGroup_ClickHandler.bind(this));
+		filters_row_button.addEventListener("click", this._AddFilterGroup_ClickHandler.bind(this));
 
 		collapse_body					.appendChild(filters_row_button_add_col);
 		filters_row_button_add_col		.appendChild(filters_row_button);
@@ -139,7 +139,7 @@ export default class Dataset {
 		$("[dataset='" + this.id + "'] .collapse").collapse("toggle");
 	}
 
-	_AddFirterGroup_ClickHandler(e) {
+	_AddFilterGroup_ClickHandler(e) {
 		let new_id = this._filter_groups.length;
 		let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`));
 		this._filter_groups.push(filter_group);
