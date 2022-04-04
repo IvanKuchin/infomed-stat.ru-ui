@@ -81,12 +81,12 @@ export default class Dataset {
 		collapse_top_shadow.classList.add("col-xs-12", "collapse-top-shadow", "margin_bottom_20");
 		collapse_top_shadow.appendChild(document.createElement("p"));
 
-		let collapse_body_row = document.createElement("div");
-		collapse_body_row.setAttribute("body", "");
-		collapse_body_row.classList.add("row", "form-group");
+		let collapse_body = document.createElement("div");
+		collapse_body.setAttribute("collapse-body", "");
 
-		let collapse_body_col = document.createElement("div");
-		collapse_body_col.classList.add("col-xs-12");
+		let collapse_bottom_buffer = document.createElement("div");
+		collapse_bottom_buffer.classList.add("col-xs-12", "form-group");
+		collapse_bottom_buffer.appendChild(document.createElement("p"));
 
 		let collapse_bottom_shadow = document.createElement("div");
 		collapse_bottom_shadow.classList.add("col-xs-12", "collapse-bottom-shadow");
@@ -111,10 +111,23 @@ export default class Dataset {
 		panel_header_hide_button		.appendChild(panel_header_hide_button_icon);
 		panel_body						.appendChild(collapse);
 		collapse						.appendChild(collapse_top_shadow);
-		collapse						.appendChild(collapse_body_row);
+		collapse						.appendChild(collapse_body);
+		collapse						.appendChild(collapse_bottom_buffer);
 		collapse						.appendChild(collapse_bottom_shadow);
-		collapse_body_row				.appendChild(collapse_body_col);
 
+		
+
+		// inside group content
+
+		let filters_row_button_add_col = document.createElement("div");
+		filters_row_button_add_col.classList.add("col-xs-12");
+
+		let filters_row_button = document.createElement("buttom");
+		filters_row_button.classList.add("btn", "btn-primary", "float_right");
+		filters_row_button.appendChild(document.createTextNode("+ группа фильтров"));
+
+		collapse_body					.appendChild(filters_row_button_add_col);
+		filters_row_button_add_col		.appendChild(filters_row_button);
 
 		return panel;
 	}
