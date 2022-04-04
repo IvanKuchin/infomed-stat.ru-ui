@@ -1,8 +1,10 @@
+import FilterGroup from "./filter-group.js"
+
 export default class Dataset {
 	_records = [];
 	_indices = [];
-	_filters = [];
 	_visibility = true;
+	_filter_groups = [];
 
 	constructor(id, records, km) { 
 		this.id = id; // --- forwards it to setter 
@@ -120,11 +122,12 @@ export default class Dataset {
 		// inside group content
 
 		let filters_row_button_add_col = document.createElement("div");
-		filters_row_button_add_col.classList.add("col-xs-12");
+		filters_row_button_add_col.classList.add("col-xs-12", "form-group");
 
-		let filters_row_button = document.createElement("buttom");
+		let filters_row_button = document.createElement("button");
 		filters_row_button.classList.add("btn", "btn-primary", "float_right");
 		filters_row_button.appendChild(document.createTextNode("+ группа фильтров"));
+		filters_row_button.addEventListener("click", this._AddFirterGroup_ClickHandler.bind(this));
 
 		collapse_body					.appendChild(filters_row_button_add_col);
 		filters_row_button_add_col		.appendChild(filters_row_button);
@@ -134,6 +137,14 @@ export default class Dataset {
 
 	_ToggleCollapsible() {
 		$("[dataset='" + this.id + "'] .collapse").collapse("toggle");
+	}
+
+	_AddFirterGroup_ClickHandler(e) {
+		let new_id = this._filter_groups.length;
+		let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`));
+		this._filter_groups.push(filter_group);
+
+		document.querySelectorAll(`[dataset="${this.id}"] [collapse-body]`)[0].appendChild(filter_group.GetDOM());
 	}
 
 	AddToParent(parentDOM) {
@@ -172,17 +183,18 @@ export default class Dataset {
 
 
 	// Produces Event indices and Censor indices from indices(general) slice
+	// Input:   indexes     - array of indexes pointing to records[]
 	// Output: object with following items
 	//			Event		- [] of record indexes with event happened
 	//			Censored	- [] of record indexes with censoring happened
 	//			Alive		- number of records that alive
-	_GetEventCensorIndexes() {
+	_GetEventCensorIndexes(indexes) {
 		let censored_idxs = [];
 		let event_idxs = [];
 		let alive_idxs = [];
 
-		for (let i = this._indices.length - 1; i >= 0; i--) {
-			let record_idx = this._indices[i];
+		for (let i = indexes.length - 1; i >= 0; i--) {
+			let record_idx = indexes[i];
 			let retirement_date = this._records[record_idx].___study_retirement_date;
 			let death_date = this._records[record_idx].___death_date;
 
@@ -195,13 +207,14 @@ export default class Dataset {
 	}
 
 	// Produces Kaplan-Meier metadata 
+	// Input:   indexes     - array of indexes pointing to records[]
 	// Output: object
 	//			Events		- number of events
 	//			Censored	- number of censored
 	//			Alive		- number of alive
 	//			Total		- sum of all above
-	_GetKMMetadata() {
-		let obj	= this._GetEventCensorIndexes();
+	GetKMMetadata(indexes) {
+		let obj	= this._GetEventCensorIndexes(indexes);
 
 		return {
 				Events:		obj.Event.length, 
@@ -347,8 +360,16 @@ export default class Dataset {
 		return km_base;
 	}
 
-	_CalculateKMSurvivalData() {
-		let indices_map		= this._GetEventCensorIndexes();
+	// Calculates full KM data from provided indexes
+	// Input:   indexes     - array of indexes pointing to records[]
+	// Output:	object
+	// 			Time		- time in months till censoring or event
+	//			Censored	- number of events at this time
+	//			Events		- number of events at this time
+	//			Alive		- number of alive at this time
+	//			Patients	- list of all patients at timestamp
+	_CalculateKMSurvivalData(indexes) {
+		let indices_map		= this._GetEventCensorIndexes(indexes);
 		let km_base			= this._GetTimeDtCtOfEventCensor(indices_map);
 		let	km_survival		= this._KMaddSurvival(km_base);
 
@@ -367,13 +388,13 @@ export default class Dataset {
 	}
 
 	Indices_ChangeHandler() {
-		let km_metadata = this._GetKMMetadata();
+		let km_metadata = this.GetKMMetadata(this._indices);
 		document.querySelectorAll("[dataset='" + this._id + "'] [total-record-counter]")[0].innerText = km_metadata.Total;
 		document.querySelectorAll("[dataset='" + this._id + "'] [censored-record-counter]")[0].innerText = km_metadata.Censored;
 		document.querySelectorAll("[dataset='" + this._id + "'] [alive-record-counter]")[0].innerText = km_metadata.Alive;
 		document.querySelectorAll("[dataset='" + this._id + "'] [event-record-counter]")[0].innerText = km_metadata.Events;
 
-		let km_data = this._CalculateKMSurvivalData();
+		let km_data = this._CalculateKMSurvivalData(this._indices);
 		this._km.UpdateDataset(this.id, km_data);
 		this._km.UpdateStepFunction();
 	}
