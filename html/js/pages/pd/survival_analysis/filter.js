@@ -68,7 +68,7 @@ export default class Filter {
 	// Builds array of options from records[indices].key
 	// Input:
 	//		record	- array of medical records
-	//		indices - array of filtered indeces 
+	//		indices - array of filtered indices 
 	//		key		- object field that provides values for HTML option tag
 	_GetValuesOfMedicalRecordsAsOptionList(records, indices, key) {
 		let arr = [];
