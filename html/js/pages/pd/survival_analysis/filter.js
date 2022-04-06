@@ -20,6 +20,11 @@ export default class Filter {
 		return property.indexOf("___") == 0 ? true : false;
 	}
 
+	// Build HTML-option tag. Values taken from translation of medical record keys to local language
+	// Input:
+	//		property	- medical record key
+	// Output:
+	//		HTML option tag
 	_GetMedPropertyDOM(property) {
 		let opt = document.createElement("option");
 		opt.setAttribute("value", property);
@@ -28,8 +33,28 @@ export default class Filter {
 		return opt;
 	}
 
+	// Build HTML-option tag. Values taken from parameter
+	// Input:
+	//		value - Option value
+	// Output:
+	//		HTML option tag
+	_GetOptionDOM(value) {
+		let opt = document.createElement("option");
+		opt.setAttribute("value", value);
+		opt.appendChild(document.createTextNode(value));
+
+		return opt;
+	}
+
+
+	// Builds array of HTML-options with names/values build from medical records keys
+	// Input:
+	//		record - object contains all fields that filter coul be applied to
+	// Output:
+	//		array of HTML option tags with proper values
 	_GetMedicalNamesAsOptionList(record) {
 		let arr = [];
+		arr.push(this._GetMedPropertyDOM("")); // first element should be empty, to denote "all" values
 
 		for(const property in record) {
 			if(this._IsMedProperty(property)) {
@@ -38,6 +63,33 @@ export default class Filter {
 		}
 
 		return arr;
+	}
+
+	// Builds array of options from records[indices].key
+	// Input:
+	//		record	- array of medical records
+	//		indices - array of filtered indeces 
+	//		key		- object field that provides values for HTML option tag
+	_GetValuesOfMedicalRecordsAsOptionList(records, indices, key) {
+		let arr = [];
+		arr.push(this._GetOptionDOM("")); // first element should be empty, to denote "all" values
+
+		for (var i = 0; i < indices.length; i++) {
+			let	idx = indices[i];
+
+			arr.push(this._GetOptionDOM(records[idx][key]))
+		}
+
+		return arr;
+	}
+
+	_Key_ChangeHandler(e) {
+		let	values_tag	= e.target.closest("[placeholder]").querySelector("[values]");
+		let option_list = this._GetValuesOfMedicalRecordsAsOptionList(this._records, this._indices, e.target.value);
+
+		for (var i = 0; i < option_list.length; i++) {
+			values_tag.appendChild(option_list[i]);
+		}
 	}
 
 	_GetSelectsDOM() {
@@ -50,10 +102,12 @@ export default class Filter {
 		filter_key_div.classList.add("form-group");
 		let filter_key_sel = document.createElement("select");
 		filter_key_sel.setAttribute("key", "");
+
 		let option_list = this._GetMedicalNamesAsOptionList(this._records[0]);
 		for (var i = 0; i < option_list.length; i++) {
 			filter_key_sel.appendChild(option_list[i]);
 		}
+		filter_key_sel.addEventListener("change", this._Key_ChangeHandler.bind(this));
 
 		let filter_val_div = document.createElement("div");
 		let filter_val_sel = document.createElement("select");
@@ -119,7 +173,6 @@ export default class Filter {
 
 		let filter_row = document.createElement("div");
 		filter_row.classList.add("row");
-		filter_row.setAttribute("placeholder", "");
 
 		wrapper							.appendChild(panel);
 		panel							.appendChild(panel_header);
@@ -138,6 +191,7 @@ export default class Filter {
 		panel_header_col2				.appendChild(panel_header_hide_button);
 		panel_header_hide_button		.appendChild(panel_header_delete_button_icon);
 		panel_body						.appendChild(filter_row);
+		filter_row						.appendChild(this._GetSelectsDOM());
 
 		return wrapper;
 	}
