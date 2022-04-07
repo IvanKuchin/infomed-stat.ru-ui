@@ -71,7 +71,7 @@ export default class KaplanMeier {
 		return {
 			parent_id:			parent_id,
 			stepped:			true,
-			label:				'Группа ' + parent_id,
+			label:				'График ' + parent_id,
 			backgroundColor:	`rgb(${red}, ${green}, ${blue})`,
 			borderColor:		`rgb(${red}, ${green}, ${blue})`,
 			data: [],

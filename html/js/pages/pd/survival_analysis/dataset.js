@@ -99,7 +99,7 @@ export default class Dataset {
 		panel_header					.appendChild(panel_header_row);
 		panel_header_row				.appendChild(panel_header_col1);
 		panel_header_row				.appendChild(panel_header_col2);
-		panel_header_col1				.appendChild(document.createTextNode("Группа " + this.id + ". Всего записей: "));
+		panel_header_col1				.appendChild(document.createTextNode("График " + this.id + ". Всего записей: "));
 		panel_header_col1				.appendChild(panel_header_total_record_counter);
 		panel_header_col1				.appendChild(document.createTextNode(". Событий: "));
 		panel_header_col1				.appendChild(panel_header_event_record_counter);
@@ -141,7 +141,7 @@ export default class Dataset {
 
 	_AddFilterGroup_ClickHandler(e) {
 		let new_id = this._filter_groups.length;
-		let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`));
+		let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`), this);
 		this._filter_groups.push(filter_group);
 
 		document.querySelectorAll(`[dataset="${this.id}"] [collapse-body]`)[0].appendChild(filter_group.GetDOM());

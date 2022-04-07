@@ -1,20 +1,36 @@
 export default class Filter {
 	_records = [];
-	_indices = [];
-	_ref_dom;
+	_pre_filter_indices = [];
+	_post_filter_indices = [];
+	_filter_group;
+	_dataset;
 
-	constructor(id, records, ref_dom) { 
+
+	// Constructor
+	// Input:
+	//		id				- filter.id (set by filter-group, IMPORTANT !!! always sequential)
+	//		records			- medical records
+	//		filter_group	- reference to the parent filter-group object, will be used to notify parent object if this filter been changed
+	//		dataset_obj		- reference to parent dataset object, it will be used to get KM-metadata
+	constructor(id, records, pre_filter_indices, filter_group, dataset_obj) { 
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
-		this._indices = Array.from(Array(records.length).keys()); // --- initialize indices w/o filters
+		this._pre_filter_indices = pre_filter_indices; // --- initialize indices w/o filters
+		this._dataset = dataset_obj; // --- used for metadata collection
 
-		this._ref_dom = ref_dom;
+
+		this._filter_group = filter_group;
 
 	}
 
 	get id() { return this._id; }
 	set id(id) { this._id = id; }
+
+	get post_filter_indices() { return this._post_filter_indices; }
+
+	set pre_filter_indices(indices) { this._pre_filter_indices = indices; }
+
 
 	_IsMedProperty(property) {
 		return property.indexOf("___") == 0 ? true : false;
@@ -54,7 +70,6 @@ export default class Filter {
 	//		array of HTML option tags with proper values
 	_GetMedicalNamesAsOptionList(record) {
 		let arr = [];
-		arr.push(this._GetMedPropertyDOM("")); // first element should be empty, to denote "all" values
 
 		for(const property in record) {
 			if(this._IsMedProperty(property)) {
@@ -65,31 +80,113 @@ export default class Filter {
 		return arr;
 	}
 
+
+	// Builds array of unique values from records[indices][key]
+	// Input:
+	//		record	- array of medical records
+	//		indices - array of filtered indices 
+	//		key		- object field that provides values for HTML option tag
+	// Output:
+	//		array of uniq values
+	_GetUniqueValues(records, indices, key) {
+		let unique_values_map = new Map();
+		let unique_values_array = [];
+
+		for (let i = 0; i < indices.length; i++) {
+			let idx = indices[i];
+			unique_values_map.set(records[idx][key]);
+		}
+
+		for (let key of unique_values_map.keys()) {
+			unique_values_array.push(key);
+		}
+
+		return unique_values_array.sort();
+	}
+
 	// Builds array of options from records[indices].key
 	// Input:
 	//		record	- array of medical records
 	//		indices - array of filtered indices 
 	//		key		- object field that provides values for HTML option tag
 	_GetValuesOfMedicalRecordsAsOptionList(records, indices, key) {
-		let arr = [];
-		arr.push(this._GetOptionDOM("")); // first element should be empty, to denote "all" values
+		let arr				= [];
+		let unique_values	= this._GetUniqueValues(records, indices, key);
 
-		for (var i = 0; i < indices.length; i++) {
-			let	idx = indices[i];
-
-			arr.push(this._GetOptionDOM(records[idx][key]))
+		for (let i = 0; i < unique_values.length; i++) {
+			arr.push(this._GetOptionDOM(unique_values[i]))
 		}
 
 		return arr;
 	}
 
 	_Key_ChangeHandler(e) {
-		let	values_tag	= e.target.closest("[placeholder]").querySelector("[values]");
-		let option_list = this._GetValuesOfMedicalRecordsAsOptionList(this._records, this._indices, e.target.value);
+		let	filter_val_sel	= e.target.closest("[placeholder]").querySelector("[values]");
+		let option_list = this._GetValuesOfMedicalRecordsAsOptionList(this._records, this._pre_filter_indices, e.target.value);
 
+		filter_val_sel.innerHTML = "";
 		for (var i = 0; i < option_list.length; i++) {
-			values_tag.appendChild(option_list[i]);
+			option_list[i].selected = "selected";
+			filter_val_sel.appendChild(option_list[i]);
 		}
+
+		this._FireChangeEvent(filter_val_sel);
+	}
+
+	// Returns array of values collected from multiple selected options
+	// Input:
+	//		select_tag - <SELECT>
+	// Output:
+	//		array of values from selected options
+	_GetSelectedOptionsValues(select_tag) {
+		return Array.from(select_tag.selectedOptions).map(tag => tag.value);
+	}
+
+	// Update filter GUI-metadata
+	// Input:
+	//		indices - array of indices to calculate metadata
+	//		dom_placeholder - place in the DOM where to start searching for metadata
+	_UpdateMetadata(indices, dom_placeholder) {
+		let km_metadata = this._dataset.GetKMMetadata(indices);
+
+		dom_placeholder.querySelectorAll("[total-record-counter]")[0].innerText = km_metadata.Total;
+		dom_placeholder.querySelectorAll("[censored-record-counter]")[0].innerText = km_metadata.Censored;
+		dom_placeholder.querySelectorAll("[alive-record-counter]")[0].innerText = km_metadata.Alive;
+		dom_placeholder.querySelectorAll("[event-record-counter]")[0].innerText = km_metadata.Events;
+	}
+
+
+	// Event handler, handles "change" events happened in "value"-<SELECT>
+	// Input:
+	//		e - event object
+	_Val_ChangeHandler(e) {
+		let selected_values = this._GetSelectedOptionsValues(e.target);
+		let	key_select_tag	= e.target.closest("[placeholder]").querySelectorAll("select[key]")[0];
+		let key				= key_select_tag.value;
+
+		this._post_filter_indices = [];
+		for (let i = 0; i < this._pre_filter_indices.length; i++) {
+			let idx = this._pre_filter_indices[i];
+
+			if(selected_values.includes(this._records[idx][key])) {
+				this._post_filter_indices.push(idx);
+			}
+		}
+
+		console.debug("pre-filter: ", this._pre_filter_indices);
+		console.debug("post-filter: ", this._post_filter_indices);
+
+		this._UpdateMetadata(this._post_filter_indices, e.target.closest(".panel"));
+	}
+
+	_FireChangeEvent(tag) {
+		if ("createEvent" in document) {
+		    var evt = document.createEvent("HTMLEvents");
+		    evt.initEvent("change", false, true);
+		    tag.dispatchEvent(evt);
+		}
+		else
+		    tag.fireEvent("onchange");
 	}
 
 	_GetSelectsDOM() {
@@ -115,6 +212,7 @@ export default class Filter {
 		filter_val_sel.setAttribute("multiple", "");
 		filter_val_sel.setAttribute("size", "10");
 		filter_val_sel.classList.add("form-group");
+		filter_val_sel.addEventListener("change", this._Val_ChangeHandler.bind(this));
 
 
 		col				.appendChild(filter_key_div);
@@ -192,6 +290,8 @@ export default class Filter {
 		panel_header_hide_button		.appendChild(panel_header_delete_button_icon);
 		panel_body						.appendChild(filter_row);
 		filter_row						.appendChild(this._GetSelectsDOM());
+
+		this._FireChangeEvent(panel.querySelector("select[key]"));
 
 		return wrapper;
 	}

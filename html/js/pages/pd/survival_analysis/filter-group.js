@@ -6,11 +6,12 @@ export default class FilterGroup {
 	_filters = [];
 	_ref_dom;
 
-	constructor(id, records, ref_dom) { 
+	constructor(id, records, ref_dom, dataset_obj) { 
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
 		this._indices = Array.from(Array(records.length).keys()); // --- initialize indices w/o filters
+		this._dataset = dataset_obj; // --- used for metadata collection
 
 		this._ref_dom = ref_dom;
 	}
@@ -84,7 +85,7 @@ export default class FilterGroup {
 		panel_header					.appendChild(panel_header_row);
 		panel_header_row				.appendChild(panel_header_col1);
 		panel_header_row				.appendChild(panel_header_col2);
-		panel_header_col1				.appendChild(document.createTextNode("Всего записей: "));
+		panel_header_col1				.appendChild(document.createTextNode(`Группа фильтров: ${this.id}.Всего записей: `));
 		panel_header_col1				.appendChild(panel_header_total_record_counter);
 		panel_header_col1				.appendChild(document.createTextNode(". Событий: "));
 		panel_header_col1				.appendChild(panel_header_event_record_counter);
@@ -103,11 +104,12 @@ export default class FilterGroup {
 	}
 
 	_AddFilter_ClickHandler(e) {
-		let new_id = this._filters.length;
-		let ref_dom = this._ref_dom.querySelectorAll(`[filter-group="${this.id}"]`)[0];
-		let filter = new Filter(new_id, this._records, ref_dom);
+		let new_id				= this._filters.length;
+		let pre_filter_indices	= (new_id ? this._filters[new_id - 1].post_filter_indices : Array.from(Array(this._records.length).keys()));
+		let filter				= new Filter(new_id, this._records, pre_filter_indices, this, this._dataset);
 		this._filters.push(filter);
 
+		let ref_dom = this._ref_dom.querySelectorAll(`[filter-group="${this.id}"]`)[0];
 		ref_dom.querySelectorAll(`[placeholder]`)[0].appendChild(filter.GetDOM());
 	}
 }
