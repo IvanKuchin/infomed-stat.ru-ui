@@ -130,7 +130,7 @@ export default class Filter {
 			filter_val_sel.appendChild(option_list[i]);
 		}
 
-		this._FireChangeEvent(filter_val_sel);
+		system_calls.FireChangeEvent(filter_val_sel);
 	}
 
 	// Returns array of values collected from multiple selected options
@@ -173,20 +173,12 @@ export default class Filter {
 			}
 		}
 
-		console.debug("pre-filter: ", this._pre_filter_indices);
-		console.debug("post-filter: ", this._post_filter_indices);
+		console.debug(`pre-filter ${this.id}: ${this._pre_filter_indices}`);
+		console.debug(`post-filter ${this.id}: ${this._post_filter_indices}`);
 
 		this._UpdateMetadata(this._post_filter_indices, e.target.closest(".panel"));
-	}
 
-	_FireChangeEvent(tag) {
-		if ("createEvent" in document) {
-		    var evt = document.createEvent("HTMLEvents");
-		    evt.initEvent("change", false, true);
-		    tag.dispatchEvent(evt);
-		}
-		else
-		    tag.fireEvent("onchange");
+		this._filter_group.FilterValue_Changed(this.id);
 	}
 
 	_GetSelectsDOM() {
@@ -226,7 +218,6 @@ export default class Filter {
 
 	GetDOM() {
 		let wrapper = document.createElement("div");
-		wrapper.setAttribute("filter-group", this.id);
 		wrapper.classList.add("col-xs-12");
 
 		let panel = document.createElement("div");
@@ -291,7 +282,7 @@ export default class Filter {
 		panel_body						.appendChild(filter_row);
 		filter_row						.appendChild(this._GetSelectsDOM());
 
-		this._FireChangeEvent(panel.querySelector("select[key]"));
+		system_calls.FireChangeEvent(panel.querySelector("select[key]"));
 
 		return wrapper;
 	}

@@ -2,7 +2,6 @@ import Filter from "./filter.js"
 
 export default class FilterGroup {
 	_records = [];
-	_indices = [];
 	_filters = [];
 	_ref_dom;
 
@@ -10,7 +9,6 @@ export default class FilterGroup {
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
-		this._indices = Array.from(Array(records.length).keys()); // --- initialize indices w/o filters
 		this._dataset = dataset_obj; // --- used for metadata collection
 
 		this._ref_dom = ref_dom;
@@ -18,6 +16,19 @@ export default class FilterGroup {
 
 	get id() { return this._id; }
 	set id(id) { this._id = id; }
+
+	// Update filter GUI-metadata
+	// Input:
+	//		indices - array of indices to calculate metadata
+	//		dom_placeholder - place in the DOM where to start searching for metadata
+	_UpdateMetadata(indices, dom_placeholder) {
+		let km_metadata = this._dataset.GetKMMetadata(indices);
+
+		dom_placeholder.querySelectorAll("[total-record-counter]")[0].innerText		= km_metadata.Total;
+		dom_placeholder.querySelectorAll("[censored-record-counter]")[0].innerText	= km_metadata.Censored;
+		dom_placeholder.querySelectorAll("[alive-record-counter]")[0].innerText		= km_metadata.Alive;
+		dom_placeholder.querySelectorAll("[event-record-counter]")[0].innerText		= km_metadata.Events;
+	}
 
 	GetDOM() {
 		let wrapper = document.createElement("div");
@@ -85,7 +96,7 @@ export default class FilterGroup {
 		panel_header					.appendChild(panel_header_row);
 		panel_header_row				.appendChild(panel_header_col1);
 		panel_header_row				.appendChild(panel_header_col2);
-		panel_header_col1				.appendChild(document.createTextNode(`Группа фильтров: ${this.id}.Всего записей: `));
+		panel_header_col1				.appendChild(document.createTextNode(`Группа фильтров: ${this.id}. Всего записей: `));
 		panel_header_col1				.appendChild(panel_header_total_record_counter);
 		panel_header_col1				.appendChild(document.createTextNode(". Событий: "));
 		panel_header_col1				.appendChild(panel_header_event_record_counter);
@@ -111,5 +122,26 @@ export default class FilterGroup {
 
 		let ref_dom = this._ref_dom.querySelectorAll(`[filter-group="${this.id}"]`)[0];
 		ref_dom.querySelectorAll(`[placeholder]`)[0].appendChild(filter.GetDOM());
+	}
+
+	// Function to call once filter values changed. It will trigger chain update to following filters
+	// If filter is the last in filter-group, update filter-group metadata
+	// If filter is not the last one, fire change-event in th next filter key field
+	// Input:
+	//		filter_id	- filter.id
+	FilterValue_Changed(filter_id) {
+		let filter_group_dom = this._ref_dom.querySelector(`[filter-group="${this.id}"]`);
+
+		if(filter_id == (this._filters.length - 1)) {
+			// update metadata
+			let indices = this._filters[filter_id].post_filter_indices;
+			this._UpdateMetadata(indices, filter_group_dom);
+		} else {
+			this._filters[filter_id + 1].pre_filter_indices = this._filters[filter_id].post_filter_indices;
+
+			// fire change event in next filter key-field
+			let filter_dom = filter_group_dom.querySelector(`[filter="${filter_id + 1}"]`)
+			system_calls.FireChangeEvent(filter_dom.querySelector("select[key]"));
+		}
 	}
 }

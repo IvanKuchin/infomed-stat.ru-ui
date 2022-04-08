@@ -4107,6 +4107,15 @@ var system_calls = (function()
 		$("#sowSelector").empty().append(system_calls.GetSOWSelectBox(sow_list_container, active_sow_id));
 	};
 
+	var FireChangeEvent = function(tag) {
+		if ("createEvent" in document) {
+		    var evt = document.createEvent("HTMLEvents");
+		    evt.initEvent("change", false, true);
+		    tag.dispatchEvent(evt);
+		}
+		else
+		    tag.fireEvent("onchange");
+	};
 
 	// --- cookie part
 	var ClearSession = function()
@@ -4253,6 +4262,8 @@ var system_calls = (function()
 		isDateInFutureOrMonthAgo: isDateInFutureOrMonthAgo,
 		GetSOWSelectBox: GetSOWSelectBox,
 		SOWSelectBox_OnloadRender: SOWSelectBox_OnloadRender,
+
+		FireChangeEvent: FireChangeEvent,
 
 		// --- cookie
 		ClearSession: ClearSession
