@@ -43,11 +43,29 @@ export default class DatasetGroup {
 			})
 			.then(data => {
 				if(data.result == "success") {
-					this._medical_records = data.medical_records;
+					this._medical_records = this._PreprocessData(data.medical_records);
 				} else {
 					system_calls.PopoverError($("body"), "Ошибка: " + data.description);
 				}
 			})
 			.catch(err => {throw new Error(err)});
+	}
+
+
+	_AddStatusField(medical_records) {
+		for (let i = 0; i < medical_records.length; i++) {
+			let record = medical_records[i]
+
+			if(record.___death_date.length) { record.___calculated_status = "event"; }
+			else if(record.___study_retirement_date.length) {  record.___calculated_status = "censored"; }
+			else { record.___calculated_status = "alive"; }
+		}
+
+		return medical_records;
+	};
+
+	_PreprocessData(medical_records) {
+		medical_records = this._AddStatusField(medical_records);
+		return medical_records;
 	}
 }

@@ -1,6 +1,6 @@
 import DatasetGroup from "./dataset_list.js"
 
-let dataset_group1 = new DatasetGroup(0);
+let dataset_group1		= new DatasetGroup(0);
 
 var Init = function() {
 	let create_dataset_button = document.getElementById("create_dataset");
@@ -12,4 +12,3 @@ var CreateDataset_ClickHandler = function() {
 };
 
 Init();
-
