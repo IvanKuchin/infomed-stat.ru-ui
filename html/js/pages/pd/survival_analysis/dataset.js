@@ -6,12 +6,13 @@ export default class Dataset {
 	_visibility = true;
 	_filter_groups = [];
 
-	constructor(id, records, km) { 
+	constructor(id, records, km, lr) { 
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
 
 		this._km = km;
+		this._lr = lr;
 	}
 
 	get id() { return this._id; }
@@ -42,6 +43,9 @@ export default class Dataset {
 
 		let panel_header_col2 = document.createElement("div");
 		panel_header_col2.classList.add("col-xs-2");
+
+		let panel_header_metadata = document.createElement("div");
+		panel_header_metadata.classList.add("form-group");
 
 		let panel_header_total_record_counter = document.createElement("span");
 		panel_header_total_record_counter.setAttribute("total-record-counter", "");
@@ -98,14 +102,16 @@ export default class Dataset {
 		panel_header					.appendChild(panel_header_row);
 		panel_header_row				.appendChild(panel_header_col1);
 		panel_header_row				.appendChild(panel_header_col2);
-		panel_header_col1				.appendChild(document.createTextNode("График " + this.id + ". Всего записей: "));
-		panel_header_col1				.appendChild(panel_header_total_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Событий: "));
-		panel_header_col1				.appendChild(panel_header_event_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Выбывших: "));
-		panel_header_col1				.appendChild(panel_header_censored_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Живых: "));
-		panel_header_col1				.appendChild(panel_header_alive_record_counter);
+		panel_header_col1				.appendChild(panel_header_metadata);
+		panel_header_col1				.appendChild(this._GetWarningDOM());
+		panel_header_metadata			.appendChild(document.createTextNode("График " + this.id + ". Всего записей: "));
+		panel_header_metadata			.appendChild(panel_header_total_record_counter);
+		panel_header_metadata			.appendChild(document.createTextNode(". Событий: "));
+		panel_header_metadata			.appendChild(panel_header_event_record_counter);
+		panel_header_metadata			.appendChild(document.createTextNode(". Выбывших: "));
+		panel_header_metadata			.appendChild(panel_header_censored_record_counter);
+		panel_header_metadata			.appendChild(document.createTextNode(". Живых: "));
+		panel_header_metadata			.appendChild(panel_header_alive_record_counter);
 		panel_header_col2				.appendChild(panel_header_hide_button);
 		panel_header_col2				.appendChild(panel_header_collapse_button);
 		panel_header_collapse_button	.appendChild(panel_header_collapse_button_icon);
@@ -115,27 +121,67 @@ export default class Dataset {
 		collapse						.appendChild(collapse_body);
 		collapse						.appendChild(collapse_bottom_buffer);
 		collapse						.appendChild(collapse_bottom_shadow);
+		collapse_body					.appendChild(this._GetDatasetControlDOM());
 
-		
+		return panel;
+	}
 
-		// inside group content
+	_GetWarningDOM() {
+		let warning = document.createElement("div");
+		warning.classList.add("alert", "alert-warning");
+		warning.setAttribute("role", "alert");
+		warning.setAttribute("logrank-warning", "");
+		warning.setAttribute("hidden", "");
 
-		let filters_row_button_add_col = document.createElement("div");
-		filters_row_button_add_col.classList.add("col-xs-12", "form-group");
+		warning.appendChild(document.createTextNode("LogRank вычисления требуют по крайней мере 30 записей."));
+
+		return warning;
+	}
+
+	_GetDatasetControlDOM() {
+		let wrapper = document.createElement("div");
+		wrapper.classList.add("col-xs-12", "form-group");
+
+		let row = document.createElement("div");
+		row.classList.add("row");
+
+		let col_date = document.createElement("div");
+		col_date.classList.add("col-xs-6", "col-md-9");
+
+		let col_button = document.createElement("div");
+		col_button.classList.add("col-xs-6", "col-md-3");
+
+		let now = new Date();
+		let date_input = document.createElement("input");
+		date_input.setAttribute("type", "date");
+		date_input.setAttribute("call_date", "");
+		date_input.addEventListener("change", this._CallDate_ChangeHandler.bind(this));
+		date_input.value = now.toISOString().slice(0, 10);
+
 
 		let filters_row_button = document.createElement("button");
 		filters_row_button.classList.add("btn", "btn-primary", "float_right");
 		filters_row_button.appendChild(document.createTextNode("+ группа фильтров"));
 		filters_row_button.addEventListener("click", this._AddFilterGroup_ClickHandler.bind(this));
 
-		collapse_body					.appendChild(filters_row_button_add_col);
-		filters_row_button_add_col		.appendChild(filters_row_button);
+		wrapper		.appendChild(row);
+		row			.appendChild(col_date);
+		row			.appendChild(col_button);
+		col_date	.appendChild(document.createTextNode("Дата обзвона:"));
+		col_date	.appendChild(date_input);
+		col_button	.appendChild(filters_row_button);
 
-		return panel;
+
+		return wrapper;
 	}
 
 	_ToggleCollapsible() {
 		$("[dataset='" + this.id + "'] .collapse").collapse("toggle");
+	}
+
+	_CallDate_ChangeHandler(e) {
+		console.debug("change handler");
+		this.Indices_ChangeHandler();
 	}
 
 	_AddFilterGroup_ClickHandler(e) {
@@ -243,7 +289,7 @@ export default class Dataset {
 	// 			Time		- time in months till censoring or event
 	//			Censored	- number of events at this time
 	//			Events		- number of events at this time
-	_GetTimeDtCtOfEventCensor(indices_map) {
+	_GetTimeDtCtOfEventCensor(indices_map, call_date) {
 		let	km_map = new Map();
 
 		for (var i = indices_map.Censored.length - 1; i >= 0; i--) {
@@ -301,8 +347,8 @@ export default class Dataset {
 			}
 		}
 
-		let now_date = new Date();
-		let now_str = now_date.toISOString().slice(0, 10);
+		// let now_date = new Date();
+		// let now_str = now_date.toISOString().slice(0, 10);
 		for (var i = indices_map.Alive.length - 1; i >= 0; i--) {
 			let record_idx = indices_map.Alive[i];
 
@@ -310,7 +356,9 @@ export default class Dataset {
 			let invasion_date		= this._records[record_idx].___op_done___invasion_date;
 			let adj_chemo_date		= ""; // --- is not important
 
-			let finish_date			= now_str;
+			// let finish_date			= now_str;
+			let finish_date			= call_date;
+
 
 			let time_map			= this._GetMonthsBetweenDates(neoadj_chemo_date, invasion_date, adj_chemo_date, finish_date);
 
@@ -367,9 +415,9 @@ export default class Dataset {
 	//			Events		- number of events at this time
 	//			Alive		- number of alive at this time
 	//			Patients	- list of all patients at timestamp
-	_CalculateKMSurvivalData(indexes) {
+	_CalculateKMSurvivalData(indexes, call_date) {
 		let indices_map		= this._GetEventCensorIndexes(indexes);
-		let km_base			= this._GetTimeDtCtOfEventCensor(indices_map);
+		let km_base			= this._GetTimeDtCtOfEventCensor(indices_map, call_date);
 		let	km_survival		= this._KMaddSurvival(km_base);
 
 		return km_survival;
@@ -382,7 +430,7 @@ export default class Dataset {
 			this.Indices_ChangeHandler();
 		} else {
 			this._km.RemoveDataset(this.id);
-			this._km.UpdateStepFunction();
+			this._km.UpdateUI();
 		}
 	}
 
@@ -403,6 +451,30 @@ export default class Dataset {
 		return Array.from(map.keys());
 	}
 
+	_ShowHideLogRankWarning(number_of_records) {
+		let tag = document.querySelectorAll("[dataset='" + this._id + "'] [logrank-warning]")[0];
+
+		if(isNaN(number_of_records)) {
+			tag.setAttribute("hidden", "");
+		} else {
+			if(number_of_records >= 30) {
+				tag.setAttribute("hidden", "");
+			} else {
+				tag.removeAttribute("hidden");
+			}
+
+		}
+	}
+
+	// Calculate Log Rank data based on Kaplan Meier data
+	// Input:
+	//		data - KM data
+	// Output:
+	//		array of LogRank data
+	_CalculateLogRank(data) {
+		return data;
+	}
+
 	Indices_ChangeHandler() {
 		let indices = this._GetIndicesFromDatasets(this._filter_groups);
 
@@ -412,8 +484,15 @@ export default class Dataset {
 		document.querySelectorAll("[dataset='" + this._id + "'] [alive-record-counter]")[0].innerText = km_metadata.Alive;
 		document.querySelectorAll("[dataset='" + this._id + "'] [event-record-counter]")[0].innerText = km_metadata.Events;
 
-		let km_data = this._CalculateKMSurvivalData(indices);
+		this._ShowHideLogRankWarning(km_metadata.Total);
+
+		let	wellfarecheck_date = document.querySelectorAll("[dataset='" + this._id + "'] [call_date]")[0].value
+		let km_data = this._CalculateKMSurvivalData(indices, wellfarecheck_date);
 		this._km.UpdateDataset(this.id, km_data);
-		this._km.UpdateStepFunction();
+		this._km.UpdateUI();
+
+		let log_rank = this._CalculateLogRank(km_data);
+		this._lr.UpdateDataset(this.id, log_rank);
+		this._lr.UpdateUI();
 	}
 }

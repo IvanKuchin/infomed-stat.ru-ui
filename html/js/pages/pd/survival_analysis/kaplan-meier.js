@@ -74,7 +74,7 @@ export default class KaplanMeier {
 			label:				'График ' + parent_id,
 			backgroundColor:	`rgb(${red}, ${green}, ${blue})`,
 			borderColor:		`rgb(${red}, ${green}, ${blue})`,
-			data: [],
+			data: 				[],
 		}
 	}
 
@@ -134,7 +134,7 @@ export default class KaplanMeier {
 
 	}
 
-	UpdateStepFunction() {
+	UpdateUI() {
 		this._UpdateLabels();
 
 		this._myChart.update();

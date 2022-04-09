@@ -1,5 +1,6 @@
 import Dataset from "./dataset.js"
 import KaplanMeier from "./kaplan-meier.js"
+import LogRank from "./log_rank.js"
 
 export default class DatasetGroup {
 	_datasets = [];
@@ -8,6 +9,7 @@ export default class DatasetGroup {
 	constructor(id) {
 		this.id = id;
 		this._km_object = new KaplanMeier(this.id);
+		this._lr_object = new LogRank(this.id);
 		this._FetchMedicalRecords("/cgi-bin/doctor.cgi?action=AJAX_getMedicalRecords&_=" + Math.random() * 872364982374629234);
 	}
 
@@ -15,7 +17,7 @@ export default class DatasetGroup {
 	set id(id) { this._id = id; }
 
 	CreateDS() {
-		let new_ds = new Dataset(this._datasets.length, this._medical_records, this._km_object);
+		let new_ds = new Dataset(this._datasets.length, this._medical_records, this._km_object, this._lr_object);
 
 		this._datasets.push(new_ds);
 

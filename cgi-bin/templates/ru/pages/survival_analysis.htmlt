@@ -39,9 +39,27 @@
       <div class="row">
         <div class="col-xs-12" dataset-group="0"></div>
       </div>
+    </div>
+    <div class="container single_block box-shadow--6dp">
+      <div class="row">
+        <div class="col-xs-12">
+          <h2 class="text-center">Kaplan-Meier график</h2>
+        </div>
+      </div>
       <div class="row">
         <div class="col-xs-12" km-group="0">
           <canvas></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="container single_block box-shadow--6dp">
+      <div class="row">
+        <div class="col-xs-12">
+          <h2 class="text-center">Log Rank анализ</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12" lr-group="0">
         </div>
       </div>
     </div>
