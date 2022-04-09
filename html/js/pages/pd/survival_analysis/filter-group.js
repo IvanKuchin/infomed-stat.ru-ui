@@ -17,6 +17,9 @@ export default class FilterGroup {
 	get id() { return this._id; }
 	set id(id) { this._id = id; }
 
+	get indices() { return this._indices; }
+	set indices(idx) { return this._indices = idx; }
+
 	// Update filter GUI-metadata
 	// Input:
 	//		indices - array of indices to calculate metadata
@@ -134,8 +137,9 @@ export default class FilterGroup {
 
 		if(filter_id == (this._filters.length - 1)) {
 			// update metadata
-			let indices = this._filters[filter_id].post_filter_indices;
-			this._UpdateMetadata(indices, filter_group_dom);
+			this.indices = this._filters[filter_id].post_filter_indices;
+			this._UpdateMetadata(this.indices, filter_group_dom);
+			this._dataset.Indices_ChangeHandler();
 		} else {
 			this._filters[filter_id + 1].pre_filter_indices = this._filters[filter_id].post_filter_indices;
 

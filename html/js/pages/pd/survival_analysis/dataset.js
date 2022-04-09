@@ -10,7 +10,6 @@ export default class Dataset {
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
-		this._indices = Array.from(Array(records.length).keys()); // --- initialize indices w/o filters
 
 		this._km = km;
 	}
@@ -151,7 +150,7 @@ export default class Dataset {
 		parentDOM.appendChild(this.GetDOM());
 		this._ToggleCollapsible();
 
-		this.Indices_ChangeHandler();
+		// this.Indices_ChangeHandler();
 	}
 
 	// Calculate number of months between start dates and finish date
@@ -387,14 +386,33 @@ export default class Dataset {
 		}
 	}
 
+	_GetIndicesFromDatasets(filter_groups) {
+		let indices = [];
+
+		for (let i = 0; i < filter_groups.length; i++) {
+			if(filter_groups[i].indices) {
+				indices = indices.concat(filter_groups[i].indices);
+			}
+		}
+
+		let map = new Map();
+		for (var i = 0; i < indices.length; i++) {
+			map.set(indices[i], "");
+		}
+
+		return Array.from(map.keys());
+	}
+
 	Indices_ChangeHandler() {
-		let km_metadata = this.GetKMMetadata(this._indices);
+		let indices = this._GetIndicesFromDatasets(this._filter_groups);
+
+		let km_metadata = this.GetKMMetadata(indices);
 		document.querySelectorAll("[dataset='" + this._id + "'] [total-record-counter]")[0].innerText = km_metadata.Total;
 		document.querySelectorAll("[dataset='" + this._id + "'] [censored-record-counter]")[0].innerText = km_metadata.Censored;
 		document.querySelectorAll("[dataset='" + this._id + "'] [alive-record-counter]")[0].innerText = km_metadata.Alive;
 		document.querySelectorAll("[dataset='" + this._id + "'] [event-record-counter]")[0].innerText = km_metadata.Events;
 
-		let km_data = this._CalculateKMSurvivalData(this._indices);
+		let km_data = this._CalculateKMSurvivalData(indices);
 		this._km.UpdateDataset(this.id, km_data);
 		this._km.UpdateStepFunction();
 	}

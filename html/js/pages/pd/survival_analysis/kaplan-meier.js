@@ -130,7 +130,7 @@ export default class KaplanMeier {
 			max_t = Math.max(max_t, data[data.length - 1].x);
 		}
 
-		this._data.labels = Array.from(Array(max_t).keys());
+		this._data.labels = Array.from(Array(max_t + 1).keys());
 
 	}
 
