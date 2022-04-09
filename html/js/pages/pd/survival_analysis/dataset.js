@@ -486,8 +486,8 @@ export default class Dataset {
 
 		this._ShowHideLogRankWarning(km_metadata.Total);
 
-		let	wellfare_check_date = document.querySelectorAll("[dataset='" + this._id + "'] [call_date]")[0].value
-		let km_data = this._CalculateKMSurvivalData(indices, wellfare_check_date);
+		let	welfare_check_date = document.querySelectorAll("[dataset='" + this._id + "'] [call_date]")[0].value
+		let km_data = this._CalculateKMSurvivalData(indices, welfare_check_date);
 		this._km.UpdateDataset(this.id, km_data);
 		this._km.UpdateUI();
 
