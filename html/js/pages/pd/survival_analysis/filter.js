@@ -173,8 +173,8 @@ export default class Filter {
 			}
 		}
 
-		console.debug(`pre-filter ${this.id}: ${this._pre_filter_indices}`);
-		console.debug(`post-filter ${this.id}: ${this._post_filter_indices}`);
+		// console.debug(`pre-filter ${this.id}: ${this._pre_filter_indices}`);
+		// console.debug(`post-filter ${this.id}: ${this._post_filter_indices}`);
 
 		this._UpdateMetadata(this._post_filter_indices, e.target.closest(".panel"));
 

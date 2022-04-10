@@ -223,6 +223,10 @@ export default class Dataset {
 			months = (finish.getFullYear() - start.getFullYear()) * 12 - start.getMonth() + finish.getMonth();
 		}
 
+		if(months < 0) {
+			error = new Error(`timeframe is negative(${months})`)
+		}
+
 		return {error: error, months: months};
 	}
 
