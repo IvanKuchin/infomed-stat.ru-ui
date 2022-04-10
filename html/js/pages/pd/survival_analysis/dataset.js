@@ -224,7 +224,7 @@ export default class Dataset {
 		}
 
 		if(months < 0) {
-			error = new Error(`timeframe is negative(${months})`)
+			error = new Error(`time frame is negative(${months})`)
 		}
 
 		return {error: error, months: months};
