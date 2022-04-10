@@ -123,7 +123,7 @@ export default class LogRank {
 	// Output:
 	//		AtRisk value
 	_GetAtRiskAtATime(time, ds) {
-		let at_risk = 0;
+		let at_risk = ds.data[0].AtRisk;
 
 		for (let i = 0; i < ds.data.length; i++) {
 			let record = ds.data[i];
