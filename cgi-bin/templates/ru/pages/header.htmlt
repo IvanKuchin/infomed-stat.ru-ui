@@ -39,6 +39,7 @@
 	<link href="/css/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet">
 	<script src="/js/jquery-ui/jquery-ui-1.12.1.min.js"></script>
  -->
+ 
 	<!-- jQuery.cookie -->
 	<script src="/js/jquery.cookie/jquery.cookie.js"></script>
 

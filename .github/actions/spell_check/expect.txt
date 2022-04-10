@@ -349,3 +349,11 @@ petct
 recist
 serot
 syrgical
+kaplan
+meier
+config
+instanceof
+KMadd
+metadata
+onchange
+logrank
