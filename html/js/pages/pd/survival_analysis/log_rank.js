@@ -141,7 +141,7 @@ export default class LogRank {
 	_LogRank(ds1, ds2) {
 		let map = new Map();
 
-		// Build initial map form existsing datasets
+		// Build initial map form existing datasets
 		for (var i = 0; i < ds1.data.length; i++) {
 			let record = ds1.data[i];
 			if(record.Events) {
