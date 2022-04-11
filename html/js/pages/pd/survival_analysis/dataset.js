@@ -2,7 +2,6 @@ import FilterGroup from "./filter-group.js"
 
 export default class Dataset {
 	_records = [];
-	_indices = [];
 	_visibility = true;
 	_filter_groups = [];
 
@@ -185,11 +184,38 @@ export default class Dataset {
 	}
 
 	_AddFilterGroup_ClickHandler(e) {
-		let new_id = this._filter_groups.length;
+		let new_id = this._filter_groups.length ? this._filter_groups[this._filter_groups.length - 1].id + 1 : 0;
 		let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`), this);
 		this._filter_groups.push(filter_group);
 
-		document.querySelectorAll(`[dataset="${this.id}"] [collapse-body]`)[0].appendChild(filter_group.GetDOM());
+		let dom = filter_group.GetDOM();
+		document.querySelectorAll(`[dataset="${this.id}"] [collapse-body]`)[0].appendChild(dom);
+		dom.querySelector("[close]").addEventListener("click", this._RemoveFilterGroup_ClickHandler.bind(this));
+	}
+
+	// Delete dataset with id == id from datasets[]
+	// Input:
+	//		id - dataset.id to be deleted
+	_RemoveFilterGroupFromArray(id) {
+		let filter_groups = this._filter_groups;
+
+		for (var i = 0; i < filter_groups.length; i++) {
+			if(filter_groups[i].id == id) {
+				filter_groups.splice(i, 1);
+				break;
+			}
+		}
+	}
+
+	// Remove filter-group from GUI and filters[]
+	_RemoveFilterGroup_ClickHandler(e) {
+		let id = e.target.getAttribute("close");
+		let tag = e.target.closest(`[filter-group="${id}"`);
+
+		tag.remove();
+		this._RemoveFilterGroupFromArray(id);
+
+		this.Indices_ChangeHandler();
 	}
 
 	AddToParent(parentDOM) {
@@ -435,6 +461,9 @@ export default class Dataset {
 		} else {
 			this._km.RemoveDataset(this.id);
 			this._km.UpdateUI();
+
+			this._lr.RemoveDataset(this.id);
+			this._lr.UpdateUI();
 		}
 	}
 

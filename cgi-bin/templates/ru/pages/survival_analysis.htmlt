@@ -78,6 +78,11 @@
         <div class="col-xs-12" table-placeholder>
         </div>
       </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <canvas></canvas>
+        </div>
+      </div>
     </div>
 
     <div id="scrollerToShow"></div>
