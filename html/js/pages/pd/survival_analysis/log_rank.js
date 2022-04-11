@@ -360,7 +360,7 @@ export default class LogRank {
 	      cubicInterpolationMode: 'monotone',
 	      tension: 0.4
 	    }, {
-	      label: 'Nornal standard distribution',
+	      label: 'Normal standard distribution',
 	      data: this._datapoints,
 	      borderColor: "#bbbbbb",
 	      fill: false,
