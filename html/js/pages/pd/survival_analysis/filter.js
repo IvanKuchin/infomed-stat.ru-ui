@@ -28,7 +28,6 @@ export default class Filter {
 	set id(id) { this._id = id; }
 
 	get post_filter_indices() { return this._post_filter_indices; }
-
 	set pre_filter_indices(indices) { this._pre_filter_indices = indices; }
 
 
@@ -149,10 +148,10 @@ export default class Filter {
 	_UpdateMetadata(indices, dom_placeholder) {
 		let km_metadata = this._dataset.GetKMMetadata(indices);
 
-		dom_placeholder.querySelectorAll("[total-record-counter]")[0].innerText = km_metadata.Total;
-		dom_placeholder.querySelectorAll("[censored-record-counter]")[0].innerText = km_metadata.Censored;
-		dom_placeholder.querySelectorAll("[alive-record-counter]")[0].innerText = km_metadata.Alive;
-		dom_placeholder.querySelectorAll("[event-record-counter]")[0].innerText = km_metadata.Events;
+		dom_placeholder.querySelectorAll("[total-record-counter]")[0].innerText		= km_metadata.Total;
+		dom_placeholder.querySelectorAll("[censored-record-counter]")[0].innerText	= km_metadata.Censored;
+		dom_placeholder.querySelectorAll("[alive-record-counter]")[0].innerText		= km_metadata.Alive;
+		dom_placeholder.querySelectorAll("[event-record-counter]")[0].innerText		= km_metadata.Events;
 	}
 
 
@@ -219,6 +218,7 @@ export default class Filter {
 	GetDOM() {
 		let wrapper = document.createElement("div");
 		wrapper.classList.add("col-xs-12");
+		wrapper.setAttribute("remove", this.id);
 
 		let panel = document.createElement("div");
 		panel.classList.add("panel", "panel-default")
@@ -254,8 +254,8 @@ export default class Filter {
 		panel_header_hide_button.classList.add("btn", "btn_default", "float_right");
 
 		let panel_header_delete_button_icon = document.createElement("span");
-		panel_header_delete_button_icon.classList.add("glyphicon", "glyphicon-eye-close");
-		// panel_header_delete_button_icon.addEventListener("click", this._ToggleDatasetVisibility_ClickHandler.bind(this));
+		panel_header_delete_button_icon.classList.add("glyphicon", "glyphicon-remove-circle");
+		panel_header_delete_button_icon.setAttribute("close", `${this.id}`);
 
 		let panel_body = document.createElement("div");
 		panel_body.classList.add("panel-body");
