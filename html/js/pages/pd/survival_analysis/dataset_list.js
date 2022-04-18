@@ -33,10 +33,14 @@ export default class DatasetGroup {
 	}
 
 	_FetchMedicalRecords(url) {
+
+		system_calls.ButtonLoadingDisable(document.getElementById("create_dataset"));
+
 		fetch(url)
 			.then(response => {
 			    if (response.ok) {
 			    	// --- ok
+					system_calls.ButtonLoadingEnable(document.getElementById("create_dataset"));
 			    } else {
 			      throw new Error(`HTTP error! Status: ${ response.status }`);
 			    }

@@ -4107,6 +4107,31 @@ var system_calls = (function()
 		$("#sowSelector").empty().append(system_calls.GetSOWSelectBox(sow_list_container, active_sow_id));
 	};
 
+	var ButtonLoadingDisable = function(elem) {
+		elem.setAttribute("disabled", "");
+
+		elem.setAttribute("_original_innerhtml", elem.innerHTML);
+		elem.innerHTML = `<i class="fa fa-spinner fa-pulse fa-fw"></i> <span>loading...</span>`;
+	};
+
+	var ButtonLoadingEnable = function(elem) {
+		elem.removeAttribute("disabled");
+
+		elem.innerHTML = elem.getAttribute("_original_innerhtml");
+	};
+
+	var ButtonLoadingToggle = function(elem) {
+		if(elem.getAttribute("disabled") == "") {
+			// --- disabled
+
+			ButtonLoadingEnable(elem);
+		} else {
+			// --- enabled
+
+			ButtonLoadingDisable(elem);
+		}
+	};
+
 	var FireChangeEvent = function(tag) {
 		if ("createEvent" in document) {
 		    var evt = document.createEvent("HTMLEvents");
@@ -4209,6 +4234,11 @@ var system_calls = (function()
 		isElementInList: isElementInList,
 		isIDInTheJQueryList: isIDInTheJQueryList,
 		FillArrayWithNumbers: FillArrayWithNumbers,
+
+		// --- button GUI
+		ButtonLoadingDisable: ButtonLoadingDisable,
+		ButtonLoadingEnable: ButtonLoadingEnable,
+		ButtonLoadingToggle: ButtonLoadingToggle,
 
 		// --- companies
 		GetCompanyInfo_DOM: GetCompanyInfo_DOM,
