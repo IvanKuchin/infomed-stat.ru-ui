@@ -4110,14 +4110,14 @@ var system_calls = (function()
 	var ButtonLoadingDisable = function(elem) {
 		elem.setAttribute("disabled", "");
 
-		elem.setAttribute("_original_innerhtml", elem.innerHTML);
+		elem.setAttribute("_original_innerh_tml", elem.innerHTML);
 		elem.innerHTML = `<i class="fa fa-spinner fa-pulse fa-fw"></i> <span>loading...</span>`;
 	};
 
 	var ButtonLoadingEnable = function(elem) {
 		elem.removeAttribute("disabled");
 
-		elem.innerHTML = elem.getAttribute("_original_innerhtml");
+		elem.innerHTML = elem.getAttribute("_original_innerh_tml");
 	};
 
 	var ButtonLoadingToggle = function(elem) {
