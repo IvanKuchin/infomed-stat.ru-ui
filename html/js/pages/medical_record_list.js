@@ -13,6 +13,7 @@ var	medical_record_list = (function()
 		GetInitialData();
 
 		$("#status_filter")						.on("change", DisplayFilter_ChangeHandler);
+		$("#sort_order")						.on("change", SortOrder_ChangeHandler);
 		$("#AreYouSureRemovePatient .submit")	.on("click", ConfirmPatientRemove_ClickHandler);
 
 	};
@@ -191,8 +192,14 @@ var	medical_record_list = (function()
 	var	GetMedicalRecords_DOM = function(medical_records)
 	{
 		let	result = $();
+		let sort_key = document.getElementById("sort_order").value; 
+		let sort_func = function(a, b) {
+			if(a[sort_key] < b[sort_key]) return -1;
+			else if(a[sort_key] > b[sort_key]) return 1;
+			else return 0;
+		}
 
-		medical_records.forEach(function(item)
+		medical_records.sort(sort_func).forEach(function(item)
 		{
 			result = result.add(GetMedicalRecord_DOM(item));
 		});
@@ -265,6 +272,11 @@ var	medical_record_list = (function()
 		$("[status-all]").hide();
 		$(`[status-${filter}]`).show(750);
 	};
+
+	var	SortOrder_ChangeHandler = function(e) {
+		RenderMedicalRecords(data_global.medical_records);
+	};
+
 
 	return {
 		Init: Init
