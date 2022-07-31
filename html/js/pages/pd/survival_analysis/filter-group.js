@@ -1,4 +1,5 @@
 import Filter from "./filter.js"
+import SaveToXLS from "../save2xls.js"
 
 export default class FilterGroup {
 	_records = [];
@@ -76,6 +77,13 @@ export default class FilterGroup {
 		panel_header_delete_button_icon.setAttribute("close", `${this.id}`);
 		// panel_header_delete_button_icon.addEventListener("click", this._ToggleDatasetVisibility_ClickHandler.bind(this));
 
+		let panel_header_download_button = document.createElement("span");
+		panel_header_download_button.classList.add("btn", "btn_default", "float_right");
+		panel_header_download_button.addEventListener("click", this._Download_ClickHandler.bind(this));
+
+		let panel_header_download_button_icon = document.createElement("i");
+		panel_header_download_button_icon.classList.add("fa", "fa-download");
+
 		let panel_body = document.createElement("div");
 		panel_body.classList.add("panel-body");
 
@@ -109,7 +117,9 @@ export default class FilterGroup {
 		panel_header_col1				.appendChild(document.createTextNode(". Живых: "));
 		panel_header_col1				.appendChild(panel_header_alive_record_counter);
 		panel_header_col2				.appendChild(panel_header_hide_button);
+		panel_header_col2				.appendChild(panel_header_download_button);
 		panel_header_hide_button		.appendChild(panel_header_delete_button_icon);
+		panel_header_download_button	.appendChild(panel_header_download_button_icon);
 		panel_body						.appendChild(control_row);
 		panel_body						.appendChild(filters_row);
 		control_row						.appendChild(control_col);
@@ -129,6 +139,26 @@ export default class FilterGroup {
 		ref_dom.querySelectorAll(`[placeholder]`)[0].appendChild(dom);
 		dom.querySelector("[close]").addEventListener("click", this._RemoveFilter_ClickHandler.bind(this));
 
+	}
+
+	// Click handler to download filtered records
+	// Input:  e		- Event
+	// Output: none
+	_Download_ClickHandler(e) {
+		if(this._indices && this._indices.length)
+		{
+			// collect records filtered by indexes
+			let records_to_save = this._indices.map(idx => this._records[parseInt(idx)]);
+
+			let saver = new SaveToXLS();
+			let save_result = saver.Do(records_to_save);
+
+			if(save_result.error instanceof Error) {
+				console.error(save_result.error);
+			}
+		} else {
+			console.debug(`_indices array is empty`)	
+		}
 	}
 
 	// Delete filter from filter_group[]

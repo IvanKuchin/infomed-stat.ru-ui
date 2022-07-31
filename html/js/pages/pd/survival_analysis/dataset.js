@@ -1,4 +1,5 @@
 import FilterGroup from "./filter-group.js"
+import SaveToXLS from "../save2xls.js"
 
 export default class Dataset {
 	_records = [];
@@ -73,6 +74,13 @@ export default class Dataset {
 		panel_header_hide_button_icon.classList.add("glyphicon", "glyphicon-eye-close");
 		panel_header_hide_button_icon.addEventListener("click", this._ToggleDatasetVisibility_ClickHandler.bind(this));
 
+		let panel_header_download_button = document.createElement("span");
+		panel_header_download_button.classList.add("btn", "btn_default", "float_right");
+		panel_header_download_button.addEventListener("click", this._Download_ClickHandler.bind(this));
+
+		let panel_header_download_button_icon = document.createElement("i");
+		panel_header_download_button_icon.classList.add("fa", "fa-download");
+
 		let panel_body = document.createElement("div");
 		panel_body.classList.add("panel-body");
 
@@ -113,8 +121,10 @@ export default class Dataset {
 		panel_header_metadata			.appendChild(panel_header_alive_record_counter);
 		panel_header_col2				.appendChild(panel_header_hide_button);
 		panel_header_col2				.appendChild(panel_header_collapse_button);
+		panel_header_col2				.appendChild(panel_header_download_button);
 		panel_header_collapse_button	.appendChild(panel_header_collapse_button_icon);
 		panel_header_hide_button		.appendChild(panel_header_hide_button_icon);
+		panel_header_download_button	.appendChild(panel_header_download_button_icon);
 		panel_body						.appendChild(collapse);
 		collapse						.appendChild(collapse_top_shadow);
 		collapse						.appendChild(collapse_body);
@@ -527,5 +537,27 @@ export default class Dataset {
 		let log_rank = this._CalculateLogRank(km_data);
 		this._lr.UpdateDataset(this.id, log_rank);
 		this._lr.UpdateUI();
+	}
+
+	// Click handler to download filtered records
+	// Input:  e		- Event
+	// Output: none
+	_Download_ClickHandler(e) {
+		let indices = this._GetIndicesFromDatasets(this._filter_groups);
+
+		if(indices && indices.length)
+		{
+			// collect records filtered by indexes
+			let records_to_save = indices.map(idx => this._records[parseInt(idx)]);
+
+			let saver = new SaveToXLS();
+			let save_result = saver.Do(records_to_save);
+
+			if(save_result.error instanceof Error) {
+				console.error(save_result.error);
+			}
+		} else {
+			console.debug(`indices array is empty`)	
+		}
 	}
 }
