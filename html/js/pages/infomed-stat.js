@@ -133,7 +133,7 @@ infomed_stat = (function()
 			}
 		});
 
-		return result;
+		return result == "undefined" ? med_item : result;
 	};
 
 	var	GetMedicalItemValueSpelling = function(value)

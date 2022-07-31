@@ -13,9 +13,6 @@ export default class FilterGroup {
 		this._dataset = dataset_obj; // --- used for metadata collection
 
 		this._ref_dom = ref_dom;
-
-		let save2xls = new SaveToXLS();
-		save2xls.Do();
 	}
 
 	get id() { return this._id; }
@@ -144,8 +141,24 @@ export default class FilterGroup {
 
 	}
 
+	// Click handler to download filtered records
+	// Input:  e		- Event
+	// Output: none
 	_Download_ClickHandler(e) {
-		debugger;
+		if(this._indices && this._indices.length)
+		{
+			// collect records filtered by indexes
+			let records_to_save = this._indices.map(idx => this._records[parseInt(idx)]);
+
+			let saver = new SaveToXLS();
+			let save_result = saver.Do(records_to_save);
+
+			if(save_result.error instanceof Error) {
+				console.error(save_result.error);
+			}
+		} else {
+			console.debug(`_indices array is empty`)	
+		}
 	}
 
 	// Delete filter from filter_group[]
