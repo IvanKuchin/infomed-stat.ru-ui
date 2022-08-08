@@ -264,10 +264,15 @@ this._dictionary.___death_date 														= { delete: false };
 	}
 
 	Do() {
+		let error = null;
 		console.debug(`medical records legth ${this._medical_records.length}`);
 		let result = this._CheckConsistency(this._medical_records[0]);
+		
 		if(result.error instanceof Error) {
-			console.error(result.error)
+			console.error(result.error);
+			return {error: result.error};
 		}
+
+		return {error: error};
 	}
 }

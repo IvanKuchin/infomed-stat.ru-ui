@@ -10,7 +10,8 @@ class MonthPredictor {
 
 	_DataPreprocess() {
 		let dp = new DatasetPreprocess(this._medical_records);
-		dp.Do();
+		let result = dp.Do();
+		if(result.error instanceof Error)
 	}
 
 	_FetchMedicalRecords(url) {
