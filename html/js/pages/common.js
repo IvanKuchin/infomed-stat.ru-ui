@@ -1,5 +1,4 @@
 /*exported system_notifications*/
-/*exported preview_modal*/
 /*global EXIF, module, define*/
 /*global system_calls:off*/
 /*global system_notifications:off*/
@@ -5302,6 +5301,7 @@ var system_notifications = (function ()
 	};
 })();
 
+/*exported preview_modal*/
 var preview_modal = (function ()
 {
 	var		rotation;
