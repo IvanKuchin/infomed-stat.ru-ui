@@ -1,16 +1,5 @@
 /*jslint devel: true, indent: 4, maxerr: 50, esversion: 6*/
-/*globals $:false localStorage:false location: false*/
-/*globals localStorage:false*/
-/*globals location:false*/
-/*globals document:false*/
-/*globals window:false*/
-/*globals Image:false*/
-/*globals jQuery:false*/
-/*globals Notification:false*/
-/*globals setTimeout:false*/
-/*globals navigator:false*/
-/*globals module:false*/
-/*globals define:false*/
+/*globals infomed_stat:false*/
 
 infomed_stat = (function()
 {

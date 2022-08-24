@@ -2136,16 +2136,16 @@ var system_calls = (function()
     };
 
     function MonthsDiff(d1, d2) {
-	    var months;
-	    months = (d2.getFullYear() - d1.getFullYear()) * 12;
-	    months -= d1.getMonth();
-	    months += d2.getMonth();
+		var months;
+		months = (d2.getFullYear() - d1.getFullYear()) * 12;
+		months -= d1.getMonth();
+		months += d2.getMonth();
 
-	    if(months < 0) {
-	    	console.error(`months difference less than 0 between ${d1} and ${d2}`);
-	    }
+		if(months < 0) {
+			console.error(`months difference less than 0 between ${d1} and ${d2}`);
+		}
 
-	    return months <= 0 ? 0 : months;
+		return months <= 0 ? 0 : months;
 	}
 
 	// --- Companies
@@ -2318,27 +2318,27 @@ var system_calls = (function()
 	{
 		 $img.on('load', function()
 		 {
-		     EXIF.getData($img[0], function()
+		 EXIF.getData($img[0], function()
+		 {
+		     console.log('Exif=', EXIF.getTag(this, "Orientation"));
+		     switch(parseInt(EXIF.getTag(this, "Orientation")))
 		     {
-		         console.log('Exif=', EXIF.getTag(this, "Orientation"));
-		         switch(parseInt(EXIF.getTag(this, "Orientation")))
-		         {
-		             case 2:
-		                 $img.addClass('exif_flip'); break;
-		             case 3:
-		                 $img.addClass('exif_rotate-180'); break;
-		             case 4:
-		                 $img.addClass('exif_flip-and-rotate-180'); break;
-		             case 5:
-		                 $img.addClass('exif_flip-and-rotate-270'); break;
-		             case 6:
-		                 $img.addClass('exif_rotate-90'); break;
-		             case 7:
-		                 $img.addClass('exif_flip-and-rotate-90'); break;
-		             case 8:
-		                 $img.addClass('exif_rotate-270'); break;
-		         }
-		     });
+		         case 2:
+		             $img.addClass('exif_flip'); break;
+		         case 3:
+		             $img.addClass('exif_rotate-180'); break;
+		         case 4:
+		             $img.addClass('exif_flip-and-rotate-180'); break;
+		         case 5:
+		             $img.addClass('exif_flip-and-rotate-270'); break;
+		         case 6:
+		             $img.addClass('exif_rotate-90'); break;
+		         case 7:
+		             $img.addClass('exif_flip-and-rotate-90'); break;
+		         case 8:
+		             $img.addClass('exif_rotate-270'); break;
+		     }
+		 });
 		 });
 	};
 */
@@ -4158,13 +4158,15 @@ var system_calls = (function()
 
 
 	var FireChangeEvent = function(tag) {
-		if ("createEvent" in document) {
-		    var evt = document.createEvent("HTMLEvents");
-		    evt.initEvent("change", false, true);
-		    tag.dispatchEvent(evt);
+
+		if("createEvent" in document) {
+			var evt = document.createEvent("HTMLEvents");
+			evt.initEvent("change", false, true);
+			tag.dispatchEvent(evt);
+		} else {
+			tag.fireEvent("onchange");
 		}
-		else
-		    tag.fireEvent("onchange");
+		
 	};
 
 	// --- cookie part

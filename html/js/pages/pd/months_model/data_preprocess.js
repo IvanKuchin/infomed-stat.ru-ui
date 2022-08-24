@@ -1,3 +1,5 @@
+/*jslint devel: true, indent: 4, maxerr: 50, esversion: 11*/
+
 import DataPrepDictionary from "./dictionary.js"
 
 export default class DatasetPreprocess {
