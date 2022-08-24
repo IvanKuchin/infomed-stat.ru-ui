@@ -25,6 +25,9 @@ globals:
     Uint8Array: writable
     window: writable
 
+parserOptions:
+    sourceType: module
+
 # --- rules turn on/off
 #rules:
 #    "no-undef": off

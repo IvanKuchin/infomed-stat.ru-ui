@@ -1,6 +1,3 @@
-/*eslint no-restricted-imports: ["dictionary.js"]*/
-
-
 import DataPrepDictionary from "./dictionary.js"
 
 export default class DatasetPreprocess {
