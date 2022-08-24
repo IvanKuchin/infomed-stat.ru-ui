@@ -148,7 +148,7 @@ infomed_stat = (function()
 
 	// --- UI update
 	// input:	selector	- tag to update
-	//			class_list	- classes to replace instead of existsing fa-classes
+	//			class_list	- classes to replace instead of existing fa-classes
 	//			message		- message to write
 	var ChangeStageState = function(selector, class_list, message) {
 		let error = null;
