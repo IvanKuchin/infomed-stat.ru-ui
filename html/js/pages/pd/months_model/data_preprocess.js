@@ -403,7 +403,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	// --- Convert date-columns to months
 	//		input:	source df containing date-typed columns
 	//		output: df containing numeric only
-	_ConvertDateToNumers(df) {
+	_ConvertDateToNumbers(df) {
 		let	error = null;
 		let new_df = df.copy();
 		let column = "";
@@ -529,7 +529,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			return {error: non_string_result.error};
 		}
 
-		let numeric_result = this._ConvertDateToNumers(non_string_result.df);
+		let numeric_result = this._ConvertDateToNumbers(non_string_result.df);
 		if(numeric_result.error instanceof Error) {
 			return {error: numeric_result.error};
 		}
@@ -578,7 +578,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			return {error: non_string_result.error};
 		}
 
-		let numeric_result = this._ConvertDateToNumers(non_string_result.df);
+		let numeric_result = this._ConvertDateToNumbers(non_string_result.df);
 		if(numeric_result.error instanceof Error) {
 			return {error: numeric_result.error};
 		}

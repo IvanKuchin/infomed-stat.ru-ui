@@ -364,3 +364,13 @@ ffaaaa
 xsi
 vnd
 xls
+df
+dfd
+emb
+inp
+nn
+relu
+softmax
+stringify
+tf
+tfvis
