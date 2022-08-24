@@ -1,6 +1,6 @@
 /*jslint devel: true, indent: 4, maxerr: 50, esversion: 6*/
-/*globals infomed_stat:false*/
 
+/*exported infomed_stat*/
 infomed_stat = (function()
 {
 	var	dictionary = [];
