@@ -1,4 +1,5 @@
-/*jslint devel: true, indent: 4, maxerr: 50, esversion: 11*/
+/*eslint no-restricted-imports: ["dictionary.js"]*/
+
 
 import DataPrepDictionary from "./dictionary.js"
 
