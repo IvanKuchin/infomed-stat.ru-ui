@@ -1,4 +1,5 @@
-/*exported system_notifications, preview_modal*/
+/*exported system_notifications*/
+/*exported preview_modal*/
 /*global EXIF, module, define*/
 /*global system_calls:off*/
 /*global system_notifications:off*/
