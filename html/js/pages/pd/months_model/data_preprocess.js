@@ -5,6 +5,7 @@ export default class DatasetPreprocess {
 	_dictionary			= {};
 	_string_columns		= [];
 	_date_columns		= [];
+	_drop_columns		= [];
 	Y_column			= "___birthdate";
 
 	constructor() {
@@ -296,19 +297,21 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	}
 
 	// --- Delete columns if empty
-	_DeleteEmptyColumns(df) {
-		let unique_values = df.nUnique(0);
-		let drop_columns = [];
+	_DeleteEmptyColumns(df, inference = 0) {
+		if(inference == 0) {
+			// --- training cycle
+			let unique_values = df.nUnique(0);
 
-		for(let i = 0; i < unique_values.$data.length; ++i) {
-			if(unique_values.$data[i] == 1) {
-				drop_columns.push(unique_values.$index[i]);
+			for(let i = 0; i < unique_values.$data.length; ++i) {
+				if(unique_values.$data[i] == 1) {
+					this._drop_columns.push(unique_values.$index[i]);
+				}
 			}
+
+			this._drop_columns = [... new Set(this._drop_columns)];
 		}
 
-		drop_columns = [... new Set(drop_columns)];
-
-		let new_df = df.drop({columns: drop_columns});
+		let new_df = df.drop({columns: this._drop_columns});
 
 		return new_df;
 	}
@@ -366,22 +369,16 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	// --- Move string-types columns to dictionary
 	//		input:	source df containing mix of numeric, date and string values
 	//		output:	df containing non-string columns only
-	_ExtractStringColumns(df) {
+	_CreateStringEncoder(df, inference = 0) {
 		let error = null;
-		let new_df = df.copy();
 
 		this._string_columns.forEach(column => {
 			let encoder = new dfd.LabelEncoder();
 
 			// --- save encoder to dictionary
+			encoder.fit(df[column])
 			this._dictionary[column].encoder = encoder;
-			// --- save encoding to dictionary
-			this._dictionary[column].encoding = encoder.fitTransform(new_df[column]);
-
-			new_df.drop({ columns: [column], inplace: true });
 		})
-
-		return {df: new_df, error: error};
 	}
 
 	_MonthsDiff(column_name) {
@@ -419,38 +416,82 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 				new_df = new_df.drop({ columns: [column]});
 				new_df = new_df.addColumn(column, temp_df.values);
 			}
-		})
+		});
 
 		new_df = new_df.drop({ columns: ["___death_date"]});
 
 		return {df: new_df, error: error};
 	}
 
-	_Normalize(df) {
+	_Normalize(df, inference = 0) {
 		let error = null;
 		let nona_df = df.fillNa(0);
-		let scaler = new dfd.MinMaxScaler();
-		let result = scaler.fitTransform(nona_df);
+
+		if(inference == 0) {
+			this._scaler = new dfd.MinMaxScaler();
+			this._scaler.fit(nona_df);
+		}
+
+		let result = this._scaler.transform(nona_df);
 
 		return {df: result, error: error };
 	}
 
-	_ExtractY(df, y_column) {
-		let Y = df[y_column].values;
-		let df_no_Y = df.drop({ columns: [y_column] });
-		let error = null;
+	_ExtractY(df, y_column, inference = 0) {
+		let Y		= df[y_column].values;
+		let df_no_Y	= df.drop({ columns: [y_column] });
+		let error	= null;
 
-		return {Y: Y, df: df_no_Y, error: error};
+		if(inference == 0){
+			let sc		= new dfd.MinMaxScaler();
+
+			sc.fit(Y);
+			this._dictionary[y_column].scaler = sc;
+		}
+
+		return {Y: this._dictionary[y_column].scaler.transform(Y), df: df_no_Y, error: error};
 	}
 
-	_ExtractX(df) {
+	_DeleteStringColumns(df) {
+		let new_df = df.copy();
+
+		this._string_columns.forEach(column => {
+			new_df = new_df.drop({ columns: [column] });
+		});
+
+		return new_df;
+	}
+
+	_EncodeStringColumns(df) {
+		let error = null;
+		let number_of_rows = df[df['$columns'][0]].size;
+		let temp_array = [...Array(number_of_rows).keys()];
+		let encodings = new dfd.DataFrame({ temp_col: temp_array });
+
+		this._string_columns.forEach(column => {
+			let encoding = this._dictionary[column].encoder.transform(df[column]);
+			encodings = encodings.addColumn(column, encoding.values);
+		});
+
+		this._string_columns.forEach(column => {
+			df = df.drop({ columns: [column] });
+		});
+
+		encodings = encodings.drop({ columns: ["temp_col"] });
+
+		return {df: df, encodings: encodings, error: error};
+	}
+
+	_ExtractX(df, encodings) {
 		let X = []
 		let error = null
 
+		// --- push numeric columns into first row.
 		X.push(df.values)
+
 		this._string_columns.forEach(column => {
-			X.push(this._dictionary[column].encoding.values)
-		})
+			X.push(encodings[column].values);
+		});
 
 		return {X: X, error: error};
 	}
@@ -477,46 +518,107 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			return {error: cleaned_df2.error};
 		}
 
-		let cleaned_df3 = this._DeleteEmptyColumns(cleaned_df2.df);
-
+		let cleaned_df3 = this._DeleteEmptyColumns(cleaned_df2.df, 0);
 
 		this._InventoryStringColumns(cleaned_df3);
 		this._InventoryDateColumns(cleaned_df3);
 
-		let non_string_result = this._ExtractStringColumns(cleaned_df3);
+		this._CreateStringEncoder(cleaned_df3)
+		let non_string_result = this._EncodeStringColumns(cleaned_df3);
 		if(non_string_result.error instanceof Error) {
 			return {error: non_string_result.error};
 		}
 
-		// --- empty columns might appear due to patient with some dates is alive
-		// --- for example: operations date is not empty , but patient still alive
-		// --- following formula gives zero: death date - operation date 
-		let numeric_and_empty_result = this._ConvertDateToNumers(non_string_result.df);
-		if(numeric_and_empty_result.error instanceof Error) {
-			return {error: numeric_and_empty_result.error};
+		let numeric_result = this._ConvertDateToNumers(non_string_result.df);
+		if(numeric_result.error instanceof Error) {
+			return {error: numeric_result.error};
 		}
 
-		let numeric_result = this._DeleteEmptyColumns(numeric_and_empty_result.df);
-
-		// let Y = numeric_result[this.Y_column].values;
-		// let numeric_result_no_Y = numeric_result.drop({ columns: [this.Y_column] });
-		let extractY_result = this._ExtractY(numeric_result, this.Y_column);
+		let extractY_result = this._ExtractY(numeric_result.df, this.Y_column, 0);
 		if(extractY_result.error instanceof Error) {
 			return {error: extractY_result.error};
 		}
 		let Y = extractY_result.Y
 
-		let normalized_df = this._Normalize(extractY_result.df);
-		if(normalized_df.error instanceof Error) {
-			return {error: normalized_df.error};
+		let normalized_result = this._Normalize(extractY_result.df, 0);
+		if(normalized_result.error instanceof Error) {
+			return {error: normalized_result.error};
 		}
 
-		let final_result = this._ExtractX(normalized_df.df)
+		let final_result = this._ExtractX(normalized_result.df, non_string_result.encodings);
 		if(final_result.error instanceof Error) {
 			return {error: final_result.error};
 		}
 		let X = final_result.X
 
 		return {X: X, Y: Y, error: error};
+	}
+
+	inference(record) {
+		let error = null;
+
+		let result = this._CheckConsistency([record]);
+		if(result.error instanceof Error) {
+			console.error(result.error);
+			return {error: result.error};
+		}
+
+		let source_df = new dfd.DataFrame([record]);
+
+		let cleaned_df1 = this._DeleteConfiguredColumns(source_df);
+
+		let typed_result = this._AssignConfiguredTypes(cleaned_df1);
+		if(typed_result.error instanceof Error) {
+			return {error: typed_result.error};
+		}
+		let cleaned_df3 = this._DeleteEmptyColumns(typed_result.df, 1);
+
+		let non_string_result = this._EncodeStringColumns(cleaned_df3);
+		if(non_string_result.error instanceof Error) {
+			return {error: non_string_result.error};
+		}
+
+		let numeric_result = this._ConvertDateToNumers(non_string_result.df);
+		if(numeric_result.error instanceof Error) {
+			return {error: numeric_result.error};
+		}
+
+		let extractY_result = this._ExtractY(numeric_result.df, this.Y_column, 1);
+		if(extractY_result.error instanceof Error) {
+			return {error: extractY_result.error};
+		}
+		let Y = extractY_result.Y
+
+		let normalized_result = this._Normalize(extractY_result.df, 1);
+		if(normalized_result.error instanceof Error) {
+			return {error: normalized_result.error};
+		}
+
+		let final_result = this._ExtractX(normalized_result.df, non_string_result.encodings);
+		if(final_result.error instanceof Error) {
+			return {error: final_result.error};
+		}
+		let X = final_result.X
+
+		return {X: X, Y: Y, error: error};
+	}
+
+	GetDateByY(record, Y) {
+		const y_column		= this.Y_column;
+		const scaler		= this._dictionary[y_column].scaler;
+		let	  dates			= [];
+
+		for (var i = Y.length - 1; i >= 0; i--) {
+			const initial_date	= new Date(record[y_column] + " 00:00:00");
+			const months		= scaler.inverseTransform([Y[i]]);
+
+			const final_ts		= initial_date.setMonth(initial_date.getMonth() + months[0]);
+			const final_date	= new Date(final_ts);
+
+			dates.push(final_date);
+		}
+
+
+		return dates;
 	}
 }

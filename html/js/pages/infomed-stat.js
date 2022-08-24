@@ -146,10 +146,46 @@ infomed_stat = (function()
 	};
 
 
+	// --- UI update
+	// input:	selector	- tag to update
+	//			class_list	- classes to replace instead of existsing fa-classes
+	//			message		- message to write
+	var ChangeStageState = function(selector, class_list, message) {
+		let error = null;
+		let image_tag = document.getElementsByClassName(selector + "-image")[0];
+
+		if(image_tag == undefined) {
+			error = new Error("tag not found");
+			console.error(error);
+			return {error: error};
+		}
+
+		system_calls.RemoveClassesFromTag(image_tag, "fa");
+		image_tag.className += " " + class_list;
+
+		let comment_tag = document.getElementsByClassName(selector + "-comment")[0];
+
+		if(comment_tag == undefined) {
+			error = new Error("tag not found");
+			console.error(error);
+			return {error: error};
+		}
+
+		comment_tag.innerHTML = message;
+
+		return {error: error};
+	}
+
+	var GetMaxEpochs = function () {
+		return 50;
+	}
+
 	return {
 		GetRussianSpelling: GetRussianSpelling,
 		GetMedicalItemNameSpelling: GetMedicalItemNameSpelling,
 		GetMedicalItemValueSpelling: GetMedicalItemValueSpelling,
+		ChangeStageState: ChangeStageState,
+		GetMaxEpochs: GetMaxEpochs,
 	};
 
 })();

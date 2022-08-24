@@ -1,27 +1,38 @@
 import DatasetPreprocess from "./data_preprocess.js"
 import TrainNN from "./train_nn.js"
+import InferenceUI from "./inference_ui.js"
 
 class MonthPredictor {
 	_medical_records = [];
+	_preprocessing = null;
+	_nn = null;
 
 	async Do() {
-		this._ChangeStageState("_download", "fa fa-refresh fa-spin", "");
+		infomed_stat.ChangeStageState("_download", "fa fa-refresh fa-spin", "");
 		this._medical_records = await this._FetchMedicalRecords("/cgi-bin/doctor.cgi?action=AJAX_getMedicalRecords&_=" + Math.random() * 872364982374629234);
-		this._ChangeStageState("_download", "fa fa-check", "");
+		infomed_stat.ChangeStageState("_download", "fa fa-check", "");
 
-		this._ChangeStageState("_preprocessing", "fa fa-refresh fa-spin", "");
+		infomed_stat.ChangeStageState("_preprocessing", "fa fa-refresh fa-spin", "");
 		let data_preprocessed = this._DataPreprocess();
-		this._ChangeStageState("_preprocessing", "fa fa-check", "");
+		infomed_stat.ChangeStageState("_preprocessing", "fa fa-check", "");
 
-		this._ChangeStageState("_train", "fa fa-refresh fa-spin", "");
-		this._TrainNN(data_preprocessed.X, data_preprocessed.Y);
-		// this._ChangeStageState("_train", "fa fa-check", "");
+		infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", "");
+		await this._TrainNN(data_preprocessed.X, data_preprocessed.Y);
+		infomed_stat.ChangeStageState("_train", "fa fa-check", "");
+
+		let ui = new InferenceUI(this._preprocessing, this._nn, this._medical_records);
+		let result_ui = ui.RenderUI();
+		if(result_ui.error instanceof Error) {
+			return {error: error};			
+		}
+		ui.AddToPage(result_ui.dom, document.getElementById("inference_records"));
+
 	}
 
 	_DataPreprocess() {
 		let error = null;
-		let dp = new DatasetPreprocess();
-		let result = dp.fit(this._medical_records);
+		this._preprocessing = new DatasetPreprocess();
+		let result = this._preprocessing.fit(this._medical_records);
 		if(result.error instanceof Error) {
 			error = result.error;
 			return {error: error};
@@ -30,13 +41,13 @@ class MonthPredictor {
 		return {X: result.X, Y: result.Y, error: error};
 	}
 
-	_TrainNN(X, Y) {
-		let error = null
+	async _TrainNN(X, Y) {
+		let error = null;
 
-		let train = new TrainNN()
-		let result = train.fit(X, Y)
+		this._nn = new TrainNN();
+		let result = await this._nn.fit(X, Y);
 
-		return {error: error}
+		return {error: error};
 	}
 
 	// --- Download medical records from the server
@@ -68,7 +79,7 @@ class MonthPredictor {
 	// input:	selector	- tag to update
 	//			class_list	- classes to replace instead of existsing fa-classes
 	//			message		- message to write
-	_ChangeStageState(selector, class_list, message) {
+/*	_ChangeStageState(selector, class_list, message) {
 		let error = null;
 		let image_tag = document.getElementsByClassName(selector + "-image")[0];
 
@@ -93,6 +104,7 @@ class MonthPredictor {
 
 		return {error: error};
 	}
+*/
 }
 
 let obj = new MonthPredictor();

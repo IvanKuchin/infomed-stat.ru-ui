@@ -1,4 +1,5 @@
 export default class Train {
+	_model = null;
 
 	_GetModel1() {
 		const model = tf.sequential();
@@ -55,7 +56,7 @@ export default class Train {
 
 		// --- first column of X is the only column contains numeric values
 		// --- it should have dense layers, rather than embeddings
-		const dense_0 = tf.layers.dense({ units: 16, activation: "relu" });
+		const dense_0 = tf.layers.dense({ units: 16, activation: "relu", name: "inp_dense0" });
 		embedding_layers.push(dense_0);
 
 		for (let i = 1; i < X.length; ++i) {
@@ -104,25 +105,56 @@ export default class Train {
 		// -- dense layers
 		const dense_layers_0	= this._BuildDenseLayers(embedding_layers.outputs, 16, "relu", "emb");
 
-		const concat = tf.layers.concatenate({ name: `concat_1` }).apply(dense_layers_0.outputs);
-		const output =
-		     tf.layers.dense({units: 1}).apply(concat);
+		// === change to single column
+		// const trunk_dense_0 = tf.layers.dense({ units: 16, activation: "relu", name: "trunk_dense0" }).apply(dense_layers_0.outputs);
+		const concat		= tf.layers.concatenate({ name: `concat_1` }).apply(dense_layers_0.outputs);
+		const trunk_dense_0 = tf.layers.dense({ units: 16, activation: "relu", name: "trunk_dense_0" }).apply(concat);
+
+		const trunk_dense_1 = tf.layers.dense({ units: 32, activation: "relu", name: "trunk_dense1" }).apply(trunk_dense_0);
+		const trunk_dense_2 = tf.layers.dense({ units: 64, activation: "relu", name: "trunk_dense2" }).apply(trunk_dense_1);
+		const trunk_dense_3 = tf.layers.dense({ units: 32, activation: "relu", name: "trunk_dense3" }).apply(trunk_dense_2);
+		const trunk_dense_4 = tf.layers.dense({ units: 16, activation: "relu", name: "trunk_dense4" }).apply(trunk_dense_3);
+		const output		= tf.layers.dense({ units: 1, name: "predictor" }).apply(trunk_dense_4);
 
 		const model = tf.model({inputs: input_layers, outputs: output});
 
-		model.summary();
+		model.compile({
+			optimizer: tf.train.adam(),
+			loss: "meanSquaredError",
+			metrics: ["accuracy"],
+		});
 
-		// debugger
+		// model.summary();
 
 		return model
 	}
 
-	fit(X, Y) {
+	_ConvertArraysToTensors(X, Y) {
+		let rows = Y.length;
+		let trainY = tf.tensor(Y, [rows, 1]);
+		let trainX = [];
+		let error = null;
+
+		for(let i = 0; i < X.length; ++i) {
+			if(typeof(X[i][0]) == "number") {
+				trainX.push(tf.tensor(X[i], [rows, 1]));
+			} else {
+				trainX.push(tf.tensor(X[i]));
+			}
+		}
+
+		return { X: trainX, Y: trainY, error: error };
+	}
+
+
+
+	async fit(X, Y) {
 		let error = null
 
-		let model = this._GetModel(X, Y)
+		// --- Crafting the model 
+		let model = this._GetModel(X, Y);
 
-
+		// --- Show model summary in GUI
 		async function showModel() {
 		  const surface = {
 		    name: 'Model Summary',
@@ -132,6 +164,71 @@ export default class Train {
 		}
 		document.querySelector('#show-model').addEventListener('click', showModel);
 
+		// --- Convert arrays to tensors
+		const trainData = this._ConvertArraysToTensors(X, Y);
+
+		// --- Train function
+		async function train(obj, model, X, Y, callbacks) {
+			// === change to single column
+			return model.fit(X, Y, {
+				batchSize: 16,
+				epochs: infomed_stat.GetMaxEpochs(), 
+				validationSplit: 0.2,
+				shuffle: true,
+				callbacks: callbacks,
+			});
+
+		}
+	    const callbacks = [
+	    	new tf.CustomCallback({
+		        onEpochEnd: async (epoch, logs) => {
+		          console.log(`EPOCH (${epoch + 1}): Train Loss: ${logs.loss}, Train Accuracy: ${(logs.acc * 100).toFixed(2)}, Val Loss: ${logs.val_loss}, Val Accuracy:  ${(logs.val_acc * 100).toFixed(2)}`);
+		          infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", `#${epoch + 1}, max: ${infomed_stat.GetMaxEpochs()}`);
+		        },
+		        onBatchEnd: async (batch, logs) => {
+		          // console.log(`BATCH (${batch + 1}): Train Loss: ${logs.loss}, Size: ${logs.size}, Accuracy: ${(logs.acc * 100).toFixed(2)}`);
+		        },
+		        onTrainBegin: async (logs) => {
+		        },
+		        onTrainEnd: async (logs) => {
+		        },
+		    }),
+        	tf.callbacks.earlyStopping({monitor: 'val_loss', patience: 5 })
+	      ];
+
+		const res = await train(this, model, trainData.X, trainData.Y, callbacks);
+		// console.debug(`training result: EPOCHS: ${res.epoch.length}, val_loss: ${res.history.val_loss}`);
+
+		this._model = model;
+
+/*
+		async function watchTraining() {
+		  const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
+		  const container = {
+		    name: 'show.fitCallbacks',
+		    tab: 'Training',
+		    styles: {
+		      height: '1000px'
+		    }
+		  };
+		  const callbacks = tfvis.show.fitCallbacks(container, metrics);
+		  return train(model, trainData.X, trainData.Y, callbacks);
+		}
+		document.querySelector('#start-training').addEventListener('click', watchTraining);
+*/
+
+
 		return { error: error }
+	}
+
+	// --- prediction from neural net
+	// 		input: array of arrays
+	// 		output:	array of a single element
+	predict(X) {
+		const	inferenceData	= this._ConvertArraysToTensors(X, [0]);
+		let 	result			= this._model.predict(inferenceData.X);
+		let		prediction		= result.dataSync()[0];
+
+		return [prediction];
 	}
 }
