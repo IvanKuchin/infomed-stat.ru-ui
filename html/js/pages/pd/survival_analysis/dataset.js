@@ -2,11 +2,12 @@ import FilterGroup from "./filter-group.js"
 import SaveToXLS from "../save2xls.js"
 
 export default class Dataset {
-	_records = [];
-	_visibility = true;
-	_filter_groups = [];
 
 	constructor(id, records, km, lr) { 
+		this._records = [];
+		this._visibility = true;
+		this._filter_groups = [];
+
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
@@ -188,12 +189,12 @@ export default class Dataset {
 		$("[dataset='" + this.id + "'] .collapse").collapse("toggle");
 	}
 
-	_CallDate_ChangeHandler(e) {
+	_CallDate_ChangeHandler() {
 		console.debug("change handler");
 		this.Indices_ChangeHandler();
 	}
 
-	_AddFilterGroup_ClickHandler(e) {
+	_AddFilterGroup_ClickHandler() {
 		let new_id = this._filter_groups.length ? this._filter_groups[this._filter_groups.length - 1].id + 1 : 0;
 		let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`), this);
 		this._filter_groups.push(filter_group);
@@ -309,11 +310,11 @@ export default class Dataset {
 			}; 
 	}
 
-	_GetBasicKMObject = function() {
+	_GetBasicKMObject() {
 		return {Censored: 0, Events: 0, Alive: 0, Patients: [] };
 	}
 
-	_GetPatientBriefObj = function(record, status) {
+	_GetPatientBriefObj(record, status) {
 		return {
 					first_name:		record.___first_name,
 					last_name:		record.___last_name,
@@ -332,7 +333,7 @@ export default class Dataset {
 	_GetTimeDtCtOfEventCensor(indices_map, call_date) {
 		let	km_map = new Map();
 
-		for (var i = indices_map.Censored.length - 1; i >= 0; i--) {
+		for (let i = indices_map.Censored.length - 1; i >= 0; i--) {
 			let record_idx = indices_map.Censored[i];
 
 			let neoadj_chemo_date	= this._records[record_idx].___neoadj_chemo___start_date;
@@ -350,6 +351,7 @@ export default class Dataset {
 
 				let	time = time_map.months;
 				if(km_map.has(time)) {
+					// --- ok
 				} else {
 					km_map.set(time, this._GetBasicKMObject());
 				}
@@ -360,7 +362,7 @@ export default class Dataset {
 		}
 
 
-		for (var i = indices_map.Event.length - 1; i >= 0; i--) {
+		for (let i = indices_map.Event.length - 1; i >= 0; i--) {
 			let record_idx = indices_map.Event[i];
 
 			let neoadj_chemo_date	= this._records[record_idx].___neoadj_chemo___start_date;
@@ -378,6 +380,7 @@ export default class Dataset {
 
 				let	time = time_map.months;
 				if(km_map.has(time)) {
+					/// --- ok
 				} else {
 					km_map.set(time, this._GetBasicKMObject());
 				}
@@ -389,7 +392,7 @@ export default class Dataset {
 
 		// let now_date = new Date();
 		// let now_str = now_date.toISOString().slice(0, 10);
-		for (var i = indices_map.Alive.length - 1; i >= 0; i--) {
+		for (let i = indices_map.Alive.length - 1; i >= 0; i--) {
 			let record_idx = indices_map.Alive[i];
 
 			let neoadj_chemo_date	= this._records[record_idx].___neoadj_chemo___start_date;
@@ -409,6 +412,7 @@ export default class Dataset {
 
 				let	time = time_map.months;
 				if(km_map.has(time)) {
+					/// --- ok
 				} else {
 					km_map.set(time, this._GetBasicKMObject());
 				}
@@ -463,7 +467,7 @@ export default class Dataset {
 		return km_survival;
 	}
 
-	_ToggleDatasetVisibility_ClickHandler(e) {
+	_ToggleDatasetVisibility_ClickHandler() {
 		this._visibility = !this._visibility;
 
 		if(this._visibility) {
@@ -542,7 +546,7 @@ export default class Dataset {
 	// Click handler to download filtered records
 	// Input:  e		- Event
 	// Output: none
-	_Download_ClickHandler(e) {
+	_Download_ClickHandler() {
 		let indices = this._GetIndicesFromDatasets(this._filter_groups);
 
 		if(indices && indices.length)

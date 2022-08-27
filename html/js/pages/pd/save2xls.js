@@ -1,3 +1,5 @@
+/* globals infomed_stat */
+
 export default class SaveToXLS {
 
 	_GetTableHeader(record) {

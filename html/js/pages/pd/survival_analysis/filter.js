@@ -1,11 +1,6 @@
 import SaveToXLS from "../save2xls.js"
 
 export default class Filter {
-	_records = [];
-	_pre_filter_indices = [];
-	_post_filter_indices = [];
-	_filter_group;
-	_dataset;
 
 
 	// Constructor
@@ -15,6 +10,12 @@ export default class Filter {
 	//		filter_group	- reference to the parent filter-group object, will be used to notify parent object if this filter been changed
 	//		dataset_obj		- reference to parent dataset object, it will be used to get KM-metadata
 	constructor(id, records, pre_filter_indices, filter_group, dataset_obj) { 
+		this._records = [];
+		this._pre_filter_indices = [];
+		this._post_filter_indices = [];
+		this._filter_group = null;
+		this._dataset = null;
+
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
@@ -301,7 +302,7 @@ export default class Filter {
 	// Click handler to download filtered records
 	// Input:  e		- Event
 	// Output: none
-	_Download_ClickHandler(e) {
+	_Download_ClickHandler() {
 		if(this._post_filter_indices && this._post_filter_indices.length)
 		{
 			// collect records filtered by indexes

@@ -1,9 +1,166 @@
+/* globals Chart */
+
 export default class LogRank {
-	_id;
-	_datasets = [];
 
 	constructor(id) { 
 		this.id = id;
+		this._datasets = [];
+
+		// Drawing normal distributions
+		this._datapoints = [
+					0.000291947,
+					0.00042478,
+					0.000611902,
+					0.000872683,
+					0.001232219,
+					0.001722569,
+					0.002384088,
+					0.003266819,
+					0.004431848,
+					0.005952532,
+					0.007915452,
+					0.010420935,
+					0.013582969,
+					0.0175283,
+					0.02239453,
+					0.028327038,
+					0.035474593,
+					0.043983596,
+					0.053990967,
+					0.065615815,
+					0.078950158,
+					0.094049077,
+					0.110920835,
+					0.129517596,
+					0.149727466,
+					0.171368592,
+					0.194186055,
+					0.217852177,
+					0.241970725,
+					0.26608525,
+					0.289691553,
+					0.312253933,
+					0.333224603,
+					0.352065327,
+					0.36827014,
+					0.381387815,
+					0.391042694,
+					0.396952547,
+					0.39894228,
+					0.396952547,
+					0.391042694,
+					0.381387815,
+					0.36827014,
+					0.352065327,
+					0.333224603,
+					0.312253933,
+					0.289691553,
+					0.26608525,
+					0.241970725,
+					0.217852177,
+					0.194186055,
+					0.171368592,
+					0.149727466,
+					0.129517596,
+					0.110920835,
+					0.094049077,
+					0.078950158,
+					0.065615815,
+					0.053990967,
+					0.043983596,
+					0.035474593,
+					0.028327038,
+					0.02239453,
+					0.0175283,
+					0.013582969,
+					0.010420935,
+					0.007915452,
+					0.005952532,
+					0.004431848,
+					0.003266819,
+					0.002384088,
+					0.001722569,
+					0.001232219,
+					0.000872683,
+					0.000611902,
+					0.00042478,
+					0.000291947
+					];
+
+		this._data = {
+			labels: [],
+			datasets: [
+			{
+				label: 'Χ',
+				data: [],
+				borderColor: "#00ff00",
+				fill: false,
+				cubicInterpolationMode: 'monotone',
+				tension: 0.4
+			}, {
+				label: 'Left side',
+				data: [],
+				borderColor: "#ff0000",
+				backgroundColor: "#ffaaaa",
+				fill: true,
+				cubicInterpolationMode: 'monotone',
+				tension: 0.4
+			}, {
+				label: 'Right side',
+				data: [],
+				borderColor: "#ff0000",
+				backgroundColor: "#ffaaaa",
+				fill: true,
+				cubicInterpolationMode: 'monotone',
+				tension: 0.4
+			}, {
+				label: 'Normal standard distribution',
+				data: this._datapoints,
+				borderColor: "#bbbbbb",
+				fill: false,
+				cubicInterpolationMode: 'monotone',
+				tension: 0.4
+			}
+			],
+			min: -3.8,
+			max: 3.8,
+			x: [],
+			chi_x: NaN,
+		};
+
+		this._config = {
+			type: 'line',
+			data: this._data,
+			options: {
+			responsive: true,
+			plugins: {
+				title: {
+				display: true,
+				text: 'Chart.js Line Chart - Cubic interpolation mode'
+				},
+			},
+			interaction: {
+				intersect: false,
+			},
+			scales: {
+				x: {
+				display: true,
+				title: {
+					display: true
+				}
+				},
+				y: {
+				display: true,
+				title: {
+					display: true,
+					text: 'Value'
+				},
+				// suggestedMin: 0,
+				// suggestedMax: 0.4
+				}
+			}
+			},
+		};
 
 		document.querySelector(`[lr-group="${this.id}"] [alpha-value]`).addEventListener("change", this.UpdateUI.bind(this));
 
@@ -52,6 +209,7 @@ export default class LogRank {
 		let ds_idx = this._FindDSIndexByParentID(parent_id);
 
 		if(ds_idx == datasets.length) {
+			// --- success
 		} else {
 			datasets.splice(ds_idx, 1);
 		}
@@ -160,10 +318,11 @@ export default class LogRank {
 		let map = new Map();
 
 		// Build initial map form existing datasets
-		for (var i = 0; i < ds1.data.length; i++) {
+		for (let i = 0; i < ds1.data.length; i++) {
 			let record = ds1.data[i];
 			if(record.Events) {
 				if(map.has(record.Time)) {
+					// --- ok
 				} else {
 					map.set(record.Time, this._GetEmptyObject()) 
 				}
@@ -173,10 +332,11 @@ export default class LogRank {
 				map.get(record.Time).AtRisk1	= record.AtRisk;
 			}
 		}
-		for (var i = 0; i < ds2.data.length; i++) {
+		for (let i = 0; i < ds2.data.length; i++) {
 			let record = ds2.data[i];
 			if(record.Events) {
 				if(map.has(record.Time)) {
+					// --- ok
 				} else {
 					map.set(record.Time, this._GetEmptyObject()) 
 				}
@@ -189,7 +349,7 @@ export default class LogRank {
 
 		// Convert map to array
 		let temp_table = [];
-		map.forEach((v, k) => {
+		map.forEach((v) => {
 			temp_table.push(v);
 		});
 
@@ -198,10 +358,12 @@ export default class LogRank {
 		// Fill blank values in AtRisk1 and AtRisk2
 		for (let i = 0; i < table.length; i++) {
 			if(table[i].AtRisk1) {
+				// --- ok
 			} else {
 				table[i].AtRisk1 = this._GetAtRiskAtATime(table[i].Time, ds1);
 			}
 			if(table[i].AtRisk2) {
+				// --- ok
 			} else {
 				table[i].AtRisk2 = this._GetAtRiskAtATime(table[i].Time, ds2);
 			}
@@ -234,7 +396,7 @@ export default class LogRank {
 	_PutLogRankValuesInGUI() {
 		let datasets = this._datasets;
 		let alpha = parseFloat(document.querySelector(`[lr-group="${this.id}"] [alpha-value]`).value);
-		let alpha_squared = Math.pow(alpha, 2);
+		// let alpha_squared = Math.pow(alpha, 2);
 
 		for (let i = 0; i < datasets.length; i++) {
 			for(let j = 0; j < datasets.length; j++) {
@@ -252,161 +414,6 @@ export default class LogRank {
 		}
 	}
 
-	// Drawing normal distributions
-	_datapoints = [
-				0.000291947,
-				0.00042478,
-				0.000611902,
-				0.000872683,
-				0.001232219,
-				0.001722569,
-				0.002384088,
-				0.003266819,
-				0.004431848,
-				0.005952532,
-				0.007915452,
-				0.010420935,
-				0.013582969,
-				0.0175283,
-				0.02239453,
-				0.028327038,
-				0.035474593,
-				0.043983596,
-				0.053990967,
-				0.065615815,
-				0.078950158,
-				0.094049077,
-				0.110920835,
-				0.129517596,
-				0.149727466,
-				0.171368592,
-				0.194186055,
-				0.217852177,
-				0.241970725,
-				0.26608525,
-				0.289691553,
-				0.312253933,
-				0.333224603,
-				0.352065327,
-				0.36827014,
-				0.381387815,
-				0.391042694,
-				0.396952547,
-				0.39894228,
-				0.396952547,
-				0.391042694,
-				0.381387815,
-				0.36827014,
-				0.352065327,
-				0.333224603,
-				0.312253933,
-				0.289691553,
-				0.26608525,
-				0.241970725,
-				0.217852177,
-				0.194186055,
-				0.171368592,
-				0.149727466,
-				0.129517596,
-				0.110920835,
-				0.094049077,
-				0.078950158,
-				0.065615815,
-				0.053990967,
-				0.043983596,
-				0.035474593,
-				0.028327038,
-				0.02239453,
-				0.0175283,
-				0.013582969,
-				0.010420935,
-				0.007915452,
-				0.005952532,
-				0.004431848,
-				0.003266819,
-				0.002384088,
-				0.001722569,
-				0.001232219,
-				0.000872683,
-				0.000611902,
-				0.00042478,
-				0.000291947
-				];
-
-	_data = {
-	  labels: [],
-	  datasets: [
-	    {
-	      label: 'Χ',
-	      data: [],
-	      borderColor: "#00ff00",
-	      fill: false,
-	      cubicInterpolationMode: 'monotone',
-	      tension: 0.4
-	    }, {
-	      label: 'Left side',
-	      data: [],
-	      borderColor: "#ff0000",
-	      backgroundColor: "#ffaaaa",
-	      fill: true,
-	      cubicInterpolationMode: 'monotone',
-	      tension: 0.4
-	    }, {
-	      label: 'Right side',
-	      data: [],
-	      borderColor: "#ff0000",
-	      backgroundColor: "#ffaaaa",
-	      fill: true,
-	      cubicInterpolationMode: 'monotone',
-	      tension: 0.4
-	    }, {
-	      label: 'Normal standard distribution',
-	      data: this._datapoints,
-	      borderColor: "#bbbbbb",
-	      fill: false,
-	      cubicInterpolationMode: 'monotone',
-	      tension: 0.4
-	    }
-	  ],
-	  min: -3.8,
-	  max: 3.8,
-	  x: [],
-	  chi_x: NaN,
-	};
-
-	_config = {
-	  type: 'line',
-	  data: this._data,
-	  options: {
-	    responsive: true,
-	    plugins: {
-	      title: {
-	        display: true,
-	        text: 'Chart.js Line Chart - Cubic interpolation mode'
-	      },
-	    },
-	    interaction: {
-	      intersect: false,
-	    },
-	    scales: {
-	      x: {
-	        display: true,
-	        title: {
-	          display: true
-	        }
-	      },
-	      y: {
-	        display: true,
-	        title: {
-	          display: true,
-	          text: 'Value'
-	        },
-	        // suggestedMin: 0,
-	        // suggestedMax: 0.4
-	      }
-	    }
-	  },
-	};
 
 	_PlotNormalStdCurve() {
 		let labels		= [];
@@ -415,7 +422,7 @@ export default class LogRank {
 
 		for (let i = 0; i < this._datapoints.length; ++i) {
 			this._data.x.push(this._data.min + i * step);
-	 		labels.push((this._data.x[i].toFixed(1)).toString());
+			labels.push((this._data.x[i].toFixed(1)).toString());
 		}
 		this._data.labels = labels;
 	}
@@ -468,7 +475,7 @@ export default class LogRank {
 	_PlotSidePercentage() {
 		let tag			= document.querySelector(`[lr-group="${this.id}"] [alpha-value]`);
 		let start_x 	= tag.value;
-		let description	= tag.options[tag.selectedIndex].text;
+		// let description	= tag.options[tag.selectedIndex].text;
 
 		let idx_right	= this._GetClosestIndex(start_x);
 		let	idx_left 	= this._datapoints.length - idx_right;
@@ -513,9 +520,9 @@ export default class LogRank {
 
 	_InitializeGraph() {
 		this._myChart = new Chart(
-						    document.querySelectorAll("[lr-group='" + this.id + "'] canvas")[0],
-						    this._config
-						  );
+							document.querySelectorAll("[lr-group='" + this.id + "'] canvas")[0],
+							this._config
+							);
 	}
 
 	// Normal distribution ends

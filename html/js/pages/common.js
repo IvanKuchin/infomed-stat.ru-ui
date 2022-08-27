@@ -1,4 +1,4 @@
-/*exported system_notifications, preview_modal*/
+/*exported system_notifications*/
 /*global EXIF, module, define*/
 /*global system_calls:off*/
 /*global system_notifications:off*/
@@ -2135,6 +2135,19 @@ var system_calls = (function()
         return arr.map(function (x, i) { return i; });
     };
 
+    function MonthsDiff(d1, d2) {
+		var months;
+		months = (d2.getFullYear() - d1.getFullYear()) * 12;
+		months -= d1.getMonth();
+		months += d2.getMonth();
+
+		if(months < 0) {
+			console.error(`months difference less than 0 between ${d1} and ${d2}`);
+		}
+
+		return months <= 0 ? 0 : months;
+	}
+
 	// --- Companies
 	var	GetCompanyInfo_DOM = function(companies)
 	{
@@ -2305,27 +2318,27 @@ var system_calls = (function()
 	{
 		 $img.on('load', function()
 		 {
-		     EXIF.getData($img[0], function()
+		 EXIF.getData($img[0], function()
+		 {
+		     console.log('Exif=', EXIF.getTag(this, "Orientation"));
+		     switch(parseInt(EXIF.getTag(this, "Orientation")))
 		     {
-		         console.log('Exif=', EXIF.getTag(this, "Orientation"));
-		         switch(parseInt(EXIF.getTag(this, "Orientation")))
-		         {
-		             case 2:
-		                 $img.addClass('exif_flip'); break;
-		             case 3:
-		                 $img.addClass('exif_rotate-180'); break;
-		             case 4:
-		                 $img.addClass('exif_flip-and-rotate-180'); break;
-		             case 5:
-		                 $img.addClass('exif_flip-and-rotate-270'); break;
-		             case 6:
-		                 $img.addClass('exif_rotate-90'); break;
-		             case 7:
-		                 $img.addClass('exif_flip-and-rotate-90'); break;
-		             case 8:
-		                 $img.addClass('exif_rotate-270'); break;
-		         }
-		     });
+		         case 2:
+		             $img.addClass('exif_flip'); break;
+		         case 3:
+		             $img.addClass('exif_rotate-180'); break;
+		         case 4:
+		             $img.addClass('exif_flip-and-rotate-180'); break;
+		         case 5:
+		             $img.addClass('exif_flip-and-rotate-270'); break;
+		         case 6:
+		             $img.addClass('exif_rotate-90'); break;
+		         case 7:
+		             $img.addClass('exif_flip-and-rotate-90'); break;
+		         case 8:
+		             $img.addClass('exif_rotate-270'); break;
+		     }
+		 });
 		 });
 	};
 */
@@ -4132,14 +4145,28 @@ var system_calls = (function()
 		}
 	};
 
+	// --- DOM manipulation
+	var RemoveClassesFromTag = function(tag, prefix) {
+		let		classes = tag.className.split(" ");
+
+		classes.forEach(function(class_name)
+		{
+			if(class_name.search(prefix) === 0)
+				tag.classList.remove(class_name);
+		});
+	}
+
+
 	var FireChangeEvent = function(tag) {
-		if ("createEvent" in document) {
-		    var evt = document.createEvent("HTMLEvents");
-		    evt.initEvent("change", false, true);
-		    tag.dispatchEvent(evt);
+
+		if("createEvent" in document) {
+			var evt = document.createEvent("HTMLEvents");
+			evt.initEvent("change", false, true);
+			tag.dispatchEvent(evt);
+		} else {
+			tag.fireEvent("onchange");
 		}
-		else
-		    tag.fireEvent("onchange");
+		
 	};
 
 	// --- cookie part
@@ -4234,11 +4261,15 @@ var system_calls = (function()
 		isElementInList: isElementInList,
 		isIDInTheJQueryList: isIDInTheJQueryList,
 		FillArrayWithNumbers: FillArrayWithNumbers,
+		MonthsDiff: MonthsDiff,
 
 		// --- button GUI
 		ButtonLoadingDisable: ButtonLoadingDisable,
 		ButtonLoadingEnable: ButtonLoadingEnable,
 		ButtonLoadingToggle: ButtonLoadingToggle,
+
+		// --- DOM manipulation
+		RemoveClassesFromTag: RemoveClassesFromTag,
 
 		// --- companies
 		GetCompanyInfo_DOM: GetCompanyInfo_DOM,
@@ -5270,6 +5301,7 @@ var system_notifications = (function ()
 	};
 })();
 
+/*exported preview_modal*/
 var preview_modal = (function ()
 {
 	var		rotation;
