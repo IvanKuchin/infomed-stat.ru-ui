@@ -1,24 +1,27 @@
-export default class KaplanMeier {
-	_data = {
-		labels: [],
-		datasets: []
-	};
+/* globals Chart */
 
-	_config = {
-		type: 'line',
-		data: this._data,
-		options: {
-		    plugins: {
-				tooltip: {
-					callbacks: {
-					  footer: this._footer,
-					}
-				}
-		    }
-		}
-	};
+export default class KaplanMeier {
 
 	constructor(id) { 
+		this._data = {
+			labels: [],
+			datasets: []
+		};
+
+		this._config = {
+			type: 'line',
+			data: this._data,
+			options: {
+				plugins: {
+					tooltip: {
+						callbacks: {
+							footer: this._footer,
+						}
+					}
+				}
+			}
+		};
+
 		this.id = id;
 
 		this.InitializeGraph();
@@ -29,9 +32,9 @@ export default class KaplanMeier {
 
 	InitializeGraph() {
 		this._myChart = new Chart(
-						    document.querySelectorAll("[km-group='" + this.id + "'] canvas")[0],
-						    this._config
-						  );
+							document.querySelectorAll("[km-group='" + this.id + "'] canvas")[0],
+							this._config
+						);
 	}
 
 	_footer(tooltipItems) {
@@ -41,12 +44,12 @@ export default class KaplanMeier {
 			let data	= tooltipItem.dataset.data;
 			let label	= tooltipItem.label;
 
-			for (var i = 0; i < data.length; i++) {
+			for (let i = 0; i < data.length; i++) {
 				if(data[i].x == label) {
 					let patients = data[i].Patients;
 
 					footer += `\n`;
-					for (var i = 0; i < patients.length; i++) {
+					for (let i = 0; i < patients.length; i++) {
 						let patient = patients[i];
 
 						footer += `${patient.last_name} ${patient.first_name} ${patient.middle_name} гр.${patient.birthdate} (${patient.status})\n`;
@@ -115,6 +118,7 @@ export default class KaplanMeier {
 		let ds_idx = this._FindDSIndexByParentID(parent_id);
 
 		if(ds_idx == datasets.length) {
+			// --- ok
 		} else {
 			datasets.splice(ds_idx, 1);
 		}

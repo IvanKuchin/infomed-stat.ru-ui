@@ -3,9 +3,12 @@ import TrainNN from "./train_nn.js"
 import InferenceUI from "./inference_ui.js"
 
 class MonthPredictor {
-	_medical_records = [];
-	_preprocessing = null;
-	_nn = null;
+
+	constructor() {
+		this._medical_records = [];
+		this._preprocessing = null;
+		this._nn = null;
+	}
 
 	async Do() {
 		infomed_stat.ChangeStageState("_download", "fa fa-refresh fa-spin", "");
@@ -23,7 +26,7 @@ class MonthPredictor {
 		let ui = new InferenceUI(this._preprocessing, this._nn, this._medical_records);
 		let result_ui = ui.RenderUI();
 		if(result_ui.error instanceof Error) {
-			return {error: error};			
+			return { error: result_ui.error };			
 		}
 		ui.AddToPage(result_ui.dom, document.getElementById("inference_records"));
 
@@ -47,7 +50,7 @@ class MonthPredictor {
 		this._nn = new TrainNN();
 		let result = await this._nn.fit(X, Y);
 
-		return {error: error};
+		return { history: result, error: error };
 	}
 
 	// --- Download medical records from the server
@@ -56,11 +59,11 @@ class MonthPredictor {
 
 		return fetch(url)
 			.then(response => {
-			    if (response.ok) {
-			    	// --- ok
-			    } else {
-			      throw new Error(`HTTP error! Status: ${ response.status }`);
-			    }
+				if (response.ok) {
+					// --- ok
+				} else {
+					throw new Error(`HTTP error! Status: ${ response.status }`);
+				}
 
 				return response.json();
 			})

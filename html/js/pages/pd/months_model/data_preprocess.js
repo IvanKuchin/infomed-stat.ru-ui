@@ -1,14 +1,15 @@
-import DataPrepDictionary from "./dictionary.js"
+/*global dfd*/
 
 export default class DatasetPreprocess {
-	_medical_records	= [];
-	_dictionary			= {};
-	_string_columns		= [];
-	_date_columns		= [];
-	_drop_columns		= [];
-	Y_column			= "___birthdate";
 
 	constructor() {
+		this._medical_records	= [];
+		this._dictionary		= {};
+		this._string_columns	= [];
+		this._date_columns		= [];
+		this._drop_columns		= [];
+		this.Y_column			= "___birthdate";
+
 this._dictionary.___last_name 														= { delete: true , type: "string"  };
 this._dictionary.___first_name 														= { delete: true , type: "string"  };
 this._dictionary.___middle_name 													= { delete: true , type: "string"  };
@@ -369,9 +370,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	// --- Move string-types columns to dictionary
 	//		input:	source df containing mix of numeric, date and string values
 	//		output:	df containing non-string columns only
-	_CreateStringEncoder(df, inference = 0) {
-		let error = null;
-
+	_CreateStringEncoder(df) {
 		this._string_columns.forEach(column => {
 			let encoder = new dfd.LabelEncoder();
 
@@ -406,7 +405,6 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	_ConvertDateToNumbers(df) {
 		let	error = null;
 		let new_df = df.copy();
-		let column = "";
 
 		this._date_columns.forEach(column => {
 			if(column != "___death_date") {

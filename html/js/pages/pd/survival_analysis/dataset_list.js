@@ -3,10 +3,11 @@ import KaplanMeier from "./kaplan-meier.js"
 import LogRank from "./log_rank.js"
 
 export default class DatasetGroup {
-	_datasets = [];
-	_medical_records = [];
 
 	constructor(id) {
+		this._datasets = [];
+		this._medical_records = [];
+
 		this.id = id;
 		this._km_object = new KaplanMeier(this.id);
 		this._lr_object = new LogRank(this.id);
@@ -38,12 +39,12 @@ export default class DatasetGroup {
 
 		fetch(url)
 			.then(response => {
-			    if (response.ok) {
-			    	// --- ok
+				if (response.ok) {
+					// --- ok
 					system_calls.ButtonLoadingEnable(document.getElementById("create_dataset"));
-			    } else {
-			      throw new Error(`HTTP error! Status: ${ response.status }`);
-			    }
+				} else {
+					throw new Error(`HTTP error! Status: ${ response.status }`);
+				}
 
 				return response.json();
 			})
@@ -63,12 +64,12 @@ export default class DatasetGroup {
 			let record = medical_records[i]
 
 			if(record.___death_date.length) { record.___calculated_status = "event"; }
-			else if(record.___study_retirement_date.length) {  record.___calculated_status = "censored"; }
+			else if(record.___study_retirement_date.length) { record.___calculated_status = "censored"; }
 			else { record.___calculated_status = "alive"; }
 		}
 
 		return medical_records;
-	};
+	}
 
 	_PreprocessData(medical_records) {
 		medical_records = this._AddStatusField(medical_records);

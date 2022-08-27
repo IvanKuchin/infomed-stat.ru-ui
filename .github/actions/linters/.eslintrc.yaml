@@ -25,8 +25,13 @@ globals:
     Uint8Array: writable
     window: writable
 
-parserOptions:
-    sourceType: module
+overrides:
+  - files: ["months_model/*.js"]
+    parserOptions:
+        sourceType: module
+  - files: ["survival_analysis/*.js"]
+    parserOptions:
+        sourceType: module
 
 # --- rules turn on/off
 #rules:

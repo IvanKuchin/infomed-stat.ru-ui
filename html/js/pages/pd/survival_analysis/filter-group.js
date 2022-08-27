@@ -2,11 +2,12 @@ import Filter from "./filter.js"
 import SaveToXLS from "../save2xls.js"
 
 export default class FilterGroup {
-	_records = [];
-	_filters = [];
-	_ref_dom;
 
 	constructor(id, records, ref_dom, dataset_obj) { 
+		this._records = [];
+		this._filters = [];
+		this._ref_dom = null;
+
 		this.id = id; // --- forwards it to setter 
 
 		this._records = records;
@@ -19,7 +20,7 @@ export default class FilterGroup {
 	set id(id) { this._id = id; }
 
 	get indices() { return this._indices; }
-	set indices(idx) { return this._indices = idx; }
+	set indices(idx) { this._indices = idx; }
 
 	// Update filter GUI-metadata
 	// Input:
@@ -128,7 +129,7 @@ export default class FilterGroup {
 		return wrapper;
 	}
 
-	_AddFilter_ClickHandler(e) {
+	_AddFilter_ClickHandler() {
 		let new_id				= this._filters.length ? this._filters[this._filters.length - 1].id + 1 : 0;
 		let pre_filter_indices	= (new_id ? this._filters[this._filters.length - 1].post_filter_indices : Array.from(Array(this._records.length).keys()));
 		let filter				= new Filter(new_id, this._records, pre_filter_indices, this, this._dataset);
@@ -144,7 +145,7 @@ export default class FilterGroup {
 	// Click handler to download filtered records
 	// Input:  e		- Event
 	// Output: none
-	_Download_ClickHandler(e) {
+	_Download_ClickHandler() {
 		if(this._indices && this._indices.length)
 		{
 			// collect records filtered by indexes
@@ -205,7 +206,7 @@ export default class FilterGroup {
 	// Output:
 	//		index in the filters[]
 	_GetFilterIdxByID(filter_id) {
-		var i = 0;;
+		var i = 0;
 
 		for (i = 0; i < this._filters.length; i++) {
 			if(this._filters[i].id == filter_id) {

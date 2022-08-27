@@ -1,8 +1,5 @@
 export default class InferenceUI {
 
-	_preprocessing = null;
-	_nn = null;
-	_records = null;
 
 	constructor(preprocessing, nn, records) {
 		this._preprocessing = preprocessing;

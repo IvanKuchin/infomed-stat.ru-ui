@@ -1,5 +1,10 @@
+/* globals tf, tfvis */
+
 export default class Train {
-	_model = null;
+
+	constructor () {
+		this._model = null;
+	}
 
 	_GetModel1() {
 		const model = tf.sequential();
@@ -20,8 +25,7 @@ export default class Train {
 		const dense1 = tf.layers.dense({units: 4}).apply(input1);
 		const dense2 = tf.layers.dense({units: 8}).apply(input2);
 		const concat = tf.layers.concatenate().apply([dense1, dense2]);
-		const output =
-		     tf.layers.dense({units: 3, activation: 'softmax'}).apply(concat);
+		const output = tf.layers.dense({units: 3, activation: 'softmax'}).apply(concat);
 
 		const model = tf.model({inputs: [input1, input2], outputs: output});
 
@@ -32,7 +36,7 @@ export default class Train {
 		return [... new Set(arr)];
 	}
 
-	_BuildInputLayers(X, Y) {
+	_BuildInputLayers(X) {
 		let input_layers = [];
 
 		// --- first column of X is the only column contains more than one value
@@ -50,7 +54,7 @@ export default class Train {
 		return input_layers
 	}
 
-	_BuildEmbeddings(prev_layers, X, Y) {
+	_BuildEmbeddings(prev_layers, X) {
 		let embedding_layers = [];
 		let embedding_outputs = [];
 
@@ -95,12 +99,12 @@ export default class Train {
 		return {layers: dense_layers, outputs: reshape_outputs};
 	}
 
-	_GetModel(X, Y) {
+	_GetModel(X) {
 		// --- input layers
-		const input_layers		= this._BuildInputLayers(X, Y);
+		const input_layers		= this._BuildInputLayers(X);
 
 		// --- embedding layers
-		const embedding_layers	= this._BuildEmbeddings(input_layers, X, Y);
+		const embedding_layers	= this._BuildEmbeddings(input_layers, X);
 
 		// -- dense layers
 		const dense_layers_0	= this._BuildDenseLayers(embedding_layers.outputs, 16, "relu", "emb");
@@ -152,15 +156,15 @@ export default class Train {
 		let error = null
 
 		// --- Crafting the model 
-		let model = this._GetModel(X, Y);
+		let model = this._GetModel(X);
 
 		// --- Show model summary in GUI
 		async function showModel() {
-		  const surface = {
-		    name: 'Model Summary',
-		    tab: 'Model'
-		  };
-		  tfvis.show.modelSummary(surface, model);
+			const surface = {
+				name: 'Model Summary',
+				tab: 'Model'
+			};
+			tfvis.show.modelSummary(surface, model);
 		}
 		document.querySelector('#show-model').addEventListener('click', showModel);
 
@@ -179,40 +183,33 @@ export default class Train {
 			});
 
 		}
-	    const callbacks = [
-	    	new tf.CustomCallback({
-		        onEpochEnd: async (epoch, logs) => {
-		          console.log(`EPOCH (${epoch + 1}): Train Loss: ${logs.loss}, Train Accuracy: ${(logs.acc * 100).toFixed(2)}, Val Loss: ${logs.val_loss}, Val Accuracy:  ${(logs.val_acc * 100).toFixed(2)}`);
-		          infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", `#${epoch + 1}, max: ${infomed_stat.GetMaxEpochs()}`);
-		        },
-		        onBatchEnd: async (batch, logs) => {
-		          // console.log(`BATCH (${batch + 1}): Train Loss: ${logs.loss}, Size: ${logs.size}, Accuracy: ${(logs.acc * 100).toFixed(2)}`);
-		        },
-		        onTrainBegin: async (logs) => {
-		        },
-		        onTrainEnd: async (logs) => {
-		        },
-		    }),
-        	tf.callbacks.earlyStopping({monitor: 'val_loss', patience: 5 })
-	      ];
+		const callbacks = [
+			new tf.CustomCallback({
+				onEpochEnd: async (epoch, logs) => {
+					console.log(`EPOCH (${epoch + 1}): Train Loss: ${logs.loss}, Train Accuracy: ${(logs.acc * 100).toFixed(2)}, Val Loss: ${logs.val_loss}, Val Accuracy:	${(logs.val_acc * 100).toFixed(2)}`);
+					infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", `#${epoch + 1}, max: ${infomed_stat.GetMaxEpochs()}`);
+				},
+			}),
+			tf.callbacks.earlyStopping({monitor: 'val_loss', patience: 5 })
+			];
 
 		const res = await train(this, model, trainData.X, trainData.Y, callbacks);
-		// console.debug(`training result: EPOCHS: ${res.epoch.length}, val_loss: ${res.history.val_loss}`);
+		console.debug(`training result: EPOCHS: ${res.epoch.length}, val_loss: ${res.history.val_loss}`);
 
 		this._model = model;
 
 /*
 		async function watchTraining() {
-		  const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
-		  const container = {
-		    name: 'show.fitCallbacks',
-		    tab: 'Training',
-		    styles: {
-		      height: '1000px'
-		    }
-		  };
-		  const callbacks = tfvis.show.fitCallbacks(container, metrics);
-		  return train(model, trainData.X, trainData.Y, callbacks);
+			const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
+			const container = {
+			name: 'show.fitCallbacks',
+			tab: 'Training',
+			styles: {
+				height: '1000px'
+			}
+			};
+			const callbacks = tfvis.show.fitCallbacks(container, metrics);
+			return train(model, trainData.X, trainData.Y, callbacks);
 		}
 		document.querySelector('#start-training').addEventListener('click', watchTraining);
 */

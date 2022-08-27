@@ -9,6 +9,8 @@ var Init = function() {
 
 var CreateDataset_ClickHandler = function() {
 	let dataset = dataset_group1.CreateAndRenderDS();
+
+	return { dataset: dataset };
 };
 
 Init();
