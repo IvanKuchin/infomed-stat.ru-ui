@@ -4,19 +4,8 @@ view_profile = (function()
 {
 	"use strict";
 
-	var		userProfile;
-	var		addRecommendation = {};
-
-	var		myUserID;
-	var		myUserLogin;
-	var		friendUserID;
-
 	var	Init = function()
 	{
-		myUserID = $("#myUserID").data("myuserid");
-		myUserLogin = $("#myUserID").data("mylogin");
-		friendUserID = $("#friendLastName").data("friendid");
-
 		DrawFriendAvatar($("#friendLastName").data("friendavatar"), $("#friendName").text(), $("#friendLastName").text());
 		FillinUserProfile();
 	};
@@ -27,8 +16,6 @@ view_profile = (function()
 			.done(function(data) {
 				if(data.result === "success")
 				{
-					userProfile = data.users[0];
-
 					if(system_calls.GetParamFromURL("scrollto").length) system_calls.ScrollWindowToElementID("#" + system_calls.GetParamFromURL("scrollto"));
 				}
 				else
