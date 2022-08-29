@@ -1,3 +1,5 @@
+/* exported geo_zip_edit */
+
 var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 {
 	"use strict";
@@ -87,8 +89,6 @@ var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 		var		input_region			= $("<input>")	.addClass("form-control transparent");
 		var		input_locality			= $("<input>")	.addClass("form-control transparent");
 
-		var		country_options			= $();
-
 		select_country	.attr("id", "geo_country_"	+ suffix_global);
 		input_zip		.attr("id", "geo_zip_"		+ suffix_global)	.attr("placeholder", "Индекс");
 		input_region	.attr("id", "geo_region_"	+ suffix_global)	.attr("placeholder", "Регион");
@@ -146,7 +146,7 @@ var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 		}
 	};
 
-	var	Country_ChangeHandler = function(e)
+	var	Country_ChangeHandler = function()
 	{
 		$("#geo_zip_" + suffix_global).val("");
 		$("#geo_region_" + suffix_global).val("");
@@ -155,7 +155,7 @@ var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 		BlockRegionAndCityFields();
 	};
 
-	var	Zip_ChangeHandler = function(e)
+	var	Zip_ChangeHandler = function()
 	{
 		$("#geo_region_" + suffix_global).val("");
 		$("#geo_locality_" + suffix_global).val("");		
@@ -164,12 +164,12 @@ var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 		MakeRegionAndCityAssumption();
 	};
 
-	var	Region_ChangeHandler = function(e)
+	var	Region_ChangeHandler = function()
 	{
 		SubmitNewIndex();
 	};
 
-	var	Locality_ChangeHandler = function(e)
+	var	Locality_ChangeHandler = function()
 	{
 		SubmitNewIndex();
 	};
@@ -208,7 +208,7 @@ var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 						// system_calls.PopoverError($("#geo_zip_" + suffix_global), "Ошибка: " + data.description);
 					}
 				})
-				.fail(function(e)
+				.fail(function()
 				{
 					system_calls.PopoverError($("#geo_zip_" + suffix_global), "Ошибка ответа сервера");
 				});
@@ -243,14 +243,14 @@ var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 						system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 					}
 				})
-				.fail(function(e)
+				.fail(function()
 				{
 					system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
 				});
 		}
 	};
 
-	var	Region_InputHandler = function(e)
+	var	Region_InputHandler = function()
 	{
 		var	curr_tag = $(this);
 		var	currentValue = curr_tag.val();
@@ -274,13 +274,13 @@ var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 					console.debug(curr_tag, "Ошибка: " + data.description);
 				}
 			})
-			.fail(function(e)
+			.fail(function()
 			{
 				console.error(curr_tag, "Ошибка ответа сервера");
 			});
 	};
 
-	var	Locality_InputHandler = function(e)
+	var	Locality_InputHandler = function()
 	{
 		var	curr_tag = $(this);
 		var	currentValue = curr_tag.val();
@@ -306,7 +306,7 @@ var	geo_zip_edit = function(suffix, spelling_title, action, callback_func)
 					console.debug(curr_tag, "Ошибка: " + data.description);
 				}
 			})
-			.fail(function(e)
+			.fail(function()
 			{
 				console.error(curr_tag, "Ошибка ответа сервера");
 			});

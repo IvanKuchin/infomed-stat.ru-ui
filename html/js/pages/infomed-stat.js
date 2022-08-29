@@ -2,7 +2,7 @@
 
 /*exported infomed_stat*/
 /*global infomed_stat:off*/
-infomed_stat = (function()
+var infomed_stat = (function()
 {
 	var	dictionary = [];
 		dictionary.second_line						= "2-я линия";

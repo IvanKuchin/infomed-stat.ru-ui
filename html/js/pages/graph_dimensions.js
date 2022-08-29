@@ -1,5 +1,5 @@
 /* exported graph_dimensions */
-/* globals infomed_stat,Plotly */
+/* globals Plotly */
 
 var	graph_dimensions = (function()
 {
@@ -81,7 +81,7 @@ var	graph_dimensions = (function()
 
 	var	BuildDimensionNames = function(medical_records, dimension_names)
 	{
-			for(const [name, value] of Object.entries(dimension_names))
+			for(const [name] of Object.entries(dimension_names))
 			{
 				let	obj = 	{
 								label: infomed_stat.GetMedicalItemNameSpelling(name),
@@ -95,7 +95,7 @@ var	graph_dimensions = (function()
 
 	var	BuildDimensionValues = function(medical_records, dimension_names)
 	{
-			for(const [name, value] of Object.entries(dimension_names))
+			for(const [name] of Object.entries(dimension_names))
 			{
 				let	val_array = [];
 				medical_records.forEach(function(medical_record)
@@ -169,7 +169,7 @@ var	graph_dimensions = (function()
 		dimension_names = BuildDimensionValues(medical_records, dimension_names);
 
 
-		for(const [name, value] of Object.entries(dimension_names))
+		for(const [, value] of Object.entries(dimension_names))
 		{
 			result[0].dimensions.push(value);
 		}
