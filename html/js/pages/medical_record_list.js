@@ -1,5 +1,3 @@
-var	medical_record_list = medical_record_list || {};
-
 var	medical_record_list = (function()
 {
 	'use strict';
@@ -41,7 +39,7 @@ var	medical_record_list = (function()
 					system_calls.PopoverError(currTag, "Ошибка: " + data.description);
 				}
 			})
-			.fail(function(data)
+			.fail(function()
 			{
 				setTimeout(function() {
 					system_calls.PopoverError(currTag, "Ошибка ответа сервера");
@@ -171,9 +169,9 @@ var	medical_record_list = (function()
 		edit_col			.append(edit_button);
 		remove_col			.append(remove_button);
 
-		if(isMe) {} 
-		else
-		{
+		if(isMe) {
+			// --- ok
+		} else {
 			remove_button.hide();
 			edit_button.hide();
 		}
@@ -212,13 +210,13 @@ var	medical_record_list = (function()
 		$("#medical_record_list").empty().append(GetMedicalRecords_DOM(medical_records));
 	};
 
-	var	TriggerCollapsible_ClickHandler = function(e)
+	var	TriggerCollapsible_ClickHandler = function()
 	{
 		var		collapsible_tag_id = $(this).attr("data-target");
 		$("#" + collapsible_tag_id).collapse("toggle");
 	};
 
-	var	RemovePatient_AreYouSure_ClickHandler = function(e)
+	var	RemovePatient_AreYouSure_ClickHandler = function()
 	{
 		var		curr_tag = $(this);
 
@@ -256,11 +254,11 @@ var	medical_record_list = (function()
 					system_calls.PopoverError(curr_tag, "Ошибка: " + data.description);
 				}
 			})
-			.fail(function(e)
+			.fail(function()
 			{
 				system_calls.PopoverError(curr_tag, "Ошибка ответа сервера");
 			})
-			.always(function(e)
+			.always(function()
 			{
 				curr_tag.removeAttr("disabled");
 			});
@@ -273,7 +271,7 @@ var	medical_record_list = (function()
 		$(`[status-${filter}]`).show(750);
 	};
 
-	var	SortOrder_ChangeHandler = function(e) {
+	var	SortOrder_ChangeHandler = function() {
 		RenderMedicalRecords(data_global.medical_records);
 	};
 
