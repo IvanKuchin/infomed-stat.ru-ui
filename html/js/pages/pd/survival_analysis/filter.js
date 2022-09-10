@@ -46,7 +46,7 @@ export default class Filter {
 	_GetMedPropertyDOM(property) {
 		let opt = document.createElement("option");
 		opt.setAttribute("value", property);
-		opt.appendChild(document.createTextNode(infomed_stat.GetMedicalItemNameSpelling(property)));
+		opt.appendChild(document.createTextNode(common_infomed_stat.GetMedicalItemNameSpelling(property)));
 
 		return opt;
 	}

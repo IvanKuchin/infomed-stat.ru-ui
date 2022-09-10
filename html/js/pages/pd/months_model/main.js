@@ -11,17 +11,17 @@ class MonthPredictor {
 	}
 
 	async Do() {
-		infomed_stat.ChangeStageState("_download", "fa fa-refresh fa-spin", "");
+		common_infomed_stat.ChangeStageState("_download", "fa fa-refresh fa-spin", "");
 		this._medical_records = await this._FetchMedicalRecords("/cgi-bin/doctor.cgi?action=AJAX_getMedicalRecords&_=" + Math.random() * 872364982374629234);
-		infomed_stat.ChangeStageState("_download", "fa fa-check", "");
+		common_infomed_stat.ChangeStageState("_download", "fa fa-check", "");
 
-		infomed_stat.ChangeStageState("_preprocessing", "fa fa-refresh fa-spin", "");
+		common_infomed_stat.ChangeStageState("_preprocessing", "fa fa-refresh fa-spin", "");
 		let data_preprocessed = this._DataPreprocess();
-		infomed_stat.ChangeStageState("_preprocessing", "fa fa-check", "");
+		common_infomed_stat.ChangeStageState("_preprocessing", "fa fa-check", "");
 
-		infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", "");
+		common_infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", "");
 		await this._TrainNN(data_preprocessed.X, data_preprocessed.Y);
-		infomed_stat.ChangeStageState("_train", "fa fa-check", "");
+		common_infomed_stat.ChangeStageState("_train", "fa fa-check", "");
 
 		let ui = new InferenceUI(this._preprocessing, this._nn, this._medical_records);
 		let result_ui = ui.RenderUI();
