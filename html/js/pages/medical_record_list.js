@@ -1,3 +1,5 @@
+/*exported medical_record_list*/
+
 var	medical_record_list = (function()
 {
 	'use strict';
