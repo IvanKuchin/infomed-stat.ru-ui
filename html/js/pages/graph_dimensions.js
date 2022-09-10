@@ -84,7 +84,7 @@ var	graph_dimensions = (function()
 			for(const [name] of Object.entries(dimension_names))
 			{
 				let	obj = 	{
-								label: infomed_stat.GetMedicalItemNameSpelling(name),
+								label: common_infomed_stat.GetMedicalItemNameSpelling(name),
 							};
 
 				dimension_names[name] = obj;

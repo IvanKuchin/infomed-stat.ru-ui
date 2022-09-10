@@ -56,8 +56,8 @@ var	medical_record_list = (function()
 		let		col_name			= $("<div>")	.addClass("col-xs-6");
 		let		col_value			= $("<div>")	.addClass("col-xs-6");
 
-		col_name	.append(infomed_stat.GetMedicalItemNameSpelling(item.name));
-		col_value	.append(infomed_stat.GetMedicalItemValueSpelling(item.value));
+		col_name	.append(common_infomed_stat.GetMedicalItemNameSpelling(item.name));
+		col_value	.append(common_infomed_stat.GetMedicalItemValueSpelling(item.value));
 
 		result = result.add(row.append(col_name).append(col_value));
 

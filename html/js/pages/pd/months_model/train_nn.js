@@ -176,7 +176,7 @@ export default class Train {
 			// === change to single column
 			return model.fit(X, Y, {
 				batchSize: 16,
-				epochs: infomed_stat.GetMaxEpochs(), 
+				epochs: common_infomed_stat.GetMaxEpochs(), 
 				validationSplit: 0.2,
 				shuffle: true,
 				callbacks: callbacks,
@@ -187,7 +187,7 @@ export default class Train {
 			new tf.CustomCallback({
 				onEpochEnd: async (epoch, logs) => {
 					console.log(`EPOCH (${epoch + 1}): Train Loss: ${logs.loss}, Train Accuracy: ${(logs.acc * 100).toFixed(2)}, Val Loss: ${logs.val_loss}, Val Accuracy:	${(logs.val_acc * 100).toFixed(2)}`);
-					infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", `#${epoch + 1}, max: ${infomed_stat.GetMaxEpochs()}`);
+					common_infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", `#${epoch + 1}, max: ${common_infomed_stat.GetMaxEpochs()}`);
 				},
 			}),
 			tf.callbacks.earlyStopping({monitor: 'val_loss', patience: 5 })

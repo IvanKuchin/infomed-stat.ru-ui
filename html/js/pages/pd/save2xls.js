@@ -4,7 +4,7 @@ export default class SaveToXLS {
 		let tr = document.createElement("tr")
 
 		for (const property in record) {
-			let translation = infomed_stat.GetMedicalItemNameSpelling(property);
+			let translation = common_infomed_stat.GetMedicalItemNameSpelling(property);
 			let th = document.createElement("th");
 			th.append(translation);
 			tr.appendChild(th);
