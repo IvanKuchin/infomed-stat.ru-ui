@@ -59,3 +59,9 @@ RewriteRule ^companyprofile/(.*)$ /cgi-bin/ajax_anyrole_1.cgi?action=view_compan
 RewriteRule ^images/(.*)$				/media/images/$1				[QSA,L,R=301,NC]
 RewriteRule ^video/(.*)$				/media/video/$1				[QSA,L,R=301,NC]
 RewriteRule ^helpdesk_ticket_attaches/(.*)$		/media/helpdesk_ticket_attaches/$1       [QSA,L,R=301,NC]
+
+
+###
+# Captcha rule required only in dev-env, prod uses ingress instead
+###
+RewriteRule ^captcha/(.*)$              http://localhost:8666/captcha/$1 [P]
