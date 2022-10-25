@@ -374,3 +374,5 @@ softmax
 stringify
 tf
 tfvis
+captcha
+getnew
