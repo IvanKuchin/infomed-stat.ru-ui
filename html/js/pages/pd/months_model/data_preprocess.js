@@ -191,6 +191,7 @@ this._dictionary.___op_done___blood_loss									 		= { delete: false, type: "st
 this._dictionary.___op_done___blood_transfusion								 		= { delete: false, type: "string"  };
 this._dictionary.___op_done___assistant										 		= { delete: true , type: "string"  };
 this._dictionary.___op_done___duration										 		= { delete: false, type: "string"  };
+this._dictionary.___op_done___recovery_days									 		= { delete: false, type: "string"  };
 this._dictionary.___another_organ_resect 											= { delete: false, type: "string"  };
 this._dictionary.___another_organ_resect___liver 									= { delete: false, type: "string"  };
 this._dictionary.___another_organ_resect___colon 									= { delete: false, type: "string"  };
