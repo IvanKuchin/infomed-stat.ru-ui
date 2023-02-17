@@ -187,6 +187,7 @@ this._dictionary.___op_done___vasc_resect___celiac_trunk___resect_type 				= { d
 this._dictionary.___op_done___vasc_resect___celiac_trunk___resect_extent 			= { delete: false, type: "string"  };
 this._dictionary.___op_done___vasc_resect___common_hepatic_art___resect_type 		= { delete: false, type: "string"  };
 this._dictionary.___op_done___vasc_resect___common_hepatic_art___resect_extent 		= { delete: false, type: "string"  };
+this._dictionary.___op_done___blood_loss									 		= { delete: false, type: "string"  };
 this._dictionary.___op_done___assistant										 		= { delete: true , type: "string"  };
 this._dictionary.___another_organ_resect 											= { delete: false, type: "string"  };
 this._dictionary.___another_organ_resect___liver 									= { delete: false, type: "string"  };
