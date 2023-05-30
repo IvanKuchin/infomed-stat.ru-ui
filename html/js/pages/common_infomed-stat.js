@@ -90,6 +90,7 @@ var common_infomed_stat = (function()
 		dictionary.resect_extent					= "протяженность резекции";
 		dictionary.resect_type						= "вмд резекции";
 		dictionary.resectability					= "резектабельность";
+		dictionary.ecog_status						= "ecog статус";
 		dictionary.roughness_contour				= "неровность контура";
 		dictionary.scheme_name						= "название схемы";
 		dictionary.scheme_quantity					= "количество курсов";

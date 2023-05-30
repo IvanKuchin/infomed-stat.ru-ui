@@ -22,6 +22,7 @@ this._dictionary.___locality 														= { delete: true , type: "string"  };
 this._dictionary.___comment 														= { delete: true , type: "string"  };
 this._dictionary.___cancer_type 													= { delete: false, type: "string"  };
 this._dictionary.___non_pancreatobiliary_sickness 									= { delete: false, type: "string"  };
+this._dictionary.___ecog_status								 						= { delete: false, type: "int32"   };
 this._dictionary.___resectability 													= { delete: false, type: "string"  };
 this._dictionary.___brca 															= { delete: false, type: "string"  };	
 this._dictionary.___brca_localization_breast 										= { delete: false, type: "string"  };
