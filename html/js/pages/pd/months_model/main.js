@@ -17,6 +17,9 @@ class MonthPredictor {
 
 		common_infomed_stat.ChangeStageState("_preprocessing", "fa fa-refresh fa-spin", "");
 		let data_preprocessed = this._DataPreprocess();
+		if(data_preprocessed.error instanceof Error) {
+			return { error: data_preprocessed.error };
+		}
 		common_infomed_stat.ChangeStageState("_preprocessing", "fa fa-check", "");
 
 		common_infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", "");
