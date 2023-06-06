@@ -18,12 +18,17 @@ class MonthPredictor {
 		common_infomed_stat.ChangeStageState("_preprocessing", "fa fa-refresh fa-spin", "");
 		let data_preprocessed = this._DataPreprocess();
 		if(data_preprocessed.error instanceof Error) {
+			common_infomed_stat.ChangeStageState("_preprocessing", "fa fa-times", "");
 			return { error: data_preprocessed.error };
 		}
 		common_infomed_stat.ChangeStageState("_preprocessing", "fa fa-check", "");
 
 		common_infomed_stat.ChangeStageState("_train", "fa fa-refresh fa-spin", "");
-		await this._TrainNN(data_preprocessed.X, data_preprocessed.Y);
+		let train_result = await this._TrainNN(data_preprocessed.X, data_preprocessed.Y);
+		if(train_result.error instanceof Error) {
+			common_infomed_stat.ChangeStageState("_train", "fa fa-times", "");
+			return { error: train_result.error };
+		}
 		common_infomed_stat.ChangeStageState("_train", "fa fa-check", "");
 
 		let ui = new InferenceUI(this._preprocessing, this._nn, this._medical_records);
