@@ -506,7 +506,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		return {X: X, error: error};
 	}
 
-	fit(records) {
+	_fit_inference(records, _inference) {
 		let error = null;
 
 		let result = this._CheckConsistency(records[0]);
@@ -523,17 +523,27 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		if(typed_result.error instanceof Error) {
 			return {error: typed_result.error};
 		}
-		let cleaned_df2 = this._DeleteEmptyRows(typed_result.df, "___death_date");
-		if(cleaned_df2.error instanceof Error) {
-			return {error: cleaned_df2.error};
+
+		let cleaned_df3 = null;
+
+		if(_inference == 1) {
+			// inference mode
+			cleaned_df3 = this._DeleteEmptyColumns(typed_result.df, 1);
+		} else {
+			// fit mode 
+			let deceased_patients = this._DeleteEmptyRows(typed_result.df, "___death_date");
+			if(deceased_patients.error instanceof Error) {
+				return {error: deceased_patients.error};
+			}
+	
+			cleaned_df3 = this._DeleteEmptyColumns(deceased_patients.df, _inference);
+	
+			this._InventoryStringColumns(cleaned_df3);
+			this._InventoryDateColumns(cleaned_df3);
+	
+			this._CreateStringEncoder(cleaned_df3);
 		}
 
-		let cleaned_df3 = this._DeleteEmptyColumns(cleaned_df2.df, 0);
-
-		this._InventoryStringColumns(cleaned_df3);
-		this._InventoryDateColumns(cleaned_df3);
-
-		this._CreateStringEncoder(cleaned_df3)
 		let non_string_result = this._EncodeStringColumns(cleaned_df3);
 		if(non_string_result.error instanceof Error) {
 			return {error: non_string_result.error};
@@ -544,13 +554,13 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			return {error: numeric_result.error};
 		}
 
-		let extractY_result = this._ExtractY(numeric_result.df, this.Y_column, 0);
+		let extractY_result = this._ExtractY(numeric_result.df, this.Y_column, _inference);
 		if(extractY_result.error instanceof Error) {
 			return {error: extractY_result.error};
 		}
 		let Y = extractY_result.Y
 
-		let normalized_result = this._Normalize(extractY_result.df, 0);
+		let normalized_result = this._Normalize(extractY_result.df, _inference);
 		if(normalized_result.error instanceof Error) {
 			return {error: normalized_result.error};
 		}
@@ -564,53 +574,12 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		return {X: X, Y: Y, error: error};
 	}
 
-	inference(record) {
-		let error = null;
+	fit(records) {
+		return this._fit_inference(records, 0);
+	}
 
-		let result = this._CheckConsistency([record]);
-		if(result.error instanceof Error) {
-			console.error(result.error);
-			return {error: result.error};
-		}
-
-		let source_df = new dfd.DataFrame([record]);
-
-		let cleaned_df1 = this._DeleteConfiguredColumns(source_df);
-
-		let typed_result = this._AssignConfiguredTypes(cleaned_df1);
-		if(typed_result.error instanceof Error) {
-			return {error: typed_result.error};
-		}
-		let cleaned_df3 = this._DeleteEmptyColumns(typed_result.df, 1);
-
-		let non_string_result = this._EncodeStringColumns(cleaned_df3);
-		if(non_string_result.error instanceof Error) {
-			return {error: non_string_result.error};
-		}
-
-		let numeric_result = this._ConvertDateToNumbers(non_string_result.df);
-		if(numeric_result.error instanceof Error) {
-			return {error: numeric_result.error};
-		}
-
-		let extractY_result = this._ExtractY(numeric_result.df, this.Y_column, 1);
-		if(extractY_result.error instanceof Error) {
-			return {error: extractY_result.error};
-		}
-		let Y = extractY_result.Y
-
-		let normalized_result = this._Normalize(extractY_result.df, 1);
-		if(normalized_result.error instanceof Error) {
-			return {error: normalized_result.error};
-		}
-
-		let final_result = this._ExtractX(normalized_result.df, non_string_result.encodings);
-		if(final_result.error instanceof Error) {
-			return {error: final_result.error};
-		}
-		let X = final_result.X
-
-		return {X: X, Y: Y, error: error};
+	inference(records) {
+		return this._fit_inference(records, 1);
 	}
 
 	GetDateByY(record, Y) {
