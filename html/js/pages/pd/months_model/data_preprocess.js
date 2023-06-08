@@ -442,13 +442,19 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	_Normalize(df, inference = 0) {
 		let error = null;
 		let nona_df = df.fillNa(0);
+		let result = nona_df.copy();
 
-		if(inference == 0) {
-			this._scaler = new dfd.MinMaxScaler();
-			this._scaler.fit(nona_df);
+		for (let column of df.$columns) {
+			if(inference == 0) {
+				this._dictionary[column]._scaler = new dfd.MinMaxScaler();
+				this._dictionary[column]._scaler.fit(nona_df[column]);
+			}
+
+			let scaled_column = this._dictionary[column]._scaler.transform(nona_df[column].asType("float32"));
+
+			result = result.drop({ columns: [column] })
+			result = result.addColumn(column, scaled_column.values)
 		}
-
-		let result = this._scaler.transform(nona_df);
 
 		return {df: result, error: error };
 	}
