@@ -14,6 +14,7 @@ export default class DatasetPreprocess {
 		// first is the most important, second is less, etc ...
 		// actual Y-value calculated as difference between Y_reference and death_date
 		this._Y_reference		= ["___neoadj_chemo___start_date", "___op_done___invasion_date"];
+		this._death_column		= "___death_date";
 
 this._dictionary.___last_name 														= { delete: true , type: "string"  };
 this._dictionary.___first_name 														= { delete: true , type: "string"  };
@@ -283,15 +284,16 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		return {error: error}
 	}
 
+	// consistency checking function
 	_CheckIfAllNecessaryColumnsExists(df) {
 		let error;
 		let columns = this._Y_reference.slice();
-		columns.push("__birthdate");
-		columns.push("__death_date");
+		columns.push("___birthdate");
+		columns.push("___death_date");
 
 		for (let column of columns) {
 			if(df.$columns.indexOf(column) == -1) {
-				error = new Error(`column ${column} is not in the dataframe`);
+				error = new Error(`column ${column} is not in the DataFrame`);
 				console.error(error);
 				break;
 			}
@@ -451,10 +453,16 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		});
 
 		// birthdate column removed due to it is a reference point and always 0
-		// death date must be predicted and unknown in inference stage
-		new_df = new_df.drop({ columns: ["___birthdate", "___death_date"]});
+		new_df = new_df.drop({ columns: ["___birthdate"] })
 
 		return {df: new_df, error: error};
+	}
+
+	_RemoveDeathDate(df) {
+		// death date must be predicted and unknown in the inference stage
+		let new_df = df.drop({ columns: [this._death_column]});
+
+		return {df: new_df}
 	}
 
 	_Normalize(df, inference = 0) {
@@ -496,20 +504,45 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		return {df: result, error: error};
 	}
 
-	_ExtractY(df, y_column, inference = 0) {
-		// TODO: "Y column" should be number of month since "Y reference"
-		let Y		= df[y_column].values;
-		let df_no_Y	= df.drop({ columns: [y_column] });
+	// function returns difference in month between "Y reference" columns and death date
+	// death date must be the last column in the row
+	_LifeExpectancyInMonths(row) {
+		let death_idx = row.length - 1;
+		let result = 0;
+
+		for(let i = 0; i < row.length - 1; ++i) {
+			if(row[i] > 0) {
+				result = row[death_idx] - row[i];
+				break;
+			}
+		}
+
+		if(result < 0) {
+			result = 0;
+			console.error("death date is earlier than any other date")
+		} else if(result == 0) {
+			console.error("missing dates in Y reference columns")
+		}
+
+		return result;
+	}
+
+	_ExtractY(df, inference = 0) {
+		let columns = this._Y_reference.slice();
+		columns.push(this._death_column);
+		let temp_Y_df = df.loc({ columns: columns }).apply(this._LifeExpectancyInMonths, { axis: 1 });
+
+		let Y		= temp_Y_df.values;
 		let error	= null;
 
 		if(inference == 0){
 			let sc		= new dfd.MinMaxScaler();
 
 			sc.fit(Y);
-			this._dictionary[y_column].scaler = sc;
+			this._y_column_scaler = sc;
 		}
 
-		return {Y: this._dictionary[y_column].scaler.transform(Y), df: df_no_Y, error: error};
+		return {Y: this._y_column_scaler.transform(Y), error: error};
 	}
 
 	_DeleteStringColumns(df) {
@@ -581,7 +614,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			cleaned_df3 = this._DeleteEmptyColumns(typed_result.df, _inference);
 		} else {
 			// fit mode 
-			let deceased_patients = this._DeleteEmptyRows(typed_result.df, "___death_date");
+			let deceased_patients = this._DeleteEmptyRows(typed_result.df, this._death_column);
 			if(deceased_patients.error instanceof Error) {
 				return {error: deceased_patients.error};
 			}
@@ -614,21 +647,24 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			return {error: numeric_result.error};
 		}
 
-		let extractY_result = this._ExtractY(numeric_result.df, this.Y_column, _inference);
+		let extractY_result = this._ExtractY(numeric_result.df, _inference);
 		if(extractY_result.error instanceof Error) {
 			return {error: extractY_result.error};
 		}
 		let Y = extractY_result.Y
 
-		let normalized_result = this._Normalize(extractY_result.df, _inference);
+		let normalized_result = this._Normalize(numeric_result.df, _inference);
 		if(normalized_result.error instanceof Error) {
 			return {error: normalized_result.error};
 		}
 
-		let final_result = this._ExtractX(normalized_result.df, non_string_result.encodings);
+		let normalized_no_death = this._RemoveDeathDate(normalized_result.df);
+
+		let final_result = this._ExtractX(normalized_no_death.df, non_string_result.encodings);
 		if(final_result.error instanceof Error) {
 			return {error: final_result.error};
 		}
+
 		let X = final_result.X
 
 		return {X: X, Y: Y, error: error};
