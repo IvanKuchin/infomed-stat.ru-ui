@@ -506,31 +506,37 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 
 	// function returns difference in month between "Y reference" columns and death date
 	// death date must be the last column in the row
-	_LifeExpectancyInMonths(row) {
-		let death_idx = row.length - 1;
-		let result = 0;
+	_LifeExpectancyInMonths(inference) {
+		return function(row) {
+			let death_idx = row.length - 1;
+			let result = 0;
 
-		for(let i = 0; i < row.length - 1; ++i) {
-			if(row[i] > 0) {
-				result = row[death_idx] - row[i];
-				break;
+			for(let i = 0; i < row.length - 1; ++i) {
+				if(row[i] > 0) {
+					result = row[death_idx] - row[i];
+					break;
+				}
 			}
-		}
 
-		if(result < 0) {
-			result = 0;
-			console.error("death date is earlier than any other date")
-		} else if(result == 0) {
-			console.error("missing dates in Y reference columns")
-		}
+			if(inference == 1) {
+				// do not report error in inference stage
+			} else {
+				if(result < 0) {
+					result = 0;
+					console.error("death date is earlier than any other date")
+				} else if(result == 0) {
+					console.error("missing dates in Y reference columns")
+				}
+			}
 
-		return result;
+			return result;
+		}
 	}
 
 	_ExtractY(df, inference = 0) {
 		let columns = this._Y_reference.slice();
 		columns.push(this._death_column);
-		let temp_Y_df = df.loc({ columns: columns }).apply(this._LifeExpectancyInMonths, { axis: 1 });
+		let temp_Y_df = df.loc({ columns: columns }).apply(this._LifeExpectancyInMonths(inference), { axis: 1 });;
 
 		let Y		= temp_Y_df.values;
 		let error	= null;
