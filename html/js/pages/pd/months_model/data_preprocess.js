@@ -688,8 +688,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 					// date is missing in the column
 					// nothing to do
 				} else {
-					// TODO: fix problem with prediction, due to below scaler doesn't exists
-					const scaler		= this._dictionary[y_column].scaler;
+					const scaler		= this._y_column_scaler;
 
 					const initial_date	= new Date(record[y_column] + " 00:00:00");
 					const months		= scaler.inverseTransform([Y[i]]);
