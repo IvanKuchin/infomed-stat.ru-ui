@@ -426,7 +426,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		this._date_columns.forEach(column => {
 			if(column != "___death_date") {
 				let month_diff_closure = this._MonthsDiff(column);
-				// TODO: date fields should be made relative to birthdate, not deathdate
+				// TODO: date fields should be made relative to birthdate, not death date
 				let temp_df = df.loc({ columns: [column, "___death_date"] }).apply(month_diff_closure, { axis: 1 });
 
 				new_df = new_df.drop({ columns: [column]});
@@ -479,7 +479,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	}
 
 	_ExtractY(df, y_column, inference = 0) {
-		// TODO: Ycolumn should be number of month since Yreference
+		// TODO: "Y column" should be number of month since "Y reference"
 		let Y		= df[y_column].values;
 		let df_no_Y	= df.drop({ columns: [y_column] });
 		let error	= null;
