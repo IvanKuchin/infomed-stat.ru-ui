@@ -8,7 +8,12 @@ export default class DatasetPreprocess {
 		this._string_columns	= [];
 		this._date_columns		= [];
 		this._drop_columns		= [];
-		this.Y_column			= "___birthdate";
+		this.Y_column			= "___birthdate"; // TODO: remove
+
+		// Y must have a single value, therefore single value selects from the list ordered by importance
+		// first is the most important, second is less, etc ...
+		// actual Y-value calculated as difference between Y_reference and death_date
+		this._Y_reference		= ["___neoadj_chemo___start_date", "___op_done___invasion_date"];
 
 this._dictionary.___last_name 														= { delete: true , type: "string"  };
 this._dictionary.___first_name 														= { delete: true , type: "string"  };
@@ -402,7 +407,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 
 				diff = system_calls.MonthsDiff(d1, d2);
 
-				if(column_name == "___neoadj_chemo___finish_date") {
+				if(column_name == "___neoadj_chemo___start_date") {
 					console.debug(column_name, row, diff)
 				}
 			}
@@ -421,6 +426,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		this._date_columns.forEach(column => {
 			if(column != "___death_date") {
 				let month_diff_closure = this._MonthsDiff(column);
+				// TODO: date fields should be made relative to birthdate, not deathdate
 				let temp_df = df.loc({ columns: [column, "___death_date"] }).apply(month_diff_closure, { axis: 1 });
 
 				new_df = new_df.drop({ columns: [column]});
@@ -447,7 +453,27 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		return {df: result, error: error };
 	}
 
+	// function returns new DataFrame containing rows with non-empty value in either of input columns
+	_KeepRowsWithNonEmptyValues(df, columns) {
+		let error = null;
+		let empty_idxs = null;
+
+		for (let i = 0; i < columns.length; ++i) {
+			if(empty_idxs == null) {
+				empty_idxs = df[columns[i]].eq("");
+			} else {
+				empty_idxs = empty_idxs.mul(df[columns[i]].eq(""));
+			}
+		}
+
+		let non_empty_idxs = empty_idxs.eq(0);
+		let result = df.loc({ rows: non_empty_idxs });
+
+		return {df: result, error: error};
+	}
+
 	_ExtractY(df, y_column, inference = 0) {
+		// TODO: Ycolumn should be number of month since Yreference
 		let Y		= df[y_column].values;
 		let df_no_Y	= df.drop({ columns: [y_column] });
 		let error	= null;
@@ -536,6 +562,11 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 				return {error: deceased_patients.error};
 			}
 	
+			let relevant_patients = this._KeepRowsWithNonEmptyValues(deceased_patients.df, this._Y_reference);
+			if(relevant_patients.error instanceof Error) {
+				return {error: relevant_patients.error};
+			}
+
 			cleaned_df3 = this._DeleteEmptyColumns(deceased_patients.df, _inference);
 	
 			this._InventoryStringColumns(cleaned_df3);
@@ -583,20 +614,29 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	}
 
 	GetDateByY(record, Y) {
-		const y_column		= this.Y_column;
-		const scaler		= this._dictionary[y_column].scaler;
 		let	  dates			= [];
 
 		for (var i = Y.length - 1; i >= 0; i--) {
-			const initial_date	= new Date(record[y_column] + " 00:00:00");
-			const months		= scaler.inverseTransform([Y[i]]);
+			
+			for(let y_column of this._Y_reference) {
+				if(record[y_column] == "") {
+					// date is missing in the column
+					// nothing to do
+				} else {
+					// TODO: fix problem with prediction, due to below scaler doesn't exists
+					const scaler		= this._dictionary[y_column].scaler;
 
-			const final_ts		= initial_date.setMonth(initial_date.getMonth() + months[0]);
-			const final_date	= new Date(final_ts);
-
-			dates.push(final_date);
+					const initial_date	= new Date(record[y_column] + " 00:00:00");
+					const months		= scaler.inverseTransform([Y[i]]);
+		
+					const final_ts		= initial_date.setMonth(initial_date.getMonth() + months[0]);
+					const final_date	= new Date(final_ts);
+		
+					dates.push(final_date);
+					break;
+				}
+			}
 		}
-
 
 		return dates;
 	}
