@@ -283,6 +283,23 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		return {error: error}
 	}
 
+	_CheckIfAllNecessaryColumnsExists(df) {
+		let error;
+		let columns = this._Y_reference.slice();
+		columns.push("__birthdate");
+		columns.push("__death_date");
+
+		for (let column of columns) {
+			if(df.$columns.indexOf(column) == -1) {
+				error = new Error(`column ${column} is not in the dataframe`);
+				console.error(error);
+				break;
+			}
+		}
+
+		return error;
+	}
+
 	_IsColumnShouldBeDeleted(column) {
 		if((this._dictionary[column] != undefined) && (this._dictionary[column].delete == true)) {
 				return true;
@@ -424,17 +441,18 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		let new_df = df.copy();
 
 		this._date_columns.forEach(column => {
-			if(column != "___death_date") {
+			if(column != "___birthdate") {
 				let month_diff_closure = this._MonthsDiff(column);
-				// TODO: date fields should be made relative to birthdate, not death date
-				let temp_df = df.loc({ columns: [column, "___death_date"] }).apply(month_diff_closure, { axis: 1 });
+				let temp_df = df.loc({ columns: ["___birthdate", column] }).apply(month_diff_closure, { axis: 1 });
 
 				new_df = new_df.drop({ columns: [column]});
 				new_df = new_df.addColumn(column, temp_df.values);
 			}
 		});
 
-		new_df = new_df.drop({ columns: ["___death_date"]});
+		// birthdate column removed due to it is a reference point and always 0
+		// death date must be predicted and unknown in inference stage
+		new_df = new_df.drop({ columns: ["___birthdate", "___death_date"]});
 
 		return {df: new_df, error: error};
 	}
@@ -574,6 +592,11 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			}
 
 			cleaned_df3 = this._DeleteEmptyColumns(deceased_patients.df, _inference);
+
+			let err = this._CheckIfAllNecessaryColumnsExists(cleaned_df3);
+			if(err instanceof Error) {
+				return {error: err};
+			}
 	
 			this._InventoryStringColumns(cleaned_df3);
 			this._InventoryDateColumns(cleaned_df3);
