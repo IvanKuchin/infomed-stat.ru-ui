@@ -537,7 +537,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	_ExtractY(df, inference = 0) {
 		let columns = this._Y_reference.slice();
 		columns.push(this._death_column);
-		let temp_Y_df = df.loc({ columns: columns }).apply(this._LifeExpectancyInMonths(inference), { axis: 1 });;
+		let temp_Y_df = df.loc({ columns: columns }).apply(this._LifeExpectancyInMonths(inference), { axis: 1 });
 
 		let Y		= temp_Y_df.values;
 		let error	= null;
