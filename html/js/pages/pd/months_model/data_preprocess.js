@@ -528,7 +528,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 
 		if(_inference == 1) {
 			// inference mode
-			cleaned_df3 = this._DeleteEmptyColumns(typed_result.df, 1);
+			cleaned_df3 = this._DeleteEmptyColumns(typed_result.df, _inference);
 		} else {
 			// fit mode 
 			let deceased_patients = this._DeleteEmptyRows(typed_result.df, "___death_date");
