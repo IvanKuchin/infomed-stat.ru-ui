@@ -15,7 +15,7 @@ export default class InferenceUI {
 		let record = this._FindRecordByID(e.target.selectedOptions[0].getAttribute("_record_id"));
 
 		if(record) {
-			let result_preprocessed = this._preprocessing.inference(record);
+			let result_preprocessed = this._preprocessing.inference([record]);
 			if(result_preprocessed.error instanceof Error) {
 				// --- error
 			} else {
