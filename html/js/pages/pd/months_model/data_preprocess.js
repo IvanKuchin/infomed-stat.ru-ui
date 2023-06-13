@@ -526,6 +526,8 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 					result = 0;
 					console.error("death date is earlier than any other date")
 				} else if(result == 0) {
+					// to find entries reported by this line use the following query in MySQL:
+					// select `id`,`___first_name`, `___last_name`, `___op_done___invasion_date`, `___death_date` from `medical_records` where `___op_done___invasion_date`<>"" and `___death_date`<>"" and substring(___op_done___invasion_date, 1, 7)=substring(___death_date, 1, 7)
 					console.error("missing dates in Y reference columns")
 				}
 			}
