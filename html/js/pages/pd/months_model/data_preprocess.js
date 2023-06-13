@@ -8,7 +8,13 @@ export default class DatasetPreprocess {
 		this._string_columns	= [];
 		this._date_columns		= [];
 		this._drop_columns		= [];
-		this.Y_column			= "___birthdate";
+		this.Y_column			= "___birthdate"; // TODO: remove
+
+		// Y must have a single value, therefore single value selects from the list ordered by importance
+		// first is the most important, second is less, etc ...
+		// actual Y-value calculated as difference between Y_reference and death_date
+		this._Y_reference		= ["___neoadj_chemo___start_date", "___op_done___invasion_date"];
+		this._death_column		= "___death_date";
 
 this._dictionary.___last_name 														= { delete: true , type: "string"  };
 this._dictionary.___first_name 														= { delete: true , type: "string"  };
@@ -278,6 +284,24 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		return {error: error}
 	}
 
+	// consistency checking function
+	_CheckIfAllNecessaryColumnsExists(df) {
+		let error;
+		let columns = this._Y_reference.slice();
+		columns.push("___birthdate");
+		columns.push("___death_date");
+
+		for (let column of columns) {
+			if(df.$columns.indexOf(column) == -1) {
+				error = new Error(`column ${column} is not in the DataFrame`);
+				console.error(error);
+				break;
+			}
+		}
+
+		return error;
+	}
+
 	_IsColumnShouldBeDeleted(column) {
 		if((this._dictionary[column] != undefined) && (this._dictionary[column].delete == true)) {
 				return true;
@@ -402,7 +426,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 
 				diff = system_calls.MonthsDiff(d1, d2);
 
-				if(column_name == "___neoadj_chemo___finish_date") {
+				if(column_name == "___neoadj_chemo___start_date") {
 					console.debug(column_name, row, diff)
 				}
 			}
@@ -419,47 +443,112 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 		let new_df = df.copy();
 
 		this._date_columns.forEach(column => {
-			if(column != "___death_date") {
+			if(column != "___birthdate") {
 				let month_diff_closure = this._MonthsDiff(column);
-				let temp_df = df.loc({ columns: [column, "___death_date"] }).apply(month_diff_closure, { axis: 1 });
+				let temp_df = df.loc({ columns: ["___birthdate", column] }).apply(month_diff_closure, { axis: 1 });
 
 				new_df = new_df.drop({ columns: [column]});
 				new_df = new_df.addColumn(column, temp_df.values);
 			}
 		});
 
-		new_df = new_df.drop({ columns: ["___death_date"]});
+		// birthdate column removed due to it is a reference point and always 0
+		new_df = new_df.drop({ columns: ["___birthdate"] })
 
 		return {df: new_df, error: error};
+	}
+
+	_RemoveDeathDate(df) {
+		// death date must be predicted and unknown in the inference stage
+		let new_df = df.drop({ columns: [this._death_column]});
+
+		return {df: new_df}
 	}
 
 	_Normalize(df, inference = 0) {
 		let error = null;
 		let nona_df = df.fillNa(0);
+		let result = nona_df.copy();
 
-		if(inference == 0) {
-			this._scaler = new dfd.MinMaxScaler();
-			this._scaler.fit(nona_df);
+		for (let column of df.$columns) {
+			if(inference == 0) {
+				this._dictionary[column]._scaler = new dfd.MinMaxScaler();
+				this._dictionary[column]._scaler.fit(nona_df[column]);
+			}
+
+			let scaled_column = this._dictionary[column]._scaler.transform(nona_df[column].asType("float32"));
+
+			result = result.drop({ columns: [column] })
+			result = result.addColumn(column, scaled_column.values)
 		}
-
-		let result = this._scaler.transform(nona_df);
 
 		return {df: result, error: error };
 	}
 
-	_ExtractY(df, y_column, inference = 0) {
-		let Y		= df[y_column].values;
-		let df_no_Y	= df.drop({ columns: [y_column] });
+	// function returns new DataFrame containing rows with non-empty value in either of input columns
+	_KeepRowsWithNonEmptyValues(df, columns) {
+		let error = null;
+		let empty_idxs = null;
+
+		for (let i = 0; i < columns.length; ++i) {
+			if(empty_idxs == null) {
+				empty_idxs = df[columns[i]].eq("");
+			} else {
+				empty_idxs = empty_idxs.mul(df[columns[i]].eq(""));
+			}
+		}
+
+		let non_empty_idxs = empty_idxs.eq(0);
+		let result = df.loc({ rows: non_empty_idxs });
+
+		return {df: result, error: error};
+	}
+
+	// function returns difference in month between "Y reference" columns and death date
+	// death date must be the last column in the row
+	_LifeExpectancyInMonths(inference) {
+		return function(row) {
+			let death_idx = row.length - 1;
+			let result = 0;
+
+			for(let i = 0; i < row.length - 1; ++i) {
+				if(row[i] > 0) {
+					result = row[death_idx] - row[i];
+					break;
+				}
+			}
+
+			if(inference == 1) {
+				// do not report error in inference stage
+			} else {
+				if(result < 0) {
+					result = 0;
+					console.error("death date is earlier than any other date")
+				} else if(result == 0) {
+					console.error("missing dates in Y reference columns")
+				}
+			}
+
+			return result;
+		}
+	}
+
+	_ExtractY(df, inference = 0) {
+		let columns = this._Y_reference.slice();
+		columns.push(this._death_column);
+		let temp_Y_df = df.loc({ columns: columns }).apply(this._LifeExpectancyInMonths(inference), { axis: 1 });;
+
+		let Y		= temp_Y_df.values;
 		let error	= null;
 
 		if(inference == 0){
 			let sc		= new dfd.MinMaxScaler();
 
 			sc.fit(Y);
-			this._dictionary[y_column].scaler = sc;
+			this._y_column_scaler = sc;
 		}
 
-		return {Y: this._dictionary[y_column].scaler.transform(Y), df: df_no_Y, error: error};
+		return {Y: this._y_column_scaler.transform(Y), error: error};
 	}
 
 	_DeleteStringColumns(df) {
@@ -531,12 +620,22 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			cleaned_df3 = this._DeleteEmptyColumns(typed_result.df, _inference);
 		} else {
 			// fit mode 
-			let deceased_patients = this._DeleteEmptyRows(typed_result.df, "___death_date");
+			let deceased_patients = this._DeleteEmptyRows(typed_result.df, this._death_column);
 			if(deceased_patients.error instanceof Error) {
 				return {error: deceased_patients.error};
 			}
 	
+			let relevant_patients = this._KeepRowsWithNonEmptyValues(deceased_patients.df, this._Y_reference);
+			if(relevant_patients.error instanceof Error) {
+				return {error: relevant_patients.error};
+			}
+
 			cleaned_df3 = this._DeleteEmptyColumns(deceased_patients.df, _inference);
+
+			let err = this._CheckIfAllNecessaryColumnsExists(cleaned_df3);
+			if(err instanceof Error) {
+				return {error: err};
+			}
 	
 			this._InventoryStringColumns(cleaned_df3);
 			this._InventoryDateColumns(cleaned_df3);
@@ -554,21 +653,24 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 			return {error: numeric_result.error};
 		}
 
-		let extractY_result = this._ExtractY(numeric_result.df, this.Y_column, _inference);
+		let extractY_result = this._ExtractY(numeric_result.df, _inference);
 		if(extractY_result.error instanceof Error) {
 			return {error: extractY_result.error};
 		}
 		let Y = extractY_result.Y
 
-		let normalized_result = this._Normalize(extractY_result.df, _inference);
+		let normalized_result = this._Normalize(numeric_result.df, _inference);
 		if(normalized_result.error instanceof Error) {
 			return {error: normalized_result.error};
 		}
 
-		let final_result = this._ExtractX(normalized_result.df, non_string_result.encodings);
+		let normalized_no_death = this._RemoveDeathDate(normalized_result.df);
+
+		let final_result = this._ExtractX(normalized_no_death.df, non_string_result.encodings);
 		if(final_result.error instanceof Error) {
 			return {error: final_result.error};
 		}
+
 		let X = final_result.X
 
 		return {X: X, Y: Y, error: error};
@@ -583,20 +685,28 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	}
 
 	GetDateByY(record, Y) {
-		const y_column		= this.Y_column;
-		const scaler		= this._dictionary[y_column].scaler;
 		let	  dates			= [];
 
 		for (var i = Y.length - 1; i >= 0; i--) {
-			const initial_date	= new Date(record[y_column] + " 00:00:00");
-			const months		= scaler.inverseTransform([Y[i]]);
+			
+			for(let y_column of this._Y_reference) {
+				if(record[y_column] == "") {
+					// date is missing in the column
+					// nothing to do
+				} else {
+					const scaler		= this._y_column_scaler;
 
-			const final_ts		= initial_date.setMonth(initial_date.getMonth() + months[0]);
-			const final_date	= new Date(final_ts);
-
-			dates.push(final_date);
+					const initial_date	= new Date(record[y_column] + " 00:00:00");
+					const months		= scaler.inverseTransform([Y[i]]);
+		
+					const final_ts		= initial_date.setMonth(initial_date.getMonth() + months[0]);
+					const final_date	= new Date(final_ts);
+		
+					dates.push(final_date);
+					break;
+				}
+			}
 		}
-
 
 		return dates;
 	}
