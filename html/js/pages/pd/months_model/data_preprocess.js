@@ -8,7 +8,6 @@ export default class DatasetPreprocess {
 		this._string_columns	= [];
 		this._date_columns		= [];
 		this._drop_columns		= [];
-		this.Y_column			= "___birthdate"; // TODO: remove
 
 		// Y must have a single value, therefore single value selects from the list ordered by importance
 		// first is the most important, second is less, etc ...
@@ -518,8 +517,10 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 				}
 			}
 
-			if(inference == 1) {
-				// do not report error in inference stage
+			if((inference == 1) || (row[death_idx] > 0)) {
+				// do not report error 
+				// 1) at the inference stage
+				// 2) if patient died same month as an invasion month
 			} else {
 				if(result < 0) {
 					result = 0;
@@ -536,7 +537,7 @@ this._dictionary.___death_date 														= { delete: false, type: "date"    
 	_ExtractY(df, inference = 0) {
 		let columns = this._Y_reference.slice();
 		columns.push(this._death_column);
-		let temp_Y_df = df.loc({ columns: columns }).apply(this._LifeExpectancyInMonths(inference), { axis: 1 });;
+		let temp_Y_df = df.loc({ columns: columns }).apply(this._LifeExpectancyInMonths(inference), { axis: 1 });
 
 		let Y		= temp_Y_df.values;
 		let error	= null;
