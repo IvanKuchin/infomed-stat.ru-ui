@@ -617,7 +617,7 @@ var	medical_record_add = (function()
 
 				system_calls.PopoverError("navigate_next", `Некорректное значение в поле "${failed_tag_localized}". <br><br>Если у вас активен переводчик - отключите.`)
 				throw new Error("### data send failed")  // exception only to stop browser from progressing
-				                                         // correct way of doing it is to return error all the way back, rather than throwing
+                                                         // correct way of doing it is to return error all the way back, rather than throwing
 			} 
 			else if(tag.val().search("Не опр") == 0) { /* nothing to do */ }
 			else result = tag.val();
@@ -779,10 +779,10 @@ var	medical_record_add = (function()
 		tag.hide(100);
 	};
 
-	var	Select_ChangeHandler = function(e)
+	var	Select_ChangeHandler = function()
 	{
 		let curr_select_tag = $(this);
-		let	curr_option_tag = curr_select_tag.find("option:selected");
+		// let	curr_option_tag = curr_select_tag.find("option:selected");
 
 		// --- hide all options with toggle attribute
 		curr_select_tag.find('option[data-toggle="collapse"]').each(function()
