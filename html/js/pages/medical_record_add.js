@@ -610,7 +610,16 @@ var	medical_record_add = (function()
 
 		if(tag.prop("tagName") == "SELECT")
 		{
-			if(tag.val().search("Не опр") == 0) { /* nothing to do */ }
+			if(tag.val() == null) {
+				const failed_class = tag[0].classList[tag[0].classList.length -1]
+				const failed_tag = failed_class.substring(3)
+				const failed_tag_localized = common_infomed_stat.GetRussianSpelling(failed_tag)
+
+				system_calls.PopoverError("navigate_next", `Некорректное значение в поле "${failed_tag_localized}". <br><br>Если у вас активен переводчик - отключите.`)
+				throw new Error("### data send failed")  // exception only to stop browser from progressing
+				                                         // correct way of doing it is to return error all the way back, rather than throwing
+			} 
+			else if(tag.val().search("Не опр") == 0) { /* nothing to do */ }
 			else result = tag.val();
 		}
 		else if((tag.prop("tagName") == "INPUT") && tag.attr("type") && (tag.attr("type") == "checkbox"))
