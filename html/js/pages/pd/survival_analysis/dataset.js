@@ -3,7 +3,7 @@ import SaveToXLS from "../save2xls.js"
 
 export default class Dataset {
 
-	constructor(id, records, km, lr) { 
+	constructor(id, records, km, lr, or) { 
 		this._records = [];
 		this._visibility = true;
 		this._filter_groups = [];
@@ -14,6 +14,7 @@ export default class Dataset {
 
 		this._km = km;
 		this._lr = lr;
+		this._or = or;
 	}
 
 	get id() { return this._id; }
@@ -174,11 +175,15 @@ export default class Dataset {
 		filters_row_button.appendChild(document.createTextNode("+ группа фильтров"));
 		filters_row_button.addEventListener("click", this._AddFilterGroup_ClickHandler.bind(this));
 
+		let call_date_info = document.createElement("span");
+		call_date_info.innerHTML = '&nbsp;<span class="fa fa-info-circle" onmouseover="system_calls.PopoverInfo($(this), \'используется для вычисления количества месяцев, которые живой пациет находится в исследовании\', true)"></span>';
+
 		wrapper		.appendChild(row);
 		row			.appendChild(col_date);
 		row			.appendChild(col_button);
 		col_date	.appendChild(document.createTextNode("Дата обзвона:"));
 		col_date	.appendChild(date_input);
+		col_date	.appendChild(call_date_info);
 		col_button	.appendChild(filters_row_button);
 
 
@@ -478,6 +483,9 @@ export default class Dataset {
 
 			this._lr.RemoveDataset(this.id);
 			this._lr.UpdateUI();
+
+			this._or.RemoveDataset(this.id);
+			this._or.UpdateUI();
 		}
 	}
 
@@ -541,6 +549,9 @@ export default class Dataset {
 		let log_rank = this._CalculateLogRank(km_data);
 		this._lr.UpdateDataset(this.id, log_rank);
 		this._lr.UpdateUI();
+
+		this._or.UpdateDataset(this.id, km_data);
+		this._or.UpdateUI();
 	}
 
 	// Click handler to download filtered records
