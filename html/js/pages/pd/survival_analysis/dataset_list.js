@@ -13,7 +13,7 @@ export default class DatasetGroup {
 		this._km_object = new KaplanMeier(this.id);
 		this._lr_object = new LogRank(this.id);
 		this._or_object = new OddsRatio(this.id);
-		this._FetchMedicalRecords("/cgi-bin/doctor.cgi?action=AJAX_getMedicalRecords&_=" + Math.random() * 872364982374629234);
+		this._FetchMedicalRecords("/cgi-bin/doctor.cgi?action=AJAX_getMedicalRecords&_=" + Math.random() * 8723649);
 	}
 
 	get id() { return this._id; }

@@ -62,8 +62,6 @@ export default class OddsRatio {
 		const month = parseInt(event.target.value);
 		this.calc.SetMonth(month_idx, month);
 		
-		const months = this.calc.GetMonths();
-
 		// update GUI with new months
 		let prev_month_input = document.querySelector(`[or-group="${this.id}"] [months-setup] input[month_idx="${month_idx - 1}"]`);
 		let next_month_input = document.querySelector(`[or-group="${this.id}"] [months-setup] input[month_idx="${month_idx + 1}"]`);
@@ -175,15 +173,11 @@ export default class OddsRatio {
 	}
 
 	_DrawGUITable(table_title, matrix, callback_item_value) {
-		let datasets = this._datasets;
-
 		document.querySelector(`[or-group="${this.id}"] [${table_title}]`).innerHTML = "";
 		document.querySelector(`[or-group="${this.id}"] [${table_title}]`).appendChild(this._GetTableDOM(matrix, this.calc.GetMonths(), callback_item_value));
 	}
 
 	_DrawMedianGUITable(table_title, matrix, callback_item_value) {
-		let datasets = this._datasets;
-
 		document.querySelector(`[ms-group="${this.id}"] [${table_title}]`).innerHTML = "";
 		document.querySelector(`[ms-group="${this.id}"] [${table_title}]`).appendChild(this._GetTableDOM(matrix, ["месяцев"], callback_item_value));
 	}
