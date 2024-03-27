@@ -7,10 +7,9 @@ ARG BUILD_BASE_COMMIT_ID="not found"
 LABEL maintainer="ivan.kuchin@gmail.com"
 LABEL org.opencontainers.image.source="https://github.com/IvanKuchin/${BUILD_REPO}"
 
-####################
-# copy from repo   #
-####################
-COPY ./html/ ${ROOTDIR}html/
+######################
+# copy apache config #
+######################
 COPY ./supplemental/apache2/ /etc/apache2/
 
 WORKDIR ${ROOTDIR}html/
@@ -52,6 +51,12 @@ RUN chown -R www-data:www-data /home/httpd/
 ############################################################
 RUN ln -sf /dev/stdout ${ROOTDIR}logs/access.log \
  && ln -sf /dev/stderr ${ROOTDIR}logs/error.log
+
+######################
+# copy src from repo #
+######################
+COPY ./html/ ${ROOTDIR}html/
+
 
 EXPOSE 80
 
