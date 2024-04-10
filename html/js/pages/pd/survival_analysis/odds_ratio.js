@@ -3,8 +3,8 @@ export default class OddsRatio {
 	constructor(id) { 
 		this.id = id;
 		this._datasets = [];
-		this.calc = new OddsCalc();
-		this._RenderMonthsEditor("months-setup", this.calc.GetMonths());
+		this.calc_odds = new OddsCalc();
+		this._RenderMonthsEditor("months-setup", this.calc_odds.GetMonths());
 	}
 
 	get id() { return this._id; }
@@ -60,7 +60,7 @@ export default class OddsRatio {
 	_ChangeMonthHandler(event) {
 		const month_idx = parseInt(event.target.getAttribute("month_idx"));
 		const month = parseInt(event.target.value);
-		this.calc.SetMonth(month_idx, month);
+		this.calc_odds.SetMonth(month_idx, month);
 		
 		// update GUI with new months
 		let prev_month_input = document.querySelector(`[or-group="${this.id}"] [months-setup] input[month_idx="${month_idx - 1}"]`);
@@ -174,7 +174,7 @@ export default class OddsRatio {
 
 	_DrawGUITable(table_title, matrix, callback_item_value) {
 		document.querySelector(`[or-group="${this.id}"] [${table_title}]`).innerHTML = "";
-		document.querySelector(`[or-group="${this.id}"] [${table_title}]`).appendChild(this._GetTableDOM(matrix, this.calc.GetMonths(), callback_item_value));
+		document.querySelector(`[or-group="${this.id}"] [${table_title}]`).appendChild(this._GetTableDOM(matrix, this.calc_odds.GetMonths(), callback_item_value));
 	}
 
 	_DrawMedianGUITable(table_title, matrix, callback_item_value) {
@@ -250,7 +250,7 @@ export default class OddsRatio {
 	}
 
 	UpdateUI() {
-		const calcs = this.calc.CalculateOddsRatio(this._datasets);
+		const calcs = this.calc_odds.CalculateOddsRatio(this._datasets);
 
 		this._DrawMedianGUITable("median-survivability-matrix", calcs.medians, this._GetMedian.bind(this));
 
