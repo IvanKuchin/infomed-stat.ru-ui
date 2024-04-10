@@ -278,7 +278,7 @@ class OddsCalc {
 		this.months[idx] = month;
 	}
 
-	_GetSurvivabilityByMonth(data, survival_month) {
+	_GetSurvivabilityProbsByMonth(data, survival_month) {
 		let value = -1
 
 		for (let i = 0; i < data.length; i++) {
@@ -307,14 +307,14 @@ class OddsCalc {
 		return population
 	}
 
-	_GetProbabilitiesMatrix(datasets, months) {
+	_GetOddsMatrix(datasets, months) {
 		let matrix = new Array(datasets.length).fill(0).map(() => new Array(months.length).fill(NaN));
 
 		for (let i = 0; i < datasets.length; i++) {
 			const n = this._GetPopulationSize(datasets[i].data);
 			for (let j = 0; j < months.length; j++) {
 				const survival_month = months[j];
-				const prob = this._GetSurvivabilityByMonth(datasets[i].data, survival_month);
+				const prob = this._GetSurvivabilityProbsByMonth(datasets[i].data, survival_month);
 				const odds = prob / (1 - prob + Number.EPSILON);
 				const ci = 1.96 * Math.sqrt((prob * (1 - prob)) / n);
 				matrix[i][j] = {
@@ -368,7 +368,7 @@ class OddsCalc {
 	}
 
 	CalculateOddsRatio(datasets) {
-		const odds = this._GetProbabilitiesMatrix(datasets, this.GetMonths());
+		const odds = this._GetOddsMatrix(datasets, this.GetMonths());
 		const or = this._GetOR(odds);
 		const medians = this._GetMedianPerGroup(datasets);
 
