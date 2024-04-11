@@ -53,7 +53,6 @@ export default class ChiSquare {
     }
 
     Calculate(datasets, months) {
-        const group_count = datasets.length;
         let matrix = this._InputDataFromDatasets(datasets, months);
         matrix = this._CalcExpectations(matrix);
 
