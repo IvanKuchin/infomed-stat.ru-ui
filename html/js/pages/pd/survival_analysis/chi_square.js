@@ -1,4 +1,4 @@
-/*exported common_infomed_stat*/
+/*imported MathJax*/
 
 import ChiTable from './chi_table.js';
 
