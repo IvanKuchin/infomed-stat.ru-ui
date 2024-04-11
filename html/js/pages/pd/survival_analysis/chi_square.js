@@ -1,4 +1,4 @@
-/*imported MathJax*/
+/*globals MathJax*/
 
 import ChiTable from './chi_table.js';
 
