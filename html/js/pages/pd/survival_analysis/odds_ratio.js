@@ -1,3 +1,5 @@
+import ChiSquare from "./chi_square.js";
+
 export default class OddsRatio {
 
 	constructor(id) { 
@@ -5,6 +7,7 @@ export default class OddsRatio {
 		this._datasets = [];
 		this.calc_odds = new OddsCalc();
 		this._RenderMonthsEditor("months-setup", this.calc_odds.GetMonths());
+		this.chi = new ChiSquare();
 	}
 
 	get id() { return this._id; }
@@ -210,24 +213,20 @@ export default class OddsRatio {
 		}
 	}
 
-	_RoundToTwo(num) {
-		return +(Math.round(num + "e+2")  + "e-2");
-	}
-
 	_AddExplanations(explanation_id, text) {
 		document.querySelector(`[or-group="${this.id}"] [${explanation_id}]`).innerHTML = text;
 	}
 
 	// must return string
 	_GetProb(item) {
-		return `${this._RoundToTwo(item.prob)}`;
+		return `${common_infomed_stat.RoundToTwo(item.prob)}`;
 	}
 
 	// must return string
 	_GetOddsAndCI(item) {
-		const odds = this._RoundToTwo(item.odds);
-		const ci_start = this._RoundToTwo(odds - item.ci);
-		const ci_end = this._RoundToTwo(odds + item.ci);
+		const odds = common_infomed_stat.RoundToTwo(item.odds);
+		const ci_start = common_infomed_stat.RoundToTwo(odds - item.ci);
+		const ci_end = common_infomed_stat.RoundToTwo(odds + item.ci);
 		return `odds: ${odds}<br>CI: (${ci_start} - ${ci_end})`;
 	}
 
@@ -241,12 +240,19 @@ export default class OddsRatio {
 				return "";
 			}
 
-			return `OR:	${this._RoundToTwo(or)}<br>CI: (${this._RoundToTwo(or-ci)} - ${this._RoundToTwo(or+ci)})`;
+			return `OR:	${common_infomed_stat.RoundToTwo(or)}<br>CI: (${common_infomed_stat.RoundToTwo(or-ci)} - ${common_infomed_stat.RoundToTwo(or+ci)})`;
 		}
 	}
 
 	_GetMedian(item) {
 		return item;
+	}
+
+	// must return string
+	_GetCHIObservationAndExpectation(item) {
+		const observation = common_infomed_stat.RoundToTwo(item.observation);
+		const expectation = common_infomed_stat.RoundToTwo(item.expectation);
+		return `${observation}<br>(${expectation})`;
 	}
 
 	UpdateUI() {
@@ -261,6 +267,11 @@ export default class OddsRatio {
 		this._AddExplanations("prob-explanation", "Пояснения: Данные беруться из Kaplan-Meier графиков.");
 		this._AddExplanations("odds-explanation", "Пояснения:<br>Если odds > 1, то шансы на выживание больше, чем у всех остальных периодов.<br>Если odds < 1, то шансы на выживание меньше чем у всех остальных периодов.");
 		this._AddExplanations("odds-ratio-explanation", "Пояснения:<br>Если OR > 1, то шансы на выживание у вертикальной группы больше, чем у  горизональной.<br>Если OR < 1, то шансы на выживание у вертикальной группы меньше, чем у горизональной.");
+
+		// Chi square calculation
+		const chi = this.chi.Calculate(this._datasets, this.calc_odds.GetMonths());
+		this._DrawGUITable("chi-square-observation-matrix", chi, this._GetCHIObservationAndExpectation.bind(this));
+		this.chi.UpdateUI(chi);
 	}
 }
 

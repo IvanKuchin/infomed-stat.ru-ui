@@ -177,12 +177,20 @@ var common_infomed_stat = (function()
 		return 50;
 	}
 
+	var RoundToTwo = function(num) {
+		if ((num+"").indexOf("e") != -1)
+			return Math.round(num, 2);
+		else
+			return +(Math.round(num + "e+2")  + "e-2");
+	}
+
 	return {
 		GetRussianSpelling: GetRussianSpelling,
 		GetMedicalItemNameSpelling: GetMedicalItemNameSpelling,
 		GetMedicalItemValueSpelling: GetMedicalItemValueSpelling,
 		ChangeStageState: ChangeStageState,
 		GetMaxEpochs: GetMaxEpochs,
+		RoundToTwo: RoundToTwo,
 	};
 
 })();
