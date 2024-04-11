@@ -1,3 +1,5 @@
+/*jslint esversion: 2022*/
+
 export default class ChiTable {
     static percentile = [0.995, 0.990, 0.975, 0.950, 0.900, 0.100, 0.050, 0.025, 0.010, 0.005];
     static data = [
