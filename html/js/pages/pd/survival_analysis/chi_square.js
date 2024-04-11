@@ -136,18 +136,17 @@ export default class ChiSquare {
     _GetConclusion(matrix) {
         const chi_square = this._GetChiSquare(matrix);
         const df = (matrix.length - 1) * (matrix[0].length - 1);
-        const chi_table = new ChiTable();
-        const chi_table_row = chi_table.data[df];
+        const chi_table_row = ChiTable.data[df];
 
         let tag_parent = document.createElement("div");
         for (let i = 0; i < chi_table_row.length; i++) {
             let tag_child = document.createElement("div");
             if (chi_square < chi_table_row[i]) {
                 tag_child.className = "fa fa-check";
-                tag_child.innerHTML = `&nbsp; Нет оснований отклонять H0, потому что ${common_infomed_stat.RoundToTwo(chi_square)} < ${chi_table_row[i]}. Статистически при a = ${chi_table.percentile[i]} группы <b>независимы</b>`;
+                tag_child.innerHTML = `&nbsp; Нет оснований отклонять H0, потому что ${common_infomed_stat.RoundToTwo(chi_square)} < ${chi_table_row[i]}. Статистически при a = ${ChiTable.percentile[i]} группы <b>независимы</b>`;
             } else {
                 tag_child.className = "fa fa-times";
-                tag_child.innerHTML = `&nbsp; Есть основания отклонмть H0, потому что ${common_infomed_stat.RoundToTwo(chi_square)} >= ${chi_table_row[i]}. Есть статистически значимые доказательства при a = ${chi_table.percentile[i]} показывающие, что H0 ложно или группы не независимы (те. группы в исследовании зависимы)`;
+                tag_child.innerHTML = `&nbsp; Есть основания отклонмть H0, потому что ${common_infomed_stat.RoundToTwo(chi_square)} >= ${chi_table_row[i]}. Есть статистически значимые доказательства при a = ${ChiTable.percentile[i]} показывающие, что H0 ложно или группы не независимы (те. группы в исследовании зависимы)`;
             }
             tag_parent.appendChild(tag_child);
         }
