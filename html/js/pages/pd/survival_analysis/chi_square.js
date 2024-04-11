@@ -26,7 +26,7 @@ export default class ChiSquare {
         return matrix;
     }
 
-    _CalcExpectaions(matrix) {
+    _CalcExpectations(matrix) {
         const rows = matrix.length;
         const columns = matrix[0].length;
 
@@ -55,7 +55,7 @@ export default class ChiSquare {
     Calculate(datasets, months) {
         const group_count = datasets.length;
         let matrix = this._InputDataFromDatasets(datasets, months);
-        matrix = this._CalcExpectaions(matrix);
+        matrix = this._CalcExpectations(matrix);
 
         return matrix;
     }
