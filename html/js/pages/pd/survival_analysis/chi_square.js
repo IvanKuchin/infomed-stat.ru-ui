@@ -1,3 +1,5 @@
+/*exported common_infomed_stat*/
+
 import ChiTable from './chi_table.js';
 
 export default class ChiSquare {
