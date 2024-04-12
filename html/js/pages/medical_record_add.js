@@ -202,6 +202,85 @@ var	medical_record_add = (function()
 		return result;		
 	}
 
+	var _FinalCheck3 = function() {
+		let birthdate_str		= document.querySelectorAll(".___birthdate")[0].value;
+
+		let neoadj_chemo_str	= document.querySelectorAll(".___neoadj_chemo .___start_date")[0].value;
+		let invasion_str		= document.querySelectorAll(".___invasion_date")[0].value;
+
+		let relapse_str			= document.querySelectorAll(".___relapse_date")[0].value;
+
+		let censor_str			= document.querySelectorAll(".___study_retirement_date")[0].value;
+		let event_str			= document.querySelectorAll(".___death_date")[0].value;
+
+		if(_isValidDate(birthdate_str) && _isValidDate(relapse_str))
+			if(new Date(birthdate_str) > new Date(relapse_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата рецидива не может быть раньше даты рождения");
+				return false;
+			}
+
+		if(_isValidDate(birthdate_str) && _isValidDate(censor_str))
+			if(new Date(birthdate_str) > new Date(censor_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата выбытия не может быть раньше даты рождения");
+				return false;
+			}
+
+		if(_isValidDate(birthdate_str) && _isValidDate(event_str))
+			if(new Date(birthdate_str) > new Date(event_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата смерти не может быть раньше даты рождения");
+				return false;
+			}
+
+		if(_isValidDate(birthdate_str) && _isValidDate(neoadj_chemo_str))
+			if(new Date(birthdate_str) > new Date(neoadj_chemo_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата химиотерапии не может быть раньше даты рождения");
+				return false;
+			}
+
+		if(_isValidDate(event_str) && _isValidDate(relapse_str))
+			if(new Date(event_str) < new Date(relapse_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата рецидива не может быть позже даты смерти");
+				return false;
+			}
+
+		if(_isValidDate(censor_str) && _isValidDate(relapse_str))
+			if(new Date(censor_str) < new Date(relapse_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата рецидива не может быть позже даты выбытия из исследования");
+				return false;
+			}
+
+		if(_isValidDate(birthdate_str) && _isValidDate(invasion_str))
+			if(new Date(birthdate_str) > new Date(invasion_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата операции не может быть раньше даты рождения");
+				return false;
+			}
+
+		if(_isValidDate(censor_str) && _isValidDate(invasion_str))
+			if(new Date(censor_str) < new Date(invasion_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата операции не может быть позже даты выбытия из исследования");
+				return false;
+			}
+
+		if(_isValidDate(event_str) && _isValidDate(invasion_str))
+			if(new Date(event_str) < new Date(invasion_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата операции не может быть позже даты смерти");
+				return false;
+			}
+
+		if(_isValidDate(censor_str) && _isValidDate(neoadj_chemo_str))
+			if(new Date(censor_str) < new Date(neoadj_chemo_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата химиотерапии не может быть позже даты выбытия из исследования");
+				return false;
+			}
+
+		if(_isValidDate(event_str) && _isValidDate(neoadj_chemo_str))
+			if(new Date(event_str) < new Date(neoadj_chemo_str)) {
+				system_calls.PopoverError($("#navigate_next"), "Дата химиотерапии не может быть позже даты смерти");
+				return false;
+			}
+
+		return true;
+	}
 
 	var	ValidateTab = function(tab_id)
 	{
@@ -236,7 +315,7 @@ var	medical_record_add = (function()
 				}
 			}
 			else if(algorithm == "final_check") {
-				if(_FinalCheck1() && _FinalCheck2()) {
+				if(_FinalCheck1() && _FinalCheck2() && _FinalCheck3()) {
 					result = true;
 				}
 			}
