@@ -175,9 +175,9 @@ export default class OddsRatio {
 		return table;
 	}
 
-	_DrawGUITable(table_title, matrix, callback_item_value) {
-		document.querySelector(`[or-group="${this.id}"] [${table_title}]`).innerHTML = "";
-		document.querySelector(`[or-group="${this.id}"] [${table_title}]`).appendChild(this._GetTableDOM(matrix, this.calc_odds.GetMonths(), callback_item_value));
+	_DrawGUITable(table_selector, matrix, callback_item_value) {
+		document.querySelector(table_selector).innerHTML = "";
+		document.querySelector(table_selector).appendChild(this._GetTableDOM(matrix, this.calc_odds.GetMonths(), callback_item_value));
 	}
 
 	_DrawMedianGUITable(table_title, matrix, callback_item_value) {
@@ -260,8 +260,8 @@ export default class OddsRatio {
 
 		this._DrawMedianGUITable("median-survivability-matrix", calcs.medians, this._GetMedian.bind(this));
 
-		this._DrawGUITable("probability-over-months-matrix", calcs.odds, this._GetProb.bind(this));
-		this._DrawGUITable("odds-over-months-matrix", calcs.odds, this._GetOddsAndCI.bind(this));
+		this._DrawGUITable(`[or-group="${this.id}"] [probability-over-months-matrix]`, calcs.odds, this._GetProb.bind(this));
+		this._DrawGUITable(`[or-group="${this.id}"] [odds-over-months-matrix]`, calcs.odds, this._GetProb.bind(this));
 		this._Draw_OR_GUITables("odds-ratio-over-months-matrix", calcs);
 
 		this._AddExplanations("prob-explanation", "Пояснения: Данные беруться из Kaplan-Meier графиков.");
@@ -270,7 +270,7 @@ export default class OddsRatio {
 
 		// Chi square calculation
 		const chi = this.chi.Calculate(this._datasets, this.calc_odds.GetMonths());
-		this._DrawGUITable("chi-square-observation-matrix", chi, this._GetCHIObservationAndExpectation.bind(this));
+		this._DrawGUITable(`[chi-group="${this.id}"] [chi-square-observation-matrix]`, calcs.odds, this._GetOddsAndCI.bind(this));
 		this.chi.UpdateUI(chi);
 	}
 }
