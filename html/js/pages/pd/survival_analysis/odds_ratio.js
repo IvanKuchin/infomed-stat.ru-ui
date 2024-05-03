@@ -270,7 +270,7 @@ export default class OddsRatio {
 
 		// Chi square calculation
 		const chi = this.chi.Calculate(this._datasets, this.calc_odds.GetMonths());
-		this._DrawGUITable(`[chi-group="${this.id}"] [chi-square-observation-matrix]`, calcs.odds, this._GetOddsAndCI.bind(this));
+		this._DrawGUITable(`[chi-group="${this.id}"] [chi-square-observation-matrix]`, chi, this._GetCHIObservationAndExpectation.bind(this));
 		this.chi.UpdateUI(chi);
 	}
 }
