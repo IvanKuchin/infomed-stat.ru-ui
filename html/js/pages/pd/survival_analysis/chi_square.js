@@ -4,6 +4,10 @@ import ChiTable from './chi_table.js';
 
 export default class ChiSquare {
     constructor() {
+        // init MathJax
+        MathJax.startup.document.state(0);
+        MathJax.texReset();
+
         this.validity_threshold = 10;
     }
 
@@ -177,8 +181,6 @@ export default class ChiSquare {
         // delay execution by few seconds
         if (this.timeout) clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
-            MathJax.startup.document.state(0);
-            MathJax.texReset();
             MathJax.typeset();
         }, 3000);
     }
