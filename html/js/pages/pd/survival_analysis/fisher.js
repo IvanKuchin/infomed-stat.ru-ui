@@ -130,14 +130,12 @@ export default class FishersExactTest {
         return false;
     }
 
-    _SumOfPLessThanCutoff(matrix, p_cutoff) {
+    _SumOfPLessThanCutoff(matrix) {
         const {i_max, j_max} = this._GetMaxIndexes(matrix);
         const max = matrix[i_max][j_max].observation;
         let p_array = [];
         const sum_per_row = matrix.map((row) => row.reduce((acc, curr) => acc + curr.observation, 0));
         const sum_per_column = matrix[0].map((column, index) => matrix.reduce((acc, curr) => acc + curr[index].observation, 0)); 
-        const total = sum_per_row.reduce((acc, curr) => acc + curr, 0);
-
 
         for (let curr = 1; curr <= max; curr++) {
             const matrix = this._GetModifiedMatrix(i_max, j_max, curr, sum_per_row, sum_per_column);
@@ -302,7 +300,7 @@ export default class FishersExactTest {
 
         // calculate Fisher's exact test
         const p_cutoff = this._CalcP(matrix);
-        const p_array = this._SumOfPLessThanCutoff(matrix, p_cutoff);
+        const p_array = this._SumOfPLessThanCutoff(matrix);
         const sum_of_p_array = p_array.reduce((acc, curr) => acc + curr, 0);
         const sum_of_p_less_than_p_cutoff = p_array.reduce((acc, curr) => acc + (curr <= p_cutoff ? curr : 0), 0);
 

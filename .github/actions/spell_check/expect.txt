@@ -163,6 +163,7 @@ glyphicon
 gmail
 grep
 grinningface
+gui
 happyface
 hearteyes
 helpdesk
