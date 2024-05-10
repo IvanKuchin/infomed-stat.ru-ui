@@ -118,7 +118,7 @@ export default class ChiSquare {
                 if (matrix[i][j].expectation < this.validity_threshold) {
                     flag = false;
                     message += message.length > 0 ? ", " : "";
-                    message += `E(${i},${j}) = ${common_infomed_stat.RoundToTwo(matrix[i][j].expectation)}`;
+                    message += `E(${i+1},${j+1}) = ${common_infomed_stat.RoundToTwo(matrix[i][j].expectation)}`;
                 }
             }
         }
