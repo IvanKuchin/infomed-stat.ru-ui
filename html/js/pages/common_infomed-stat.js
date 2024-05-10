@@ -177,11 +177,19 @@ var common_infomed_stat = (function()
 		return 50;
 	}
 
-	var RoundToTwo = function(num) {
+	var RoundToExp = function(num, exponent) {
 		if ((num+"").indexOf("e") != -1)
-			return Math.round(num, 2);
+			return Math.round(num, exponent);
 		else
-			return +(Math.round(num + "e+2")  + "e-2");
+			return +(Math.round(num + "e+" + exponent)  + "e-" + exponent);
+	}
+
+	var RoundToTwo = function(num) {
+		return RoundToExp(num, 2);
+	}
+
+	var RoundToFour = function(num) {
+		return RoundToExp(num, 4);
 	}
 
 	return {
@@ -191,6 +199,7 @@ var common_infomed_stat = (function()
 		ChangeStageState: ChangeStageState,
 		GetMaxEpochs: GetMaxEpochs,
 		RoundToTwo: RoundToTwo,
+		RoundToFour: RoundToFour,
 	};
 
 })();
