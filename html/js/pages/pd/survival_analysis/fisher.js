@@ -47,7 +47,7 @@ export default class FishersExactTest {
         return n * this._Factorial(n - 1);
     }
 
-    _GetNumeratorAndDenoinator(matrix) {
+    _GetNumeratorAndDenominator(matrix) {
         const rows = matrix.length;
         const columns = matrix[0].length;
 
@@ -78,7 +78,7 @@ export default class FishersExactTest {
     }
 
     _CalcP(matrix) {
-        const {numerator, denominator} = this._GetNumeratorAndDenoinator(matrix);
+        const {numerator, denominator} = this._GetNumeratorAndDenominator(matrix);
 
         const f = new Factorial();
         return f.calc_ratio(numerator, denominator);
@@ -144,7 +144,7 @@ export default class FishersExactTest {
             if (this._SkipMatrix(matrix)) {
                 continue;
             }
-            const {numerator, denominator} = this._GetNumeratorAndDenoinator(matrix);
+            const {numerator, denominator} = this._GetNumeratorAndDenominator(matrix);
             const f = new Factorial();
             const p = f.calc_ratio(numerator, denominator);
             p_array.push(p);
@@ -161,7 +161,7 @@ export default class FishersExactTest {
 
 
     _GetEquation(matrix) {
-        const {numerator, denominator} = this._GetNumeratorAndDenoinator(matrix);
+        const {numerator, denominator} = this._GetNumeratorAndDenominator(matrix);
         let equation_numerator = "";
 
         for (let i = 0; i < numerator.length; i++) {
@@ -275,16 +275,16 @@ export default class FishersExactTest {
             new_tag.className = "alert alert-danger fa";
         } else {
             new_tag.innerHTML = `Сумма других возможных p-матриц ${common_infomed_stat.RoundToFour(sum_of_p_array)} близка к 1.`;
-            new_tag.className = "alert alert-ыuccess fa";
+            new_tag.className = "alert alert-success fa";
         }
 
         tag.appendChild(new_tag);
     }
 
     UpdateUI(matrix) {
-		this._AddExplanations("fisher-oservations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
+		this._AddExplanations("fisher-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
 
-        // rendedr validity block       
+        // render validity block       
         const tag_validity = document.querySelector("[fisher-validity]");
         while (tag_validity.firstChild) {
             tag_validity.removeChild(tag_validity.firstChild);
@@ -296,7 +296,7 @@ export default class FishersExactTest {
             return;
         }
 
-        // rendedr calculation matrix
+        // render calculation matrix
         const gui_table = new _DrawGUIFishersTable();
         gui_table.Draw(matrix, "[fisher-calculation-matrix]");
 

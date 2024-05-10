@@ -272,12 +272,12 @@ export default class OddsRatio {
 
 		this._DrawMedianGUITable("median-survivability-matrix", calcs.medians, this._GetMedian.bind(this));
 
-		this._DrawGUITable(`[or-group="${this.id}"] [odds-oservations]`, calcs.input_data, this._GetObservation.bind(this));
+		this._DrawGUITable(`[or-group="${this.id}"] [odds-observations]`, calcs.input_data, this._GetObservation.bind(this));
 		this._DrawGUITable(`[or-group="${this.id}"] [probability-over-months-matrix]`, calcs.odds, this._GetProb.bind(this));
 		this._DrawGUITable(`[or-group="${this.id}"] [odds-over-months-matrix]`, calcs.odds, this._GetOddsAndCI.bind(this));
 		this._Draw_OR_GUITables("odds-ratio-over-months-matrix", calcs);
 
-		this._AddExplanations("odds-oservations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
+		this._AddExplanations("odds-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
 		this._AddExplanations("odds-explanation", "Пояснения:<br>Если odds > 1, то шансы на выживание больше, чем у всех остальных периодов.<br>Если odds < 1, то шансы на выживание меньше чем у всех остальных периодов.");
 		this._AddExplanations("odds-ratio-explanation", "Пояснения:<br>Если OR > 1, то шансы на выживание у вертикальной группы больше, чем у  горизональной.<br>Если OR < 1, то шансы на выживание у вертикальной группы меньше, чем у горизональной.");
 

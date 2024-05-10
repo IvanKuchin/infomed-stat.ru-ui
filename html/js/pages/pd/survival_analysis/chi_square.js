@@ -169,7 +169,7 @@ export default class ChiSquare {
 	}
 
     UpdateUI(matrix) {
-		this._AddExplanations("chi-oservations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
+		this._AddExplanations("chi-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
         
         const tag_equation = document.querySelector("[chi-square-equation]");
         tag_equation.innerText = this._GetEquation(matrix);

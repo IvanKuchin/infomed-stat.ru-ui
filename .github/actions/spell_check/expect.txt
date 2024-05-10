@@ -10,6 +10,7 @@ DWORAK
 FBAN
 Facebook
 Fillin
+GUI
 HTMLTo
 IAct
 IDIn
@@ -42,6 +43,7 @@ Norder
 Nva
 ONMe
 OOO
+PLess
 Plotly
 Prebuilt
 Probs
