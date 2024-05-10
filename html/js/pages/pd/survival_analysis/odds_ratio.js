@@ -1,4 +1,5 @@
 import ChiSquare from "./chi_square.js";
+import FishersExactTest from "./fisher.js";
 
 export default class OddsRatio {
 
@@ -8,6 +9,7 @@ export default class OddsRatio {
 		this.calc_odds = new OddsCalc();
 		this._RenderMonthsEditor("months-setup", this.calc_odds.GetMonths());
 		this.chi = new ChiSquare();
+		this.fishers_test = new FishersExactTest();
 	}
 
 	get id() { return this._id; }
@@ -175,9 +177,14 @@ export default class OddsRatio {
 		return table;
 	}
 
+	_HumanizeTitles(titles) {
+		let updated_titles = titles.map(t => "жив + выбыл (" + t + " мес)").concat([`умерли (${titles[titles.length - 1]} мес)`]);
+		return updated_titles;
+	}
+
 	_DrawGUITable(table_selector, matrix, callback_item_value) {
 		document.querySelector(table_selector).innerHTML = "";
-		document.querySelector(table_selector).appendChild(this._GetTableDOM(matrix, this.calc_odds.GetMonths(), callback_item_value));
+		document.querySelector(table_selector).appendChild(this._GetTableDOM(matrix, this._HumanizeTitles(this.calc_odds.GetMonths()), callback_item_value));
 	}
 
 	_DrawMedianGUITable(table_title, matrix, callback_item_value) {
@@ -198,7 +205,7 @@ export default class OddsRatio {
 
 			let col_title = document.createElement("div");
 			col_title.classList.add("col-xs-12", "text-center");
-			col_title.appendChild(document.createTextNode(`Относительные щансы выживаемости между группами (Odds Ratio) ${months[i]} месяцев`));
+			col_title.appendChild(document.createTextNode(`Относительные шансы выживаемости между группами (Odds Ratio) ${months[i]} месяцев`));
 			
 			let col_table = document.createElement("div");
 			col_table.classList.add("col-xs-12");
@@ -220,6 +227,11 @@ export default class OddsRatio {
 	// must return string
 	_GetProb(item) {
 		return `${common_infomed_stat.RoundToTwo(item.prob)}`;
+	}
+
+	// must return string
+	_GetObservation(item) {
+		return `${common_infomed_stat.RoundToTwo(item.observation)}`;
 	}
 
 	// must return string
@@ -260,11 +272,12 @@ export default class OddsRatio {
 
 		this._DrawMedianGUITable("median-survivability-matrix", calcs.medians, this._GetMedian.bind(this));
 
+		this._DrawGUITable(`[or-group="${this.id}"] [odds-oservations]`, calcs.input_data, this._GetObservation.bind(this));
 		this._DrawGUITable(`[or-group="${this.id}"] [probability-over-months-matrix]`, calcs.odds, this._GetProb.bind(this));
-		this._DrawGUITable(`[or-group="${this.id}"] [odds-over-months-matrix]`, calcs.odds, this._GetProb.bind(this));
+		this._DrawGUITable(`[or-group="${this.id}"] [odds-over-months-matrix]`, calcs.odds, this._GetOddsAndCI.bind(this));
 		this._Draw_OR_GUITables("odds-ratio-over-months-matrix", calcs);
 
-		this._AddExplanations("prob-explanation", "Пояснения: Данные беруться из Kaplan-Meier графиков.");
+		this._AddExplanations("odds-oservations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
 		this._AddExplanations("odds-explanation", "Пояснения:<br>Если odds > 1, то шансы на выживание больше, чем у всех остальных периодов.<br>Если odds < 1, то шансы на выживание меньше чем у всех остальных периодов.");
 		this._AddExplanations("odds-ratio-explanation", "Пояснения:<br>Если OR > 1, то шансы на выживание у вертикальной группы больше, чем у  горизональной.<br>Если OR < 1, то шансы на выживание у вертикальной группы меньше, чем у горизональной.");
 
@@ -272,13 +285,19 @@ export default class OddsRatio {
 		const chi = this.chi.Calculate(this._datasets, this.calc_odds.GetMonths());
 		this._DrawGUITable(`[chi-group="${this.id}"] [chi-square-observation-matrix]`, chi, this._GetCHIObservationAndExpectation.bind(this));
 		this.chi.UpdateUI(chi);
+
+		// Fishers Exact Test calculation
+		const fisher = this.fishers_test.Calculate(this._datasets, this.calc_odds.GetMonths());
+		this._DrawGUITable(`[fisher-group="${this.id}"] [fisher-observation-matrix]`, fisher, this._GetObservation.bind(this));
+		this.fishers_test.UpdateUI(fisher);
 	}
 }
 
 
 class OddsCalc {
 	constructor() {
-		this.months = [1*12, 2*12, 3*12, 5*12, 10*12];
+		// this.months = [1*12, 2*12, 3*12, 5*12, 10*12];
+		this.months = [1*12];
 	}
 
 	GetMonths() {
@@ -289,7 +308,34 @@ class OddsCalc {
 		this.months[idx] = month;
 	}
 
-	_GetSurvivabilityProbsByMonth(data, survival_month) {
+    _InputDataFromDatasets(datasets, months) {
+        const group_count = datasets.length;
+        let matrix = new Array(group_count).fill(0).map(() => new Array(months.length + 1).fill(NaN));
+
+        for (let i = 0; i < group_count; i++) {
+            const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events + curr.Alive, 0);
+            for (let j = 0; j < months.length; j++) {
+
+                const events_before_month = datasets[i].data.reduce((acc, curr) => {
+                    return curr.Time < months[j] ? acc + curr.Events : acc;
+                }, 0)
+
+                matrix[i][j] = {
+                    observation: total_patients - events_before_month,
+                }
+            }
+
+			const items_before_last_month = datasets[i].data.filter((item) => item.Time < months[months.length - 1]);
+			// patients who died before last month
+            matrix[i][months.length] = {
+                observation: items_before_last_month.reduce((acc, curr) => acc + curr.Events, 0),
+            }
+        }
+
+        return matrix;
+    }
+
+	_GetProbsByMonth(data, survival_month) {
 		let value = -1
 
 		for (let i = 0; i < data.length; i++) {
@@ -304,11 +350,7 @@ class OddsCalc {
 	}
 
 	_GetPopulationSize(data) {
-		let population = 0;
-
-		for (let i = 0; i < data.length; i++) {
-			population += data[i].Patients.length;
-		}
+		let population = data.reduce((acc, curr) => acc + curr.observation, 0);
 
 		if (population == 0) {
 			population = 1;
@@ -318,14 +360,13 @@ class OddsCalc {
 		return population
 	}
 
-	_GetOddsMatrix(datasets, months) {
-		let matrix = new Array(datasets.length).fill(0).map(() => new Array(months.length).fill(NaN));
+	_GetOddsMatrix(input_data) {
+		let matrix = new Array(input_data.length).fill(0).map(() => new Array(input_data[0].length).fill(NaN));
 
-		for (let i = 0; i < datasets.length; i++) {
-			const n = this._GetPopulationSize(datasets[i].data);
-			for (let j = 0; j < months.length; j++) {
-				const survival_month = months[j];
-				const prob = this._GetSurvivabilityProbsByMonth(datasets[i].data, survival_month);
+		for (let i = 0; i < input_data.length; i++) {
+			const n = this._GetPopulationSize(input_data[i]);
+			for (let j = 0; j < input_data[0].length; j++) {
+				const prob = input_data[i][j].observation / n;
 				const odds = prob / (1 - prob + Number.EPSILON);
 				const ci = 1.96 * Math.sqrt((prob * (1 - prob)) / n);
 				matrix[i][j] = {
@@ -379,11 +420,13 @@ class OddsCalc {
 	}
 
 	CalculateOddsRatio(datasets) {
-		const odds = this._GetOddsMatrix(datasets, this.GetMonths());
+		const input_data = this._InputDataFromDatasets(datasets, this.GetMonths());
+		const odds = this._GetOddsMatrix(input_data);
 		const or = this._GetOR(odds);
 		const medians = this._GetMedianPerGroup(datasets);
 
 		return {
+			input_data: input_data,
 			months: this.GetMonths(),
 			odds: odds,
 			or: or,

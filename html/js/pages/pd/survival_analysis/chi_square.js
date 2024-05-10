@@ -13,10 +13,10 @@ export default class ChiSquare {
 
     _InputDataFromDatasets(datasets, months) {
         const group_count = datasets.length;
-        let matrix = new Array(group_count).fill(0).map(() => new Array(months.length).fill(NaN));
+        let matrix = new Array(group_count).fill(0).map(() => new Array(months.length + 1).fill(NaN));
 
         for (let i = 0; i < group_count; i++) {
-            const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events, 0);
+            const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events + curr.Alive, 0);
             for (let j = 0; j < months.length; j++) {
 
                 const events_before_month = datasets[i].data.reduce((acc, curr) => {
@@ -26,6 +26,12 @@ export default class ChiSquare {
                 matrix[i][j] = {
                     observation: total_patients - events_before_month,
                 }
+            }
+
+			const items_before_last_month = datasets[i].data.filter((item) => item.Time < months[months.length - 1]);
+			// patients who died before last month
+            matrix[i][months.length] = {
+                observation: items_before_last_month.reduce((acc, curr) => acc + curr.Events, 0),
             }
         }
 
@@ -158,7 +164,12 @@ export default class ChiSquare {
         return tag_parent;
     }
 
+	_AddExplanations(explanation_id, text) {
+		document.querySelector(`[${explanation_id}]`).innerHTML = text;
+	}
+
     UpdateUI(matrix) {
+		this._AddExplanations("chi-oservations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
         
         const tag_equation = document.querySelector("[chi-square-equation]");
         tag_equation.innerText = this._GetEquation(matrix);
