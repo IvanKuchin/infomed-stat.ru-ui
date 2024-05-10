@@ -159,26 +159,70 @@ export default class FishersExactTest {
 
 
     _GetEquation(matrix) {
-        const {numerator, denominator} = this._GetNumeratorAndDenominator(matrix);
-        let equation_numerator = "";
+        let math_tag = document.createElement("math");
+        math_tag.setAttribute("xmlns", "http://www.w3.org/1998/Math/MathML");
 
+        // craft left side of the equation
+        let left_side_sub = document.createElement("msub");
+        let left_side_p = document.createElement("mi");
+        left_side_p.innerHTML = "P";
+        let left_side_cutoff = document.createElement("mi");
+        left_side_cutoff.innerHTML = "cutoff";
+        left_side_sub.appendChild(left_side_p);
+        left_side_sub.appendChild(left_side_cutoff);
+        
+        let equal_sign = document.createElement("mo");
+        equal_sign.innerHTML = "=";
+        let frac_tag = document.createElement("mfrac");
+        let numerator_tag = document.createElement("mrow");
+        let denominator_tag = document.createElement("mrow");
+
+        const {numerator, denominator} = this._GetNumeratorAndDenominator(matrix);
         for (let i = 0; i < numerator.length; i++) {
-            equation_numerator += equation_numerator.length > 0 ? "\\ " : "";
-            equation_numerator += `${numerator[i]}!`;
+            let factorial_part1 = document.createElement("mi");
+            factorial_part1.innerHTML = numerator[i];
+            let factorial_part2 = document.createElement("mo");
+            factorial_part2.innerHTML = "!";
+            let multiplier_tag = document.createElement("mo");
+            multiplier_tag.innerHTML = " ";
+
+            numerator_tag.appendChild(factorial_part1);
+            numerator_tag.appendChild(factorial_part2);
+            numerator_tag.appendChild(multiplier_tag);
         }
 
-        let equation_denominator = "";
-
         for (let i = 0; i < denominator.length; i++) {
-            equation_denominator += equation_denominator.length > 0 ? "\\ " : "";
-            equation_denominator += `${denominator[i]}!`;
+            let factorial_part1 = document.createElement("mi");
+            factorial_part1.innerHTML = denominator[i];
+            let factorial_part2 = document.createElement("mo");
+            factorial_part2.innerHTML = "!";
+            let multiplier_tag = document.createElement("mo");
+            multiplier_tag.innerHTML = " ";
+
+            denominator_tag.appendChild(factorial_part1);
+            denominator_tag.appendChild(factorial_part2);
+            denominator_tag.appendChild(multiplier_tag);
         }
 
         const f = new Factorial();
         const result = f.calc_ratio(numerator, denominator);
 
-        return "\\(P_{cutoff} = { {" + equation_numerator + "} \\over { " + equation_denominator + " } }\\) = " + result + " ";
-        // return "χ2 = " + equation2 + " ";
+        let result_equal_sign = document.createElement("mo");
+        result_equal_sign.innerHTML = "=";
+        let result_tag = document.createElement("mn");
+        result_tag.innerHTML = result;
+
+        math_tag.appendChild(left_side_sub);
+        math_tag.appendChild(equal_sign);
+        math_tag.appendChild(frac_tag);
+
+        frac_tag.appendChild(numerator_tag);
+        frac_tag.appendChild(denominator_tag);
+
+        math_tag.appendChild(result_equal_sign);
+        math_tag.appendChild(result_tag);
+        
+        return math_tag;
     }
 
     _GetValidity(matrix) {
@@ -309,7 +353,13 @@ export default class FishersExactTest {
 
         // render  equation
         const tag_equation = document.querySelector("[fisher-equation]");
-        tag_equation.innerText = this._GetEquation(matrix);
+        while (tag_equation.firstChild) {
+            tag_equation.removeChild(tag_equation.firstChild);
+        }
+        tag_equation.appendChild(this._GetEquation(matrix));
+        // const shadow = tag_equation.attachShadow({mode: "open"});
+        // shadow.appendChild(this._GetEquation(matrix));
+
 
         // render conclusion block
         const tag_conclusion = document.querySelector("[fisher-conclusion]");
