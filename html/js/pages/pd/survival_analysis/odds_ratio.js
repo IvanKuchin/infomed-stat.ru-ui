@@ -313,7 +313,7 @@ class OddsCalc {
         let matrix = new Array(group_count).fill(0).map(() => new Array(months.length + 1).fill(NaN));
 
         for (let i = 0; i < group_count; i++) {
-            const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events + curr.Alive, 0);
+            const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events + curr.Alive + curr.Censored, 0);
             for (let j = 0; j < months.length; j++) {
 
                 const events_before_month = datasets[i].data.reduce((acc, curr) => {
