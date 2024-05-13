@@ -150,6 +150,7 @@ fio
 firefox
 focusout
 foreach
+frac
 frameborder
 friendavatar
 friendid
@@ -213,11 +214,15 @@ meier
 mesent
 messageid
 metadata
+mfrac
 mouseenter
 mouseleave
 mouseout
 mouseover
 mov
+mrow
+msub
+msup
 mul
 mydomain
 mylogin
@@ -317,6 +322,7 @@ webm
 workflow
 www
 xls
+xmlns
 xsi
 xxxx
 xxxxxxxx

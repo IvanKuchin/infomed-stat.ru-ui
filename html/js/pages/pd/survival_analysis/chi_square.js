@@ -102,23 +102,23 @@ export default class ChiSquare {
 
                 let ratio_nominator = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msup");
                 let ratio_nominator_diff = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mrow");
-                let ratio_nominator_diff_parentesis_open = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
-                ratio_nominator_diff_parentesis_open.innerHTML = "(";
+                let ratio_nominator_diff_parenthesis_open = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+                ratio_nominator_diff_parenthesis_open.innerHTML = "(";
                 let ratio_nominator_diff_minuend = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
                 ratio_nominator_diff_minuend.innerHTML = `${common_infomed_stat.RoundToTwo(matrix[i][j].observation)}`;
                 let ratio_nominator_diff_minus = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
                 ratio_nominator_diff_minus.innerHTML = `-`;
                 let ratio_nominator_diff_subtrahend = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
                 ratio_nominator_diff_subtrahend.innerHTML = `${common_infomed_stat.RoundToTwo(matrix[i][j].expectation)}`;
-                let ratio_nominator_diff_parentesis_close = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
-                ratio_nominator_diff_parentesis_close.innerHTML = ")";
+                let ratio_nominator_diff_parenthesis_close = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+                ratio_nominator_diff_parenthesis_close.innerHTML = ")";
                 let ratio_nominator_diff_square = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
                 ratio_nominator_diff_square.innerHTML = "2";
-                ratio_nominator_diff.appendChild(ratio_nominator_diff_parentesis_open);
+                ratio_nominator_diff.appendChild(ratio_nominator_diff_parenthesis_open);
                 ratio_nominator_diff.appendChild(ratio_nominator_diff_minuend);
                 ratio_nominator_diff.appendChild(ratio_nominator_diff_minus);
                 ratio_nominator_diff.appendChild(ratio_nominator_diff_subtrahend);
-                ratio_nominator_diff.appendChild(ratio_nominator_diff_parentesis_close);
+                ratio_nominator_diff.appendChild(ratio_nominator_diff_parenthesis_close);
                 ratio_nominator.appendChild(ratio_nominator_diff);
                 ratio_nominator.appendChild(ratio_nominator_diff_square);
 
