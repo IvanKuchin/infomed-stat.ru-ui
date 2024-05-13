@@ -70,6 +70,91 @@ export default class ChiSquare {
 
     _GetEquation(matrix) {
         let chi_square = 0;
+
+        let math_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
+        math_tag.setAttribute("xmlns", "http://www.w3.org/1998/Math/MathML");
+
+        // craft left side of the equation
+        let left_side_sup = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msup");
+        let left_side_chi = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
+        left_side_chi.innerHTML = "χ";
+        let left_side_square = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+        left_side_square.innerHTML = "2";
+        left_side_sup.appendChild(left_side_chi);
+        left_side_sup.appendChild(left_side_square);
+        
+        let equal_sign = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+        equal_sign.innerHTML = "=";
+
+        math_tag.appendChild(left_side_sup);
+        math_tag.appendChild(equal_sign);
+
+        // craft right side of the equation
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[0].length; j++) {
+                const curr = Math.pow(matrix[i][j].observation - matrix[i][j].expectation, 2) / matrix[i][j].expectation;
+                chi_square += curr;
+
+                if (i > 0 || j > 0) {
+                    let plus_sign = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+                    plus_sign.innerHTML = "+";
+                    math_tag.appendChild(plus_sign);
+                }
+
+
+                let ratio_nominator = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msup");
+                let ratio_nominator_diff = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mrow");
+                let ratio_nominator_diff_parentesis_open = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+                ratio_nominator_diff_parentesis_open.innerHTML = "(";
+                let ratio_nominator_diff_minuend = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
+                ratio_nominator_diff_minuend.innerHTML = `${common_infomed_stat.RoundToTwo(matrix[i][j].observation)}`;
+                let ratio_nominator_diff_minus = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+                ratio_nominator_diff_minus.innerHTML = `-`;
+                let ratio_nominator_diff_subtrahend = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
+                ratio_nominator_diff_subtrahend.innerHTML = `${common_infomed_stat.RoundToTwo(matrix[i][j].expectation)}`;
+                let ratio_nominator_diff_parentesis_close = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+                ratio_nominator_diff_parentesis_close.innerHTML = ")";
+                let ratio_nominator_diff_square = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+                ratio_nominator_diff_square.innerHTML = "2";
+                ratio_nominator_diff.appendChild(ratio_nominator_diff_parentesis_open);
+                ratio_nominator_diff.appendChild(ratio_nominator_diff_minuend);
+                ratio_nominator_diff.appendChild(ratio_nominator_diff_minus);
+                ratio_nominator_diff.appendChild(ratio_nominator_diff_subtrahend);
+                ratio_nominator_diff.appendChild(ratio_nominator_diff_parentesis_close);
+                ratio_nominator.appendChild(ratio_nominator_diff);
+                ratio_nominator.appendChild(ratio_nominator_diff_square);
+
+                let ratio_denominator = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
+                ratio_denominator.innerHTML = `${common_infomed_stat.RoundToTwo(matrix[i][j].expectation)}`;
+
+                let ratio = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mfrac");
+                ratio.appendChild(ratio_nominator);
+                ratio.appendChild(ratio_denominator);
+
+                math_tag.appendChild(ratio);
+
+                // if (j == matrix[0].length - 1) {
+                //     let ellipsis = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+                //     ellipsis.innerHTML = "...";
+                //     math_tag.appendChild(ellipsis);
+                // }
+
+            }
+        }
+
+        let equal_sign2 = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+        equal_sign2.innerHTML = "=";
+        math_tag.appendChild(equal_sign2);
+
+        let chi_square_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
+        chi_square_tag.innerHTML = `${common_infomed_stat.RoundToTwo(chi_square)}`;
+        math_tag.appendChild(chi_square_tag);
+
+        return math_tag;
+    }
+
+    _GetEquation_old(matrix) {
+        let chi_square = 0;
         let equation1 = "";
         let equation2 = "";
         for (let i = 0; i < matrix.length; i++) {
@@ -168,7 +253,10 @@ export default class ChiSquare {
 		this._AddExplanations("chi-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
         
         const tag_equation = document.querySelector("[chi-square-equation]");
-        tag_equation.innerText = this._GetEquation(matrix);
+        while (tag_equation.firstChild) {
+            tag_equation.removeChild(tag_equation.firstChild);
+        }
+        tag_equation.appendChild(this._GetEquation(matrix));
 
         
         const tag_validity = document.querySelector("[chi-square-validity]");
