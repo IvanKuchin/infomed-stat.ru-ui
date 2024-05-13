@@ -159,41 +159,75 @@ export default class FishersExactTest {
 
 
     _GetEquation(matrix) {
-        const {numerator, denominator} = this._GetNumeratorAndDenominator(matrix);
-        let equation_numerator = "";
+        let math_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
+        math_tag.setAttribute("xmlns", "http://www.w3.org/1998/Math/MathML");
 
+        // craft left side of the equation
+        let left_side_sub = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msub");
+        let left_side_p = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
+        left_side_p.innerHTML = "P";
+        let left_side_cutoff = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
+        left_side_cutoff.innerHTML = "cutoff";
+        left_side_sub.appendChild(left_side_p);
+        left_side_sub.appendChild(left_side_cutoff);
+        
+        let equal_sign = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+        equal_sign.innerHTML = "=";
+        let frac_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mfrac");
+        let numerator_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mrow");
+        let denominator_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mrow");
+
+        const {numerator, denominator} = this._GetNumeratorAndDenominator(matrix);
         for (let i = 0; i < numerator.length; i++) {
-            equation_numerator += equation_numerator.length > 0 ? "\\ " : "";
-            equation_numerator += `${numerator[i]}!`;
+            let factorial_part1 = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
+            factorial_part1.innerHTML = numerator[i];
+            let factorial_part2 = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+            factorial_part2.innerHTML = "!";
+            let multiplier_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+            multiplier_tag.innerHTML = " ";
+
+            numerator_tag.appendChild(factorial_part1);
+            numerator_tag.appendChild(factorial_part2);
+            numerator_tag.appendChild(multiplier_tag);
         }
 
-        let equation_denominator = "";
-
         for (let i = 0; i < denominator.length; i++) {
-            equation_denominator += equation_denominator.length > 0 ? "\\ " : "";
-            equation_denominator += `${denominator[i]}!`;
+            let factorial_part1 = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
+            factorial_part1.innerHTML = denominator[i];
+            let factorial_part2 = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+            factorial_part2.innerHTML = "!";
+            let multiplier_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+            multiplier_tag.innerHTML = " ";
+
+            denominator_tag.appendChild(factorial_part1);
+            denominator_tag.appendChild(factorial_part2);
+            denominator_tag.appendChild(multiplier_tag);
         }
 
         const f = new Factorial();
         const result = f.calc_ratio(numerator, denominator);
 
-        return "\\(P_{cutoff} = { {" + equation_numerator + "} \\over { " + equation_denominator + " } }\\) = " + result + " ";
-        // return "χ2 = " + equation2 + " ";
+        let result_equal_sign = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
+        result_equal_sign.innerHTML = "=";
+        let result_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
+        result_tag.innerHTML = result;
+
+        math_tag.appendChild(left_side_sub);
+        math_tag.appendChild(equal_sign);
+        math_tag.appendChild(frac_tag);
+
+        frac_tag.appendChild(numerator_tag);
+        frac_tag.appendChild(denominator_tag);
+
+        math_tag.appendChild(result_equal_sign);
+        math_tag.appendChild(result_tag);
+        
+        return math_tag;
     }
 
     _GetValidity(matrix) {
         let flag = false;
         let message = `в таблице нет значений меньше ${this.validity_threshold}`;
-
-        if (matrix.length > 2) {
-            flag = false;
-            message = "в таблице больше двух строк";
-        }
-
-        if (matrix[0].length > 2) {
-            flag = false;
-            message = "в таблице больше двух столбцов";
-        }
 
         for (let i = 0; i < matrix.length; i++) {
             for (let j = 0; j < matrix[0].length; j++) {
@@ -202,6 +236,16 @@ export default class FishersExactTest {
                     message = "";
                 }
             }
+        }
+
+        if (matrix.length != 2) {
+            flag = false;
+            message = "в таблице должно быть две строки";
+        }
+
+        if (matrix[0].length != 2) {
+            flag = false;
+            message = "в таблице должно быть два столбца";
         }
 
         for (let i = 0; i < matrix.length; i++) {
@@ -216,7 +260,7 @@ export default class FishersExactTest {
         let tag0 = document.createElement("div");
 
         let tag1 = document.createElement("div");
-        tag1.innerHTML = `Вычисления считаются корректными, только если в четырёхпольной таблице есть значения не больше ${this.validity_threshold}`;
+        tag1.innerHTML = `Вычисления считаются корректными, только если в четырёхпольной таблице есть значения меньше ${this.validity_threshold}`;
 
         let tag2 = document.createElement("span");
         if (flag) {
@@ -282,6 +326,26 @@ export default class FishersExactTest {
     UpdateUI(matrix) {
 		this._AddExplanations("fisher-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
 
+        // clean  equation
+        const tag_equation = document.querySelector("[fisher-equation]");
+        while (tag_equation.firstChild) {
+            tag_equation.removeChild(tag_equation.firstChild);
+        }
+
+
+        // clean conclusion block
+        const tag_conclusion = document.querySelector("[fisher-conclusion]");
+        while (tag_conclusion.firstChild) {
+            tag_conclusion.removeChild(tag_conclusion.firstChild);
+        }
+
+        // clean conclusion block
+        const tag_calc = document.querySelector("[fisher-calculation-matrix]");
+        while (tag_calc.firstChild) {
+            tag_calc.removeChild(tag_calc.firstChild);
+        }
+
+
         // render validity block       
         const tag_validity = document.querySelector("[fisher-validity]");
         while (tag_validity.firstChild) {
@@ -308,14 +372,9 @@ export default class FishersExactTest {
         this._WarnIfFarFromOne(sum_of_p_array);
 
         // render  equation
-        const tag_equation = document.querySelector("[fisher-equation]");
-        tag_equation.innerText = this._GetEquation(matrix);
+        tag_equation.appendChild(this._GetEquation(matrix));
 
         // render conclusion block
-        const tag_conclusion = document.querySelector("[fisher-conclusion]");
-        while (tag_conclusion.firstChild) {
-            tag_conclusion.removeChild(tag_conclusion.firstChild);
-        }
         tag_conclusion.appendChild(this._GetConclusion(p_cutoff, sum_of_p_less_than_p_cutoff));
     }
 }
