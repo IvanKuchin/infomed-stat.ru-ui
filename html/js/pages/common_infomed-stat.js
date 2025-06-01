@@ -1,4 +1,5 @@
 /*jslint devel: true, indent: 4, maxerr: 50, esversion: 6*/
+/*exported common_infomed_stat*/
 
 var common_infomed_stat = (function () {
 	var dictionary = [];
