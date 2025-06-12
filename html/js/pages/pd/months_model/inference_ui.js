@@ -14,12 +14,12 @@ export default class InferenceUI {
 	_ChangeHandler(e) {
 		let record = this._FindRecordByID(e.target.selectedOptions[0].getAttribute("_record_id"));
 
-		if(record) {
+		if (record) {
 			let result_preprocessed = this._preprocessing.inference([record]);
-			if(result_preprocessed.error instanceof Error) {
+			if (result_preprocessed.error instanceof Error) {
 				// --- error
 			} else {
-				if(result_preprocessed.Y > 0) {
+				if (result_preprocessed.Y > 0) {
 					let original_Y = this._preprocessing.GetDateByY(record, result_preprocessed.Y);
 					document.getElementById("duration_from_record").textContent = `${original_Y[0].getMonth() + 1} ${original_Y[0].getYear() + 1900}`;
 				} else {
@@ -55,11 +55,11 @@ export default class InferenceUI {
 			select.appendChild(option);
 		}
 
-		return {dom: select, error: error};
+		return { dom: select, error: error };
 	}
 
 	AddToPage(dom, placeholder) {
 		placeholder.appendChild(dom);
 	}
-	
+
 }
