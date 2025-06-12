@@ -2,7 +2,7 @@
 
 export default class KaplanMeier {
 
-	constructor(id) { 
+	constructor(id) {
 		this._data = {
 			labels: [],
 			datasets: []
@@ -32,20 +32,20 @@ export default class KaplanMeier {
 
 	InitializeGraph() {
 		this._myChart = new Chart(
-							document.querySelectorAll("[km-group='" + this.id + "'] canvas")[0],
-							this._config
-						);
+			document.querySelectorAll("[km-group='" + this.id + "'] canvas")[0],
+			this._config
+		);
 	}
 
 	_footer(tooltipItems) {
-		let footer	= "";
+		let footer = "";
 
-		tooltipItems.forEach(function(tooltipItem) {
-			let data	= tooltipItem.dataset.data;
-			let label	= tooltipItem.label;
+		tooltipItems.forEach(function (tooltipItem) {
+			let data = tooltipItem.dataset.data;
+			let label = tooltipItem.label;
 
 			for (let i = 0; i < data.length; i++) {
-				if(data[i].x == label) {
+				if (data[i].x == label) {
 					let patients = data[i].Patients;
 
 					footer += `\n`;
@@ -67,17 +67,17 @@ export default class KaplanMeier {
 	}
 
 	_GetDatasetObject(parent_id) {
-		let red		= Math.round(Math.random() * 255);
-		let green	= Math.round(Math.random() * 255);
-		let blue	= Math.round(Math.random() * 255);
+		let red = Math.round(Math.random() * 255);
+		let green = Math.round(Math.random() * 255);
+		let blue = Math.round(Math.random() * 255);
 
 		return {
-			parent_id:			parent_id,
-			stepped:			true,
-			label:				'График ' + parent_id,
-			backgroundColor:	`rgb(${red}, ${green}, ${blue})`,
-			borderColor:		`rgb(${red}, ${green}, ${blue})`,
-			data: 				[],
+			parent_id: parent_id,
+			stepped: true,
+			label: 'График ' + parent_id,
+			backgroundColor: `rgb(${red}, ${green}, ${blue})`,
+			borderColor: `rgb(${red}, ${green}, ${blue})`,
+			data: [],
 		}
 	}
 
@@ -86,9 +86,9 @@ export default class KaplanMeier {
 		let ds_idx;
 
 		for (ds_idx = 0; ds_idx < datasets.length; ++ds_idx) {
-			if(datasets[ds_idx].parent_id == parent_id) {
+			if (datasets[ds_idx].parent_id == parent_id) {
 				break;
-			} 
+			}
 		}
 
 		return ds_idx;
@@ -100,13 +100,13 @@ export default class KaplanMeier {
 		let datasets = this._data.datasets;
 		let ds_idx = this._FindDSIndexByParentID(parent_id);
 
-		if(ds_idx == datasets.length) {
+		if (ds_idx == datasets.length) {
 			datasets.push(this._GetDatasetObject(parent_id));
 		}
 
 		datasets[ds_idx].data = [];
 		for (var i = 0; i < km_data.length; i++) {
-			let	rec = km_data[i];
+			let rec = km_data[i];
 
 			datasets[ds_idx].data.push({ x: rec.Time, y: rec.Survival, Patients: rec.Patients });
 		}
@@ -117,7 +117,7 @@ export default class KaplanMeier {
 		let datasets = this._data.datasets;
 		let ds_idx = this._FindDSIndexByParentID(parent_id);
 
-		if(ds_idx == datasets.length) {
+		if (ds_idx == datasets.length) {
 			// --- ok
 		} else {
 			datasets.splice(ds_idx, 1);
@@ -130,7 +130,7 @@ export default class KaplanMeier {
 		let max_t = 0;
 
 		for (let i = 0; i < datasets.length; ++i) {
-			let	data = datasets[i].data;
+			let data = datasets[i].data;
 			max_t = Math.max(max_t, data[data.length - 1].x);
 		}
 

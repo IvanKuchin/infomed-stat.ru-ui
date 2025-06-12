@@ -22,8 +22,8 @@ export default class ChiSquare {
                 }
             }
 
-			const items_before_last_month = datasets[i].data.filter((item) => item.Time < months[months.length - 1]);
-			// patients who died before last month
+            const items_before_last_month = datasets[i].data.filter((item) => item.Time < months[months.length - 1]);
+            // patients who died before last month
             matrix[i][months.length] = {
                 observation: items_before_last_month.reduce((acc, curr) => acc + curr.Events, 0),
             }
@@ -40,13 +40,13 @@ export default class ChiSquare {
         let total_per_column = new Array(columns).fill(0);
 
         for (let i = 0; i < total_per_row.length; i++) {
-                total_per_row[i] = matrix[i].reduce((acc, curr) => acc + curr.observation, 0);
+            total_per_row[i] = matrix[i].reduce((acc, curr) => acc + curr.observation, 0);
         }
 
         for (let j = 0; j < total_per_column.length; j++) {
             total_per_column[j] = matrix.reduce((acc, curr) => acc + curr[j].observation, 0);
         }
-        
+
         const total = total_per_row.reduce((acc, curr) => acc + curr, 0);
 
         for (let i = 0; i < rows; i++) {
@@ -80,7 +80,7 @@ export default class ChiSquare {
         left_side_square.innerHTML = "2";
         left_side_sup.appendChild(left_side_chi);
         left_side_sup.appendChild(left_side_square);
-        
+
         let equal_sign = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
         equal_sign.innerHTML = "=";
 
@@ -197,7 +197,7 @@ export default class ChiSquare {
                 if (matrix[i][j].expectation < this.validity_threshold) {
                     flag = false;
                     message += message.length > 0 ? ", " : "";
-                    message += `E(${i+1},${j+1}) = ${common_infomed_stat.RoundToTwo(matrix[i][j].expectation)}`;
+                    message += `E(${i + 1},${j + 1}) = ${common_infomed_stat.RoundToTwo(matrix[i][j].expectation)}`;
                 }
             }
         }
@@ -243,26 +243,26 @@ export default class ChiSquare {
         return tag_parent;
     }
 
-	_AddExplanations(explanation_id, text) {
-		document.querySelector(`[${explanation_id}]`).innerHTML = text;
-	}
+    _AddExplanations(explanation_id, text) {
+        document.querySelector(`[${explanation_id}]`).innerHTML = text;
+    }
 
     UpdateUI(matrix) {
-		this._AddExplanations("chi-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
-        
+        this._AddExplanations("chi-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
+
         const tag_equation = document.querySelector("[chi-square-equation]");
         while (tag_equation.firstChild) {
             tag_equation.removeChild(tag_equation.firstChild);
         }
         tag_equation.appendChild(this._GetEquation(matrix));
 
-        
+
         const tag_validity = document.querySelector("[chi-square-validity]");
         while (tag_validity.firstChild) {
             tag_validity.removeChild(tag_validity.firstChild);
         }
         tag_validity.appendChild(this._GetValidity(matrix));
-        
+
         const tag_conclusion = document.querySelector("[chi-square-conclusion]");
         while (tag_conclusion.firstChild) {
             tag_conclusion.removeChild(tag_conclusion.firstChild);

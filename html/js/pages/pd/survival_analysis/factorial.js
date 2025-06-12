@@ -27,7 +27,7 @@ export default class Factorials {
             result.push(1);
         }
 
-        return {nominator: result, denominator: expanded_denominator};
+        return { nominator: result, denominator: expanded_denominator };
     }
 
     _calculate(nominator, denominator) {

@@ -3,7 +3,7 @@ import SaveToXLS from "../save2xls.js"
 
 export default class FilterGroup {
 
-	constructor(id, records, ref_dom, dataset_obj) { 
+	constructor(id, records, ref_dom, dataset_obj) {
 		this._records = [];
 		this._filters = [];
 		this._ref_dom = null;
@@ -26,13 +26,13 @@ export default class FilterGroup {
 	// Input:
 	//		indices - array of indices to calculate metadata
 	_UpdateMetadata(indices) {
-		let dom_placeholder	= this._ref_dom.querySelector(`[filter-group="${this.id}"]`);
-		let km_metadata		= this._dataset.GetKMMetadata(indices);
+		let dom_placeholder = this._ref_dom.querySelector(`[filter-group="${this.id}"]`);
+		let km_metadata = this._dataset.GetKMMetadata(indices);
 
-		dom_placeholder.querySelectorAll("[total-record-counter]")[0].innerText		= km_metadata.Total;
-		dom_placeholder.querySelectorAll("[censored-record-counter]")[0].innerText	= km_metadata.Censored;
-		dom_placeholder.querySelectorAll("[alive-record-counter]")[0].innerText		= km_metadata.Alive;
-		dom_placeholder.querySelectorAll("[event-record-counter]")[0].innerText		= km_metadata.Events;
+		dom_placeholder.querySelectorAll("[total-record-counter]")[0].innerText = km_metadata.Total;
+		dom_placeholder.querySelectorAll("[censored-record-counter]")[0].innerText = km_metadata.Censored;
+		dom_placeholder.querySelectorAll("[alive-record-counter]")[0].innerText = km_metadata.Alive;
+		dom_placeholder.querySelectorAll("[event-record-counter]")[0].innerText = km_metadata.Events;
 	}
 
 	GetDOM() {
@@ -103,40 +103,40 @@ export default class FilterGroup {
 		filters_row.classList.add("row");
 		filters_row.setAttribute("placeholder", "");
 
-		wrapper							.appendChild(panel);
-		panel							.appendChild(panel_header);
-		panel							.appendChild(panel_body);
-		panel_header					.appendChild(panel_header_row);
-		panel_header_row				.appendChild(panel_header_col1);
-		panel_header_row				.appendChild(panel_header_col2);
-		panel_header_col1				.appendChild(document.createTextNode(`Группа фильтров: ${this.id}. Всего записей: `));
-		panel_header_col1				.appendChild(panel_header_total_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Событий: "));
-		panel_header_col1				.appendChild(panel_header_event_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Выбывших: "));
-		panel_header_col1				.appendChild(panel_header_censored_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Живых: "));
-		panel_header_col1				.appendChild(panel_header_alive_record_counter);
-		panel_header_col2				.appendChild(panel_header_hide_button);
-		panel_header_col2				.appendChild(panel_header_download_button);
-		panel_header_hide_button		.appendChild(panel_header_delete_button_icon);
-		panel_header_download_button	.appendChild(panel_header_download_button_icon);
-		panel_body						.appendChild(control_row);
-		panel_body						.appendChild(filters_row);
-		control_row						.appendChild(control_col);
-		control_col						.appendChild(add_button);
+		wrapper.appendChild(panel);
+		panel.appendChild(panel_header);
+		panel.appendChild(panel_body);
+		panel_header.appendChild(panel_header_row);
+		panel_header_row.appendChild(panel_header_col1);
+		panel_header_row.appendChild(panel_header_col2);
+		panel_header_col1.appendChild(document.createTextNode(`Группа фильтров: ${this.id}. Всего записей: `));
+		panel_header_col1.appendChild(panel_header_total_record_counter);
+		panel_header_col1.appendChild(document.createTextNode(". Событий: "));
+		panel_header_col1.appendChild(panel_header_event_record_counter);
+		panel_header_col1.appendChild(document.createTextNode(". Выбывших: "));
+		panel_header_col1.appendChild(panel_header_censored_record_counter);
+		panel_header_col1.appendChild(document.createTextNode(". Живых: "));
+		panel_header_col1.appendChild(panel_header_alive_record_counter);
+		panel_header_col2.appendChild(panel_header_hide_button);
+		panel_header_col2.appendChild(panel_header_download_button);
+		panel_header_hide_button.appendChild(panel_header_delete_button_icon);
+		panel_header_download_button.appendChild(panel_header_download_button_icon);
+		panel_body.appendChild(control_row);
+		panel_body.appendChild(filters_row);
+		control_row.appendChild(control_col);
+		control_col.appendChild(add_button);
 
 		return wrapper;
 	}
 
 	_AddFilter_ClickHandler() {
-		let new_id				= this._filters.length ? this._filters[this._filters.length - 1].id + 1 : 0;
-		let pre_filter_indices	= (new_id ? this._filters[this._filters.length - 1].post_filter_indices : Array.from(Array(this._records.length).keys()));
-		let filter				= new Filter(new_id, this._records, pre_filter_indices, this, this._dataset);
+		let new_id = this._filters.length ? this._filters[this._filters.length - 1].id + 1 : 0;
+		let pre_filter_indices = (new_id ? this._filters[this._filters.length - 1].post_filter_indices : Array.from(Array(this._records.length).keys()));
+		let filter = new Filter(new_id, this._records, pre_filter_indices, this, this._dataset);
 		this._filters.push(filter);
 
-		let ref_dom				= this._ref_dom.querySelectorAll(`[filter-group="${this.id}"]`)[0];
-		let	dom					= filter.GetDOM();
+		let ref_dom = this._ref_dom.querySelectorAll(`[filter-group="${this.id}"]`)[0];
+		let dom = filter.GetDOM();
 		ref_dom.querySelectorAll(`[placeholder]`)[0].appendChild(dom);
 		dom.querySelector("[close]").addEventListener("click", this._RemoveFilter_ClickHandler.bind(this));
 
@@ -146,19 +146,18 @@ export default class FilterGroup {
 	// Input:  e		- Event
 	// Output: none
 	_Download_ClickHandler() {
-		if(this._indices && this._indices.length)
-		{
+		if (this._indices && this._indices.length) {
 			// collect records filtered by indexes
 			let records_to_save = this._indices.map(idx => this._records[parseInt(idx)]);
 
 			let saver = new SaveToXLS();
 			let save_result = saver.Do(records_to_save);
 
-			if(save_result.error instanceof Error) {
+			if (save_result.error instanceof Error) {
 				console.error(save_result.error);
 			}
 		} else {
-			console.debug(`_indices array is empty`)	
+			console.debug(`_indices array is empty`)
 		}
 	}
 
@@ -171,9 +170,9 @@ export default class FilterGroup {
 
 		filters.splice(idx, 1);
 
-		if(filters.length) {
+		if (filters.length) {
 			// some filters still in the filter_group
-			if(idx) {
+			if (idx) {
 				// Update filter.pre_filter_indices[] from previous post_filter
 				this.FilterValue_Changed(filters[idx - 1].id);
 			} else {
@@ -209,7 +208,7 @@ export default class FilterGroup {
 		var i = 0;
 
 		for (i = 0; i < this._filters.length; i++) {
-			if(this._filters[i].id == filter_id) {
+			if (this._filters[i].id == filter_id) {
 				break;
 			}
 		}
@@ -242,7 +241,7 @@ export default class FilterGroup {
 		let idx = this._GetFilterIdxByID(filter_id);
 
 		// if(filter_id == (this._filters.length - 1)) {
-		if(this._isLastInTheFiltersList(filter_id)) {
+		if (this._isLastInTheFiltersList(filter_id)) {
 			// update metadata
 			this.indices = this._filters[idx].post_filter_indices;
 			this._UpdateMetadata(this.indices);

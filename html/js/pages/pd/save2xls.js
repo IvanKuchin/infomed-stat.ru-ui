@@ -47,19 +47,17 @@ export default class SaveToXLS {
 
 	Do(records) {
 		let error = "";
-		
-		if(records != null)
-		{
-			let table			= this._CraftTableFromRecords(records);
-			let table_string	= this._RemoveSpecialSymbols(table.outerHTML);
-			let href			= this._CraftHREF(table_string);
+
+		if (records != null) {
+			let table = this._CraftTableFromRecords(records);
+			let table_string = this._RemoveSpecialSymbols(table.outerHTML);
+			let href = this._CraftHREF(table_string);
 			href.click();
 		}
-		else
-		{
+		else {
 			error = new Error("records is null");
 		}
 
-		return {error: error};
+		return { error: error };
 	}
 }

@@ -3,7 +3,7 @@ import FishersExactTest from "./fisher.js";
 
 export default class OddsRatio {
 
-	constructor(id) { 
+	constructor(id) {
 		this.id = id;
 		this._datasets = [];
 		this.calc_odds = new OddsCalc();
@@ -17,8 +17,8 @@ export default class OddsRatio {
 
 	_GetDatasetObject(parent_id) {
 		return {
-			parent_id:		parent_id,
-			data: 			[],
+			parent_id: parent_id,
+			data: [],
 		}
 	}
 
@@ -27,9 +27,9 @@ export default class OddsRatio {
 		let ds_idx;
 
 		for (ds_idx = 0; ds_idx < datasets.length; ++ds_idx) {
-			if(datasets[ds_idx].parent_id == parent_id) {
+			if (datasets[ds_idx].parent_id == parent_id) {
 				break;
-			} 
+			}
 		}
 
 		return ds_idx;
@@ -41,7 +41,7 @@ export default class OddsRatio {
 		let datasets = this._datasets;
 		let ds_idx = this._FindDSIndexByParentID(parent_id);
 
-		if(ds_idx == datasets.length) {
+		if (ds_idx == datasets.length) {
 			datasets.push(this._GetDatasetObject(parent_id));
 		}
 
@@ -53,7 +53,7 @@ export default class OddsRatio {
 		let datasets = this._datasets;
 		let ds_idx = this._FindDSIndexByParentID(parent_id);
 
-		if(ds_idx == datasets.length) {
+		if (ds_idx == datasets.length) {
 			// --- success
 		} else {
 			datasets.splice(ds_idx, 1);
@@ -66,7 +66,7 @@ export default class OddsRatio {
 		const month_idx = parseInt(event.target.getAttribute("month_idx"));
 		const month = parseInt(event.target.value);
 		this.calc_odds.SetMonth(month_idx, month);
-		
+
 		// update GUI with new months
 		let prev_month_input = document.querySelector(`[or-group="${this.id}"] [months-setup] input[month_idx="${month_idx - 1}"]`);
 		let next_month_input = document.querySelector(`[or-group="${this.id}"] [months-setup] input[month_idx="${month_idx + 1}"]`);
@@ -91,7 +91,7 @@ export default class OddsRatio {
 		section.style = "display: flex;";
 
 		for (let i = 0; i < months.length; i++) {
-			const min = i == 0 ? 1 : months[i-1] + 1;
+			const min = i == 0 ? 1 : months[i - 1] + 1;
 			const max = i + 1 < months.length - 1 ? months[i + 1] - 1 : 1000;
 			let input = document.createElement("input");
 			input.setAttribute("type", "number");
@@ -107,7 +107,7 @@ export default class OddsRatio {
 		}
 
 		months_editor.appendChild(section);
-	
+
 	}
 
 	_GetGroupTitle() {
@@ -119,8 +119,8 @@ export default class OddsRatio {
 		let tr = document.createElement("tr");
 		for (var i = 0; i < titles.length + 1; i++) {
 			let td = document.createElement("th");
-			if(i) {
-				td.appendChild(document.createTextNode(`${titles[i-1]}`))
+			if (i) {
+				td.appendChild(document.createTextNode(`${titles[i - 1]}`))
 			}
 			tr.appendChild(td);
 		}
@@ -206,7 +206,7 @@ export default class OddsRatio {
 			let col_title = document.createElement("div");
 			col_title.classList.add("col-xs-12", "text-center");
 			col_title.appendChild(document.createTextNode(`Относительные шансы выживаемости между группами (Odds Ratio) ${months[i]} месяцев`));
-			
+
 			let col_table = document.createElement("div");
 			col_table.classList.add("col-xs-12");
 			let cb = this._GetORAndCI(i).bind(this);
@@ -252,7 +252,7 @@ export default class OddsRatio {
 				return "";
 			}
 
-			return `OR:	${common_infomed_stat.RoundToTwo(or)}<br>CI: (${common_infomed_stat.RoundToTwo(or-ci)} - ${common_infomed_stat.RoundToTwo(or+ci)})`;
+			return `OR:	${common_infomed_stat.RoundToTwo(or)}<br>CI: (${common_infomed_stat.RoundToTwo(or - ci)} - ${common_infomed_stat.RoundToTwo(or + ci)})`;
 		}
 	}
 
@@ -297,7 +297,7 @@ export default class OddsRatio {
 class OddsCalc {
 	constructor() {
 		// this.months = [1*12, 2*12, 3*12, 5*12, 10*12];
-		this.months = [1*12];
+		this.months = [1 * 12];
 	}
 
 	GetMonths() {
@@ -308,38 +308,38 @@ class OddsCalc {
 		this.months[idx] = month;
 	}
 
-    _InputDataFromDatasets(datasets, months) {
-        const group_count = datasets.length;
-        let matrix = new Array(group_count).fill(0).map(() => new Array(months.length + 1).fill(NaN));
+	_InputDataFromDatasets(datasets, months) {
+		const group_count = datasets.length;
+		let matrix = new Array(group_count).fill(0).map(() => new Array(months.length + 1).fill(NaN));
 
-        for (let i = 0; i < group_count; i++) {
-            const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events + curr.Alive + curr.Censored, 0);
-            for (let j = 0; j < months.length; j++) {
+		for (let i = 0; i < group_count; i++) {
+			const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events + curr.Alive + curr.Censored, 0);
+			for (let j = 0; j < months.length; j++) {
 
-                const events_before_month = datasets[i].data.reduce((acc, curr) => {
-                    return curr.Time < months[j] ? acc + curr.Events : acc;
-                }, 0)
+				const events_before_month = datasets[i].data.reduce((acc, curr) => {
+					return curr.Time < months[j] ? acc + curr.Events : acc;
+				}, 0)
 
-                matrix[i][j] = {
-                    observation: total_patients - events_before_month,
-                }
-            }
+				matrix[i][j] = {
+					observation: total_patients - events_before_month,
+				}
+			}
 
 			const items_before_last_month = datasets[i].data.filter((item) => item.Time < months[months.length - 1]);
 			// patients who died before last month
-            matrix[i][months.length] = {
-                observation: items_before_last_month.reduce((acc, curr) => acc + curr.Events, 0),
-            }
-        }
+			matrix[i][months.length] = {
+				observation: items_before_last_month.reduce((acc, curr) => acc + curr.Events, 0),
+			}
+		}
 
-        return matrix;
-    }
+		return matrix;
+	}
 
 	_GetProbsByMonth(data, survival_month) {
 		let value = -1
 
 		for (let i = 0; i < data.length; i++) {
-			if(data[i].Time <= survival_month) {
+			if (data[i].Time <= survival_month) {
 				value = data[i].Survival;
 			} else {
 				break;
@@ -385,7 +385,7 @@ class OddsCalc {
 
 		for (let i = 0; i < matrix.length; i++) {
 			for (let j = 0; j < matrix.length; j++) {
-				if(i > j) {
+				if (i > j) {
 					for (let k = 0; k < matrix[0][0].length; k++) {
 						matrix[i][j][k] = {
 							or: odds[i][k].odds / odds[j][k].odds,
@@ -407,7 +407,7 @@ class OddsCalc {
 			let median = 0;
 
 			for (let j = 0; j < data.length; j++) {
-				if(data[j].Survival <= 0.5) {
+				if (data[j].Survival <= 0.5) {
 					median = data[j].Time;
 					break;
 				}
