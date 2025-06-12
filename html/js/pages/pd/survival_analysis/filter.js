@@ -9,7 +9,7 @@ export default class Filter {
 	//		records			- medical records
 	//		filter_group	- reference to the parent filter-group object, will be used to notify parent object if this filter been changed
 	//		dataset_obj		- reference to parent dataset object, it will be used to get KM-metadata
-	constructor(id, records, pre_filter_indices, filter_group, dataset_obj) { 
+	constructor(id, records, pre_filter_indices, filter_group, dataset_obj) {
 		this._records = [];
 		this._pre_filter_indices = [];
 		this._post_filter_indices = [];
@@ -73,8 +73,8 @@ export default class Filter {
 	_GetMedicalNamesAsOptionList(record) {
 		let arr = [];
 
-		for(const property in record) {
-			if(this._IsMedProperty(property)) {
+		for (const property in record) {
+			if (this._IsMedProperty(property)) {
 				arr.push(this._GetMedPropertyDOM(property));
 			}
 		}
@@ -112,8 +112,8 @@ export default class Filter {
 	//		indices - array of filtered indices 
 	//		key		- object field that provides values for HTML option tag
 	_GetValuesOfMedicalRecordsAsOptionList(records, indices, key) {
-		let arr				= [];
-		let unique_values	= this._GetUniqueValues(records, indices, key);
+		let arr = [];
+		let unique_values = this._GetUniqueValues(records, indices, key);
 
 		for (let i = 0; i < unique_values.length; i++) {
 			arr.push(this._GetOptionDOM(unique_values[i]))
@@ -123,7 +123,7 @@ export default class Filter {
 	}
 
 	_Key_ChangeHandler(e) {
-		let	filter_val_sel	= e.target.closest("[placeholder]").querySelector("[values]");
+		let filter_val_sel = e.target.closest("[placeholder]").querySelector("[values]");
 		let option_list = this._GetValuesOfMedicalRecordsAsOptionList(this._records, this._pre_filter_indices, e.target.value);
 
 		filter_val_sel.innerHTML = "";
@@ -151,10 +151,10 @@ export default class Filter {
 	_UpdateMetadata(indices, dom_placeholder) {
 		let km_metadata = this._dataset.GetKMMetadata(indices);
 
-		dom_placeholder.querySelectorAll("[total-record-counter]")[0].innerText		= km_metadata.Total;
-		dom_placeholder.querySelectorAll("[censored-record-counter]")[0].innerText	= km_metadata.Censored;
-		dom_placeholder.querySelectorAll("[alive-record-counter]")[0].innerText		= km_metadata.Alive;
-		dom_placeholder.querySelectorAll("[event-record-counter]")[0].innerText		= km_metadata.Events;
+		dom_placeholder.querySelectorAll("[total-record-counter]")[0].innerText = km_metadata.Total;
+		dom_placeholder.querySelectorAll("[censored-record-counter]")[0].innerText = km_metadata.Censored;
+		dom_placeholder.querySelectorAll("[alive-record-counter]")[0].innerText = km_metadata.Alive;
+		dom_placeholder.querySelectorAll("[event-record-counter]")[0].innerText = km_metadata.Events;
 	}
 
 
@@ -163,14 +163,14 @@ export default class Filter {
 	//		e - event object
 	_Val_ChangeHandler(e) {
 		let selected_values = this._GetSelectedOptionsValues(e.target);
-		let	key_select_tag	= e.target.closest("[placeholder]").querySelectorAll("select[key]")[0];
-		let key				= key_select_tag.value;
+		let key_select_tag = e.target.closest("[placeholder]").querySelectorAll("select[key]")[0];
+		let key = key_select_tag.value;
 
 		this._post_filter_indices = [];
 		for (let i = 0; i < this._pre_filter_indices.length; i++) {
 			let idx = this._pre_filter_indices[i];
 
-			if(selected_values.includes(this._records[idx][key])) {
+			if (selected_values.includes(this._records[idx][key])) {
 				this._post_filter_indices.push(idx);
 			}
 		}
@@ -209,11 +209,11 @@ export default class Filter {
 		filter_val_sel.addEventListener("change", this._Val_ChangeHandler.bind(this));
 
 
-		col				.appendChild(filter_key_div);
-		col				.appendChild(filter_val_div);
+		col.appendChild(filter_key_div);
+		col.appendChild(filter_val_div);
 
-		filter_key_div	.appendChild(filter_key_sel);		
-		filter_val_div	.appendChild(filter_val_sel);		
+		filter_key_div.appendChild(filter_key_sel);
+		filter_val_div.appendChild(filter_val_sel);
 
 		return col;
 	}
@@ -273,26 +273,26 @@ export default class Filter {
 		let filter_row = document.createElement("div");
 		filter_row.classList.add("row");
 
-		wrapper							.appendChild(panel);
-		panel							.appendChild(panel_header);
-		panel							.appendChild(panel_body);
-		panel_header					.appendChild(panel_header_row);
-		panel_header_row				.appendChild(panel_header_col1);
-		panel_header_row				.appendChild(panel_header_col2);
-		panel_header_col1				.appendChild(document.createTextNode(`Фильтр: ${this.id}. Всего записей: `));
-		panel_header_col1				.appendChild(panel_header_total_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Событий: "));
-		panel_header_col1				.appendChild(panel_header_event_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Выбывших: "));
-		panel_header_col1				.appendChild(panel_header_censored_record_counter);
-		panel_header_col1				.appendChild(document.createTextNode(". Живых: "));
-		panel_header_col1				.appendChild(panel_header_alive_record_counter);
-		panel_header_col2				.appendChild(panel_header_hide_button);
-		panel_header_col2				.appendChild(panel_header_download_button);
-		panel_header_hide_button		.appendChild(panel_header_delete_button_icon);
-		panel_header_download_button	.appendChild(panel_header_download_button_icon);
-		panel_body						.appendChild(filter_row);
-		filter_row						.appendChild(this._GetSelectsDOM());
+		wrapper.appendChild(panel);
+		panel.appendChild(panel_header);
+		panel.appendChild(panel_body);
+		panel_header.appendChild(panel_header_row);
+		panel_header_row.appendChild(panel_header_col1);
+		panel_header_row.appendChild(panel_header_col2);
+		panel_header_col1.appendChild(document.createTextNode(`Фильтр: ${this.id}. Всего записей: `));
+		panel_header_col1.appendChild(panel_header_total_record_counter);
+		panel_header_col1.appendChild(document.createTextNode(". Событий: "));
+		panel_header_col1.appendChild(panel_header_event_record_counter);
+		panel_header_col1.appendChild(document.createTextNode(". Выбывших: "));
+		panel_header_col1.appendChild(panel_header_censored_record_counter);
+		panel_header_col1.appendChild(document.createTextNode(". Живых: "));
+		panel_header_col1.appendChild(panel_header_alive_record_counter);
+		panel_header_col2.appendChild(panel_header_hide_button);
+		panel_header_col2.appendChild(panel_header_download_button);
+		panel_header_hide_button.appendChild(panel_header_delete_button_icon);
+		panel_header_download_button.appendChild(panel_header_download_button_icon);
+		panel_body.appendChild(filter_row);
+		filter_row.appendChild(this._GetSelectsDOM());
 
 		system_calls.FireChangeEvent(panel.querySelector("select[key]"));
 
@@ -303,19 +303,18 @@ export default class Filter {
 	// Input:  e		- Event
 	// Output: none
 	_Download_ClickHandler() {
-		if(this._post_filter_indices && this._post_filter_indices.length)
-		{
+		if (this._post_filter_indices && this._post_filter_indices.length) {
 			// collect records filtered by indexes
 			let records_to_save = this._post_filter_indices.map(idx => this._records[parseInt(idx)]);
 
 			let saver = new SaveToXLS();
 			let save_result = saver.Do(records_to_save);
 
-			if(save_result.error instanceof Error) {
+			if (save_result.error instanceof Error) {
 				console.error(save_result.error);
 			}
 		} else {
-			console.debug(`_post_filter_indices array is empty`)	
+			console.debug(`_post_filter_indices array is empty`)
 		}
 	}
 }

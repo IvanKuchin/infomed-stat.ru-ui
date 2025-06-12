@@ -45,19 +45,19 @@ export default class DatasetGroup {
 					// --- ok
 					system_calls.ButtonLoadingEnable(document.getElementById("create_dataset"));
 				} else {
-					throw new Error(`HTTP error! Status: ${ response.status }`);
+					throw new Error(`HTTP error! Status: ${response.status}`);
 				}
 
 				return response.json();
 			})
 			.then(data => {
-				if(data.result == "success") {
+				if (data.result == "success") {
 					this._medical_records = this._PreprocessData(data.medical_records);
 				} else {
 					system_calls.PopoverError($("body"), "Ошибка: " + data.description);
 				}
 			})
-			.catch(err => {throw new Error(err)});
+			.catch(err => { throw new Error(err) });
 	}
 
 
@@ -65,8 +65,8 @@ export default class DatasetGroup {
 		for (let i = 0; i < medical_records.length; i++) {
 			let record = medical_records[i]
 
-			if(record.___death_date.length) { record.___calculated_status = "event"; }
-			else if(record.___study_retirement_date.length) { record.___calculated_status = "censored"; }
+			if (record.___death_date.length) { record.___calculated_status = "event"; }
+			else if (record.___study_retirement_date.length) { record.___calculated_status = "censored"; }
 			else { record.___calculated_status = "alive"; }
 		}
 
