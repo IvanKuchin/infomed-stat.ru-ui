@@ -1,58 +1,53 @@
-var	initial_wizard = initial_wizard || {};
+var initial_wizard = initial_wizard || {};
 
-var	initial_wizard = (function()
-{
+var initial_wizard = (function () {
 	"use strict";
 
-	var		DATE_FORMAT_GLOBAL = "dd/mm/yy";
+	var DATE_FORMAT_GLOBAL = "dd/mm/yy";
 
-	var		current_tab_global = 0;
-	var		submit_obj_global;
-	var		company_arr_global = [];
-	var		counties_obj_global;
+	var current_tab_global = 0;
+	var submit_obj_global;
+	var company_arr_global = [];
+	var counties_obj_global;
 
-	var		call_stack_global = [];
-	var		call_stack_pointer_global = 0;
+	var call_stack_global = [];
+	var call_stack_pointer_global = 0;
 
-	var	Init = function()
-	{
+	var Init = function () {
 		$.ajaxSetup({ cache: false });
 
-		if(session_pi.isCookieAndLocalStorageValid())
-		{
+		if (session_pi.isCookieAndLocalStorageValid()) {
 			InitWizard();
 		}
-		else
-		{
+		else {
 			window.location.href = "/autologin?rand=" + Math.random() * 1234567890;
 		}
 	};
 
-	var	InitWizard = function()
-	{
-		$("#navigate_prev").on("click", function() { MakeStep($(".__tab[data-tab_id='" + current_tab_global + "']").attr("data-prev_tab_id")); });
-		$("#navigate_next").on("click", function() { MakeStep($(".__tab[data-tab_id='" + current_tab_global + "']").attr("data-next_tab_id")); });
+	var InitWizard = function () {
+		$("#navigate_prev").on("click", function () { MakeStep($(".__tab[data-tab_id='" + current_tab_global + "']").attr("data-prev_tab_id")); });
+		$("#navigate_next").on("click", function () { MakeStep($(".__tab[data-tab_id='" + current_tab_global + "']").attr("data-next_tab_id")); });
 
-		$("#role_subc")				.on("click", function() { submit_obj_global.type = "subc"; MakeStep($(this).attr("data-next_tab_id")); });
-		$("#role_approver")			.on("click", function() { submit_obj_global.type = "approver"; MakeStep($(this).attr("data-next_tab_id")); });
-		$("#role_agency_owner")		.on("click", function() { submit_obj_global.type = "agency_owner"; MakeStep($(this).attr("data-next_tab_id")); });
-		$("#role_agency_employee")	.on("click", function() { submit_obj_global.type = "agency_employee"; MakeStep($(this).attr("data-next_tab_id")); });
+		$("#role_subc").on("click", function () { submit_obj_global.type = "subc"; MakeStep($(this).attr("data-next_tab_id")); });
+		$("#role_approver").on("click", function () { submit_obj_global.type = "approver"; MakeStep($(this).attr("data-next_tab_id")); });
+		$("#role_agency_owner").on("click", function () { submit_obj_global.type = "agency_owner"; MakeStep($(this).attr("data-next_tab_id")); });
+		$("#role_agency_employee").on("click", function () { submit_obj_global.type = "agency_employee"; MakeStep($(this).attr("data-next_tab_id")); });
 
-		$("[data-algorithm='check_company_by_tin'] button")	.on("click", CheckCompanyByTIN_ClickHandler);
-		$("[data-algorithm='check_company_by_tin'] input")	.on("input", CheckCompanyByTIN_InputHandler);
+		$("[data-algorithm='check_company_by_tin'] button").on("click", CheckCompanyByTIN_ClickHandler);
+		$("[data-algorithm='check_company_by_tin'] input").on("input", CheckCompanyByTIN_InputHandler);
 
 		$(".__date_picker")
-							.datepicker({
-							      dateFormat: DATE_FORMAT_GLOBAL,
-							      showOtherMonths: true,
-							      selectOtherMonths: true
-							});
+			.datepicker({
+				dateFormat: DATE_FORMAT_GLOBAL,
+				showOtherMonths: true,
+				selectOtherMonths: true
+			});
 
 
 		// --- if autocomplete functionality is not initialized from the beginning
 		// --- it will not pop-up after configured threshold, it will wait one symbol more
 		// --- to overcome this fake autocomplete initialization applied
-		system_calls.CreateAutocompleteWithSelectCallback($("input.__notify_agency_name"), [{0:"0"}], AgencyName_Autocomplete_SelectHandler);
+		system_calls.CreateAutocompleteWithSelectCallback($("input.__notify_agency_name"), [{ 0: "0" }], AgencyName_Autocomplete_SelectHandler);
 		$("input.__notify_agency_name").on("input", AgencyName_Autocomplete_InputHandler);
 
 
@@ -63,75 +58,62 @@ var	initial_wizard = (function()
 		ShowTab(current_tab_global);
 	};
 
-	var	ResetDataStructureAndGUI = function()
-	{
+	var ResetDataStructureAndGUI = function () {
 		submit_obj_global = {};
 	};
 
-	var	ShowTab = function(tab_id)
-	{
-		var	algorithm = $(".__tab[data-tab_id='" + tab_id + "']").attr("data-algorithm");
+	var ShowTab = function (tab_id) {
+		var algorithm = $(".__tab[data-tab_id='" + tab_id + "']").attr("data-algorithm");
 
-		setTimeout(function()
-		{
+		setTimeout(function () {
 			$(".__tab[data-tab_id='" + tab_id + "']").show(200);
 		}, 100);
 
-		if(current_tab_global === 0)
-		{
+		if (current_tab_global === 0) {
 			$(".__control_block").hide();
 			$("#navigate_next").empty().append("Дальше");
 		}
-		else
-		{
+		else {
 			HighlightStepIndicator(tab_id);
 			$(".__control_block").show();
 		}
 
-		if($(".__tab[data-tab_id='" + tab_id + "']").attr("data-next_tab_id") == "-1")
-		{
+		if ($(".__tab[data-tab_id='" + tab_id + "']").attr("data-next_tab_id") == "-1") {
 			$("#navigate_next").empty().append("Оправить");
 		}
-		else
-		{
+		else {
 			$("#navigate_next").empty().append("Дальше");
 		}
 	};
 
-	var	HideTab = function(tab_id)
-	{
+	var HideTab = function (tab_id) {
 		DimStepIndicator(tab_id);
 		$(".__tab[data-tab_id='" + tab_id + "']").hide(100);
 	};
 
-	var	MakeStep = function(tab_id)
-	{
-		var		result = false;
+	var MakeStep = function (tab_id) {
+		var result = false;
 
 		tab_id = parseInt(tab_id);
 
-		if((tab_id > current_tab_global) && (ValidateTab(current_tab_global) === false))
-		{
+		if ((tab_id > current_tab_global) && (ValidateTab(current_tab_global) === false)) {
 			// --- keep result as false
 		}
-		else
-		{
+		else {
 			result = true;
 
-			if(tab_id < 0)
-			{
+			if (tab_id < 0) {
 				// --- submit it to server
 				Build_CallStack_and_SubmitDataToBackend();
 			}
-			else
-			{
-				if(current_tab_global === 0) BuildStepIndicators(tab_id);
+			else {
+				if (current_tab_global === 0) BuildStepIndicators(tab_id);
 
 				HideTab(current_tab_global);
 				current_tab_global = tab_id;
 				ShowTab(current_tab_global);
 
-				if(current_tab_global === 0) ResetDataStructureAndGUI();
+				if (current_tab_global === 0) ResetDataStructureAndGUI();
 			}
 
 		}
@@ -139,199 +121,167 @@ var	initial_wizard = (function()
 		return result;
 	};
 
-	var	ValidateTab = function(tab_id)
-	{
-		var	result		= false;
-		var	algorithm	= $(".__tab[data-tab_id='" + tab_id + "']").attr("data-algorithm");
-		var	first_name_tag, last_name_tag, middle_name_tag, company_tin_tag;
-		var	passport_series_tag, passport_number_tag, passport_issue_date_tag, passport_issue_authority_tag;
-		var	i;
+	var ValidateTab = function (tab_id) {
+		var result = false;
+		var algorithm = $(".__tab[data-tab_id='" + tab_id + "']").attr("data-algorithm");
+		var first_name_tag, last_name_tag, middle_name_tag, company_tin_tag;
+		var passport_series_tag, passport_number_tag, passport_issue_date_tag, passport_issue_authority_tag;
+		var i;
 
-		if(algorithm)
-		{
-			if(algorithm == "personal_data")
-			{
+		if (algorithm) {
+			if (algorithm == "personal_data") {
 				first_name_tag = $(".__tab[data-tab_id='" + tab_id + "'] input.__first_name");
 				last_name_tag = $(".__tab[data-tab_id='" + tab_id + "'] input.__last_name");
 
-				if(first_name_tag.val() === "") system_calls.PopoverError(first_name_tag, "Заполните имя");
-				else if(last_name_tag.val() === "") system_calls.PopoverError(last_name_tag, "Заполните фамилию");
+				if (first_name_tag.val() === "") system_calls.PopoverError(first_name_tag, "Заполните имя");
+				else if (last_name_tag.val() === "") system_calls.PopoverError(last_name_tag, "Заполните фамилию");
 				else result = true;
 			}
-			else if(algorithm == "check_company_by_tin")
-			{
+			else if (algorithm == "check_company_by_tin") {
 				company_tin_tag = $(".__tab[data-tab_id='" + tab_id + "'] input.__tin");
 
-				if(company_tin_tag.attr("data-check_result") != "success") system_calls.PopoverError(company_tin_tag, "Выполните проверку ИНН компании");
+				if (company_tin_tag.attr("data-check_result") != "success") system_calls.PopoverError(company_tin_tag, "Выполните проверку ИНН компании");
 				else result = true;
 			}
-			else if(algorithm == "company_info")
-			{
-				for(i = 0; i < company_arr_global.length; ++i)
-				{
-					if(company_arr_global[i].GetSuffix() == tab_id) break;
+			else if (algorithm == "company_info") {
+				for (i = 0; i < company_arr_global.length; ++i) {
+					if (company_arr_global[i].GetSuffix() == tab_id) break;
 				}
 
-				if(company_arr_global[i].isValid()) result = true;
+				if (company_arr_global[i].isValid()) result = true;
 			}
-			else if(algorithm == "passport_data")
-			{
+			else if (algorithm == "passport_data") {
 				passport_series_tag = $(".__tab[data-tab_id='" + tab_id + "'] input.__passport_series");
 				passport_number_tag = $(".__tab[data-tab_id='" + tab_id + "'] input.__passport_number");
 				passport_issue_date_tag = $(".__tab[data-tab_id='" + tab_id + "'] input.__passport_issue_date");
 				passport_issue_authority_tag = $(".__tab[data-tab_id='" + tab_id + "'] input.__passport_issue_authority");
 
-				if(passport_series_tag.val() === "") system_calls.PopoverError(passport_series_tag, "Заполните серию паспорта");
-				else if(passport_number_tag.val() === "") system_calls.PopoverError(passport_number_tag, "Заполните номер паспорта");
-				else if(passport_issue_date_tag.val() === "") system_calls.PopoverError(passport_issue_date_tag, "Заполните дату выдачи паспорта");
-				else if(passport_issue_authority_tag.val() === "") system_calls.PopoverError(passport_issue_authority_tag, "Заполните кем выдан паспорт");
+				if (passport_series_tag.val() === "") system_calls.PopoverError(passport_series_tag, "Заполните серию паспорта");
+				else if (passport_number_tag.val() === "") system_calls.PopoverError(passport_number_tag, "Заполните номер паспорта");
+				else if (passport_issue_date_tag.val() === "") system_calls.PopoverError(passport_issue_date_tag, "Заполните дату выдачи паспорта");
+				else if (passport_issue_authority_tag.val() === "") system_calls.PopoverError(passport_issue_authority_tag, "Заполните кем выдан паспорт");
 				else result = true;
 			}
-			else if(algorithm == "agency_notification")
-			{
+			else if (algorithm == "agency_notification") {
 				result = true;
 			}
-			else if(algorithm == "eula")
-			{
-				if($("div[data-tab_id='" + tab_id + "'] .eula_acceptance").prop("checked"))
-				{
+			else if (algorithm == "eula") {
+				if ($("div[data-tab_id='" + tab_id + "'] .eula_acceptance").prop("checked")) {
 					result = true;
 				}
-				else
-				{
+				else {
 					system_calls.PopoverError($("#navigate_next"), "Нужно принять условия лицензионного соглашения");
 				}
 			}
-			else
-			{
+			else {
 				console.error("unknown algorithm(" + algorithm + ")");
 			}
 		}
-		else
-		{
+		else {
 			// --- if algorithm not defined, nothing to check
 			result = true;
 		}
 
-		if(result) CompleteStepIndicator(tab_id);
+		if (result) CompleteStepIndicator(tab_id);
 
 		return result;
 	};
 
-	var	GetStepIndicators_DOM = function(start_tab_id)
-	{
-		var	result = $();
-		var	tab_id = start_tab_id;
+	var GetStepIndicators_DOM = function (start_tab_id) {
+		var result = $();
+		var tab_id = start_tab_id;
 
-		while($(".__tab[data-tab_id='" + tab_id + "']").attr("data-next_tab_id"))
-		{
+		while ($(".__tab[data-tab_id='" + tab_id + "']").attr("data-next_tab_id")) {
 			result = result.add(
-								$("<span>").addClass("step").attr("data-tab_id", tab_id)
-							);
+				$("<span>").addClass("step").attr("data-tab_id", tab_id)
+			);
 			tab_id = $(".__tab[data-tab_id='" + tab_id + "']").attr("data-next_tab_id");
 		}
 
 		return result;
 	};
 
-	var BuildStepIndicators = function(start_tab_id)
-	{
+	var BuildStepIndicators = function (start_tab_id) {
 		$("#step_indicators").empty().append(GetStepIndicators_DOM(start_tab_id));
 
 		return;
 	};
 
-	var	CompleteStepIndicator = function(tab_id)
-	{
+	var CompleteStepIndicator = function (tab_id) {
 		$("#step_indicators .step[data-tab_id=\"" + tab_id + "\"]").addClass("complete");
 	};
 
-	var	HighlightStepIndicator = function(tab_id)
-	{
+	var HighlightStepIndicator = function (tab_id) {
 		$("#step_indicators .step[data-tab_id=\"" + tab_id + "\"]").addClass("active");
 	};
 
-	var	DimStepIndicator = function(tab_id)
-	{
+	var DimStepIndicator = function (tab_id) {
 		$("#step_indicators .step[data-tab_id=\"" + tab_id + "\"]").removeClass("active");
 	};
 
-	var	RenderTabsWithCompanyInfo = function()
-	{
+	var RenderTabsWithCompanyInfo = function () {
 		$.getJSON("/cgi-bin/noauth.cgi",
 			{
 				action: "AJAX_getGeoCountryList",
 			})
-			.done(function(data)
-			{
-				if(data.result == "success")
-				{
+			.done(function (data) {
+				if (data.result == "success") {
 					counties_obj_global = data.countries;
 
-					$("[data-content=\"__company_info\"]").each(function() 
-						{
-							var		curr_tag = $(this);
-							var		random = curr_tag.closest(".__tab").attr("data-tab_id");
-							var		company_item;
+					$("[data-content=\"__company_info\"]").each(function () {
+						var curr_tag = $(this);
+						var random = curr_tag.closest(".__tab").attr("data-tab_id");
+						var company_item;
 
-							system_calls.SetCurrentScript("agency.cgi");
-							company_item = new company_info_edit(random);
-							company_item.Init(system_calls.UpdateInputFieldOnServer);
-							company_item.SetCountriesObj(counties_obj_global);
+						system_calls.SetCurrentScript("agency.cgi");
+						company_item = new company_info_edit(random);
+						company_item.Init(system_calls.UpdateInputFieldOnServer);
+						company_item.SetCountriesObj(counties_obj_global);
 
-							company_arr_global.push(company_item);
+						company_arr_global.push(company_item);
 
-							curr_tag
-								.attr("data-random", random)
-								.append(company_item.GetDOM());
-						});
+						curr_tag
+							.attr("data-random", random)
+							.append(company_item.GetDOM());
+					});
 				}
-				else
-				{
-					console.error(curr_tag, "Ошибка: " + data.description);
+				else {
+					console.error("Ошибка: " + data.description);
 				}
 			})
-			.fail(function(data)
-			{
+			.fail(function (data) {
 				console.error("fail to parse server response");
 			});
 
 
 	};
 
-	var	CheckCompanyByTIN_InputHandler = function()
-	{
-		var		company_tin_tag = $(this);
+	var CheckCompanyByTIN_InputHandler = function () {
+		var company_tin_tag = $(this);
 
 		company_tin_tag.attr("data-check_result", "");
 	};
 
-	var	CheckCompanyByTIN_ClickHandler = function()
-	{
-		var		curr_tag = $(this);
-		var		next_tab_id = curr_tag.closest(".__tab").attr("data-next_tab_id");
-		var		company_tin_tag = curr_tag.closest(".row").find("input");
-		var		company_tin_button = curr_tag.closest(".row").find("button");
+	var CheckCompanyByTIN_ClickHandler = function () {
+		var curr_tag = $(this);
+		var next_tab_id = curr_tag.closest(".__tab").attr("data-next_tab_id");
+		var company_tin_tag = curr_tag.closest(".row").find("input");
+		var company_tin_button = curr_tag.closest(".row").find("button");
 
-		if(company_tin_tag.val().length)
-		{
+		if (company_tin_tag.val().length) {
 			company_tin_tag.attr("data-check_result", "");
 			company_tin_button.button("loading");
 
-			if(company_tin_tag.attr("data-company_type") && company_tin_tag.attr("data-company_type").length)
-			{
+			if (company_tin_tag.attr("data-company_type") && company_tin_tag.attr("data-company_type").length) {
 				$.getJSON("/cgi-bin/ajax_anyrole_1.cgi",
 					{
 						action: "AJAX_isCompanyExists",
 						tin: company_tin_tag.val(),
 						company_type: company_tin_tag.attr("data-company_type"),
 					})
-					.done(function(data)
-					{
-						if(data.result == "success")
-						{
-							if(data.isExists == "no")
-							{
+					.done(function (data) {
+						if (data.result == "success") {
+							if (data.isExists == "no") {
 								company_tin_tag.attr("data-check_result", "success");
 								system_calls.PopoverInfo(curr_tag, "Проверка успешна.");
 
@@ -340,42 +290,35 @@ var	initial_wizard = (function()
 									.val(company_tin_tag.val())
 									.attr("disabled", "");
 							}
-							else
-							{
+							else {
 								system_calls.PopoverError(curr_tag, "Компания с таким ИНН уже существует, Вам необходимо восстановить доступ к своей компании.");
 							}
 						}
-						else
-						{
+						else {
 							console.error(curr_tag, "Ошибка: " + data.description);
 						}
 					})
-					.fail(function(data)
-					{
+					.fail(function (data) {
 						system_calls.PopoverError("Сервер вернул ошибку.");
 					})
-					.always(function()
-					{
-						setTimeout(function() { company_tin_button.button("reset"); }, 200);
+					.always(function () {
+						setTimeout(function () { company_tin_button.button("reset"); }, 200);
 					});
 			}
-			else
-			{
+			else {
 				console.error("company_type attr is not defined");
 			}
 
 
 		}
-		else
-		{
+		else {
 			system_calls.PopoverError(company_tin_tag, "Заполните ИНН компании");
 		}
 	};
 
-	var	AgencyName_Autocomplete_InputHandler = function(e)
-	{
-		var	curr_tag = $(this);
-		var	curr_val = curr_tag.val();
+	var AgencyName_Autocomplete_InputHandler = function (e) {
+		var curr_tag = $(this);
+		var curr_val = curr_tag.val();
 
 		$.getJSON(
 			"/cgi-bin/ajax_anyrole_1.cgi",
@@ -383,42 +326,35 @@ var	initial_wizard = (function()
 				action: "AJAX_getAgencyAutocompleteList",
 				name: curr_val,
 			})
-			.done(function(data)
-			{
-				if(data.result == "success")
-				{
+			.done(function (data) {
+				if (data.result == "success") {
 					system_calls.CreateAutocompleteWithSelectCallback(curr_tag, data.autocomplete_list, AgencyName_Autocomplete_SelectHandler);
 				}
-				else
-				{
+				else {
 					system_calls.PopoverInfo(curr_tag.parent(), data.description);
 				}
 			})
-			.fail(function(data)
-			{
+			.fail(function (data) {
 				system_calls.PopoverError(curr_tag.attr("id"), "Ошибка ответа сервера");
 			});
 	};
 
-	var	AgencyName_Autocomplete_SelectHandler = function(event, ui)
-	{
-		var		id = ui.item.id;
-		var 	label = ui.item.label;
+	var AgencyName_Autocomplete_SelectHandler = function (event, ui) {
+		var id = ui.item.id;
+		var label = ui.item.label;
 
-		var		curr_tag = $(this);
-		var		curr_action = curr_tag.attr("data-company_id", id);
+		var curr_tag = $(this);
+		var curr_action = curr_tag.attr("data-company_id", id);
 
 	};
 
-	var	Build_CallStack_and_SubmitDataToBackend = function()
-	{
-		var		tab_id = current_tab_global;
+	var Build_CallStack_and_SubmitDataToBackend = function () {
+		var tab_id = current_tab_global;
 
 		call_stack_global = [];
 		call_stack_pointer_global = 0;
 
-		while(parseInt(tab_id) > 0)
-		{
+		while (parseInt(tab_id) > 0) {
 			call_stack_global.push(tab_id);
 			tab_id = $("[data-tab_id='" + tab_id + "']").attr("data-prev_tab_id");
 		}
@@ -426,60 +362,50 @@ var	initial_wizard = (function()
 		SubmitDataToBackend();
 	};
 
-	var	SubmitDataToBackend = function()
-	{
-		var		algorithm;
-		var		tab_id;
+	var SubmitDataToBackend = function () {
+		var algorithm;
+		var tab_id;
 
-		if(call_stack_global.length)
-		{
+		if (call_stack_global.length) {
 			tab_id = call_stack_global.pop();
 			algorithm = $("[data-tab_id='" + tab_id + "']").attr("data-algorithm");
 
 			SubmitDataToBackendByAlgorithm(algorithm, tab_id);
 		}
-		else
-		{
+		else {
 			// --- redirect to main screen
 			// console.debug("WELL DONE ! REDIRECT TO /");
-			window.location.href = "/?random=" + Math.random()*876543235789;
+			window.location.href = "/?random=" + Math.random() * 876543235789;
 		}
 	};
 
-	var	SubmitDataToBackendByAlgorithm = function(algorithm, tab_id)
-	{
-		var		json_param = {};
-		var		good2go = true;
-		var		company_index;
+	var SubmitDataToBackendByAlgorithm = function (algorithm, tab_id) {
+		var json_param = {};
+		var good2go = true;
+		var company_index;
 
-		if(algorithm)
-		{
-			if(algorithm == "personal_data")
-			{
+		if (algorithm) {
+			if (algorithm == "personal_data") {
 				json_param.action = "AJAX_updatePersonalData";
 				json_param.type = submit_obj_global.type;
 				json_param.first_name = $(".__tab[data-tab_id='" + tab_id + "'] input.__first_name").val();
 				json_param.last_name = $(".__tab[data-tab_id='" + tab_id + "'] input.__last_name").val();
 				json_param.middle_name = $(".__tab[data-tab_id='" + tab_id + "'] input.__middle_name").val();
 			}
-			else if(algorithm == "check_company_by_tin")
-			{
+			else if (algorithm == "check_company_by_tin") {
 			}
-			else if(algorithm == "company_info")
-			{
+			else if (algorithm == "company_info") {
 				// work - on it.
-				for(company_index = 0; company_index < company_arr_global.length; ++company_index)
-				{
-					if(company_arr_global[company_index].GetSuffix() == tab_id)
-					{
-						if(submit_obj_global.type == "subc")			company_arr_global[company_index].SetType("subcontractor");
-						if(submit_obj_global.type == "agency_owner")	company_arr_global[company_index].SetType("agency");
+				for (company_index = 0; company_index < company_arr_global.length; ++company_index) {
+					if (company_arr_global[company_index].GetSuffix() == tab_id) {
+						if (submit_obj_global.type == "subc") company_arr_global[company_index].SetType("subcontractor");
+						if (submit_obj_global.type == "agency_owner") company_arr_global[company_index].SetType("agency");
 
 						company_arr_global[company_index].SubmitNewCompanyToServer()
 							.then(
-									function(result) {SubmitDataToBackend(); }, 
-									function(err) {console.error("fail to create company"); SubmitDataToBackend(); }
-								);
+								function (result) { SubmitDataToBackend(); },
+								function (err) { console.error("fail to create company"); SubmitDataToBackend(); }
+							);
 
 						// --- this block allows avoid repetitive calling recursive.
 						// --- if it will be removed, then recursive func SubmitDataToBackend() will be called after loop
@@ -493,67 +419,56 @@ var	initial_wizard = (function()
 					}
 				}
 			}
-			else if(algorithm == "passport_data")
-			{
+			else if (algorithm == "passport_data") {
 				json_param.action = "AJAX_updatePassportData";
 				json_param.passport_series = $(".__tab[data-tab_id='" + tab_id + "'] input.__passport_series").val();
 				json_param.passport_number = $(".__tab[data-tab_id='" + tab_id + "'] input.__passport_number").val();
 				json_param.passport_issue_date = $(".__tab[data-tab_id='" + tab_id + "'] input.__passport_issue_date").val();
 				json_param.passport_issue_authority = $(".__tab[data-tab_id='" + tab_id + "'] input.__passport_issue_authority").val();
 			}
-			else if(algorithm == "agency_notification")
-			{
+			else if (algorithm == "agency_notification") {
 				json_param.agency_to_notify = $(".__tab[data-tab_id='" + tab_id + "'] input.__notify_agency_name").val();
 
-				if(json_param.agency_to_notify.length)
-				{
-					if(submit_obj_global.type == "subc")
+				if (json_param.agency_to_notify.length) {
+					if (submit_obj_global.type == "subc")
 						json_param.action = "AJAX_notifyAgencyAboutSubcRegistration";
-					else if(submit_obj_global.type == "approver")
+					else if (submit_obj_global.type == "approver")
 						json_param.action = "AJAX_notifyAgencyAboutApproverRegistration";
-					else if(submit_obj_global.type == "agency_employee")
+					else if (submit_obj_global.type == "agency_employee")
 						json_param.action = "AJAX_notifyAgencyAboutEmployeeRegistration";
 					else
 						console.error("unknown notification type: " + submit_obj_global.type);
 				}
 			}
-			else
-			{
+			else {
 				console.error("unknown algorithm(" + algorithm + ")");
 				good2go = false;
 			}
 
-			if(good2go)
-			{
+			if (good2go) {
 				$("#navigate_next").button("loading");
 
-				if((typeof json_param.action != "undefined") && (json_param.action.length))
-				{
+				if ((typeof json_param.action != "undefined") && (json_param.action.length)) {
 					$.getJSON("/cgi-bin/initial_wizard.cgi", json_param)
-						.done(function(data)
-						{
-							if(data.result == "success")
-							{
+						.done(function (data) {
+							if (data.result == "success") {
+								// --- if action is not defined, then it is stub to avoid recursive call
 							}
-							else
-							{
+							else {
 								console.error(curr_tag, json_param.action + ": " + data.description);
 							}
 						})
-						.fail(function(data)
-						{
+						.fail(function (data) {
 							console.error("fail to parse server response");
 						})
-						.always(function()
-						{
+						.always(function () {
 							SubmitDataToBackend(); // --- call recursive until finish or algorithm will not be empty
 						});
 				}
 			}
 		}
 
-		if(typeof json_param.action == "undefined")
-		{
+		if (typeof json_param.action == "undefined") {
 			SubmitDataToBackend(); // --- call recursive until finish or algorithm will not be empty
 		}
 	};

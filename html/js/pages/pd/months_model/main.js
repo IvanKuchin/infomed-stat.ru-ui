@@ -1,5 +1,3 @@
-/*globals common_infomed_stat, system_calls, $*/
-
 import DatasetPreprocess from "./data_preprocess.js"
 import TrainNN from "./train_nn.js"
 import InferenceUI from "./inference_ui.js"
