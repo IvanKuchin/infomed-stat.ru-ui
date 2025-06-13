@@ -534,6 +534,24 @@ export default class Dataset {
 		return data;
 	}
 
+	_ConvertKMToCox(data) {
+		let T = [];
+		let E = [];
+
+		for (let i = 0; i < data.length; i++) {
+			for (let j = 0; j < data[i].Events; j++) {
+				T.push(data[i].Time);
+				E.push(1);
+			}
+			for (let j = 0; j < data[i].Censored; j++) {
+				T.push(data[i].Time);
+				E.push(0);
+			}
+		}
+
+		return { T: T, E: E };
+	}
+
 	Indices_ChangeHandler() {
 		let indices = this._GetIndicesFromDatasets(this._filter_groups);
 
@@ -557,7 +575,8 @@ export default class Dataset {
 		this._or.UpdateDataset(this.id, km_data);
 		this._or.UpdateUI();
 
-		this._coxph.UpdateDataset(this.id, km_data);
+		let cox_data = this._ConvertKMToCox(km_data);
+		this._coxph.UpdateDataset(this.id, cox_data);
 		this._coxph.UpdateUI();
 	}
 
