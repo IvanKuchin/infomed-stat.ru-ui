@@ -36,7 +36,7 @@ overrides:
   - files: 
       # --- infomed-stat
       - "**/months_model/*.js"
-      - "**/survival_analysis/*.js"
+      - "**/survival_analysis/**/*.js"
       - "**/pd/save2xls.js"
       # --- connme
       - "**/view_profile.js"
