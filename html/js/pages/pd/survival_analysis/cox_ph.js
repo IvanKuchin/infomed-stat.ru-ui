@@ -77,8 +77,8 @@ export default class CoxPH {
         let ds1 = datasets[i];
         let ds2 = datasets[j];
 
-        ds1.data.X = ds1.data.T.map(0);
-        ds2.data.X = ds2.data.T.map(1);
+        ds1.data.X = ds1.data.T.map(() => 0);
+        ds2.data.X = ds2.data.T.map(() => 1);
 
         let T = ds1.data.T.concat(ds2.data.T);
         let E = ds1.data.E.concat(ds2.data.E);
