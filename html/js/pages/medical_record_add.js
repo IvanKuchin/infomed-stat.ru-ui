@@ -264,6 +264,48 @@ var medical_record_add = (function () {
 		return true;
 	}
 
+	var _FinalCheck4 = function () {
+		let birthdate_str = document.querySelectorAll(".___birthdate")[0].value;
+		let dates = document.querySelectorAll("input[type='date']:not(.___birthdate)");
+
+		for (let i = 0; i < dates.length; i++) {
+			let date_str = dates[i].value;
+
+			if (date_str.length) {
+				if (new Date(birthdate_str) > new Date(date_str)) {
+					let uniq_medical_id = dates[i].getAttribute("data-uniq_medical_id");
+					let spelling = common_infomed_stat.GetMedicalItemNameSpelling(uniq_medical_id);
+					system_calls.PopoverError($("#navigate_next"), "Дата рождения не может быть позже даты " + spelling);
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	var _FinalCheck5 = function () {
+		let death_date = document.querySelectorAll(".___death_date")[0].value;
+		let dates = document.querySelectorAll("input[type='date']:not(.___death_date)");
+
+		if (death_date.length > 0) {
+			for (let i = 0; i < dates.length; i++) {
+				let date_str = dates[i].value;
+
+				if (date_str.length) {
+					if (new Date(date_str) > new Date(death_date)) {
+						let uniq_medical_id = dates[i].getAttribute("data-uniq_medical_id");
+						let spelling = common_infomed_stat.GetMedicalItemNameSpelling(uniq_medical_id);
+						system_calls.PopoverError($("#navigate_next"), "Дата " + spelling + " не может быть позже даты смерти");
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
 	var ValidateTab = function (tab_id) {
 		var result = false;
 		var algorithm = $(".__tab[data-tab_id='" + tab_id + "']").attr("data-algorithm");
@@ -307,7 +349,7 @@ var medical_record_add = (function () {
 				}
 			}
 			else if (algorithm == "final_check") {
-				if (_FinalCheck1() && _FinalCheck2() && _FinalCheck3()) {
+				if (_FinalCheck1() && _FinalCheck2() && _FinalCheck3() && _FinalCheck4() && _FinalCheck5()) {
 					result = true;
 				}
 			}
