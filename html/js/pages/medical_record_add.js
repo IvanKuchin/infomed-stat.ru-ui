@@ -288,11 +288,11 @@ var medical_record_add = (function () {
 		let death_date = document.querySelectorAll(".___death_date")[0].value;
 		let dates = document.querySelectorAll("input[type='date']:not(.___death_date)");
 
-		if (death_date.length > 0) {
+		if (death_date.length > 0 && _isValidDate(death_date)) {
 			for (let i = 0; i < dates.length; i++) {
 				let date_str = dates[i].value;
 
-				if (date_str.length) {
+				if (date_str.length && _isValidDate(date_str)) {
 					if (new Date(date_str) > new Date(death_date)) {
 						let uniq_medical_id = dates[i].getAttribute("data-uniq_medical_id");
 						let spelling = common_infomed_stat.GetMedicalItemNameSpelling(uniq_medical_id);
