@@ -271,7 +271,7 @@ var medical_record_add = (function () {
 		for (let i = 0; i < dates.length; i++) {
 			let date_str = dates[i].value;
 
-			if (date_str.length) {
+			if (date_str.length && _isValidDate(birthdate_str) && _isValidDate(date_str)) {
 				if (new Date(birthdate_str) > new Date(date_str)) {
 					let uniq_medical_id = dates[i].getAttribute("data-uniq_medical_id");
 					let spelling = common_infomed_stat.GetMedicalItemNameSpelling(uniq_medical_id);
