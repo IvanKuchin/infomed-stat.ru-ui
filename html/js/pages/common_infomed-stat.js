@@ -110,7 +110,6 @@ var common_infomed_stat = (function () {
 	dictionary.vascular_type_vein = "вена";
 	dictionary.venous_confluence = "венозный конфлюенс";
 	dictionary.zip_code = "индекс";
-	dictionary.calculated_status = "статус";
 
 	var GetRussianSpelling = function (eng_name) {
 		return dictionary[eng_name];
