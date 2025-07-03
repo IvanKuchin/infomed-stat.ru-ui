@@ -86,3 +86,4 @@ ftpsync.settings
 sql
 sublime/
 node_modules/
+package-lock.json
