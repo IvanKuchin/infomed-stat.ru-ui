@@ -4,7 +4,7 @@
     "target": "es6",
     "strict": true,
     "verbatimModuleSyntax": true,
-    "declaration": true,
+    "declaration": false,
     "sourceMap": false,
     "declarationMap": false,
     "rootDir": "src",

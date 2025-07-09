@@ -131,7 +131,7 @@ export default class Dataset {
         collapse_body.appendChild(this._GetDatasetControlDOM());
         return panel;
     }
-    _GetWarningDOM() {
+    private _GetWarningDOM() {
         let warning = document.createElement("div");
         warning.classList.add("alert", "alert-warning");
         warning.setAttribute("role", "alert");
@@ -140,7 +140,7 @@ export default class Dataset {
         warning.appendChild(document.createTextNode("LogRank вычисления требуют по крайней мере 30 записей."));
         return warning;
     }
-    _GetDatasetControlDOM() {
+    private _GetDatasetControlDOM() {
         let wrapper = document.createElement("div");
         wrapper.classList.add("col-xs-12", "form-group");
         let row = document.createElement("div");
@@ -170,15 +170,15 @@ export default class Dataset {
         col_button.appendChild(filters_row_button);
         return wrapper;
     }
-    _ToggleCollapsible(): void {
+    private _ToggleCollapsible(): void {
         // @ts-ignore
         ($ as any)("[dataset='" + this.id + "'] .collapse").collapse("toggle");
     }
-    _CallDate_ChangeHandler(): void {
+    private _CallDate_ChangeHandler(): void {
         console.debug("Call date: change handler");
         this.Indices_ChangeHandler();
     }
-    _AddFilterGroup_ClickHandler(): void {
+    private _AddFilterGroup_ClickHandler(): void {
         let new_id = this._filter_groups.length ? this._filter_groups[this._filter_groups.length - 1].id + 1 : 0;
         let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`), this);
         this._filter_groups.push(filter_group);
@@ -192,7 +192,7 @@ export default class Dataset {
     // Delete dataset with id == id from datasets[]
     // Input:
     //		id - dataset.id to be deleted
-    _RemoveFilterGroupFromArray(id: number): void {
+    private _RemoveFilterGroupFromArray(id: number): void {
         let filter_groups = this._filter_groups;
         for (var i = 0; i < filter_groups.length; i++) {
             if (filter_groups[i].id == id) {
@@ -202,7 +202,7 @@ export default class Dataset {
         }
     }
     // Remove filter-group from GUI and filters[]
-    _RemoveFilterGroup_ClickHandler(e: Event): void {
+    private _RemoveFilterGroup_ClickHandler(e: Event): void {
         const target = e.target as HTMLElement;
         let id = Number(target.getAttribute("close"));
         let tag = target.closest(`[filter-group="${id}"]`);
@@ -220,7 +220,7 @@ export default class Dataset {
     //		start1 - most priority
     //		start2 - medium
     //		start3 - least
-    _GetMonthsBetweenDates(start1: string, start2: string, start3: string, _finish: string): { error: Error | null, months: number } {
+    private _GetMonthsBetweenDates(start1: string, start2: string, start3: string, _finish: string): { error: Error | null, months: number } {
         let error: Error | null = null;
         let months = 0;
         let d1 = new Date(start1);
@@ -248,7 +248,7 @@ export default class Dataset {
     //			Event		- [] of record indexes with event happened
     //			Censored	- [] of record indexes with censoring happened
     //			Alive		- number of records that alive
-    _GetEventCensorIndexes(indexes: number[]): { Event: number[], Censored: number[], Alive: number[] } {
+    private _GetEventCensorIndexes(indexes: number[]): { Event: number[], Censored: number[], Alive: number[] } {
         let censored_idxs: number[] = [];
         let event_idxs: number[] = [];
         let alive_idxs: number[] = [];
@@ -275,7 +275,7 @@ export default class Dataset {
     //			Censored	- number of censored
     //			Alive		- number of alive
     //			Total		- sum of all above
-    GetKMMetadata(indexes: number[]): { Events: number, Censored: number, Alive: number, Total: number } {
+    private GetKMMetadata(indexes: number[]): { Events: number, Censored: number, Alive: number, Total: number } {
         let obj = this._GetEventCensorIndexes(indexes);
         return {
             Events: obj.Event.length,
@@ -284,10 +284,10 @@ export default class Dataset {
             Total: obj.Event.length + obj.Censored.length + obj.Alive.length,
         };
     }
-    _GetBasicKMObject(): { Censored: number, Events: number, Alive: number, Patients: any[] } {
+    private _GetBasicKMObject(): { Censored: number, Events: number, Alive: number, Patients: any[] } {
         return { Censored: 0, Events: 0, Alive: 0, Patients: [] };
     }
-    _GetPatientBriefObj(record: any, status: string): any {
+    private _GetPatientBriefObj(record: any, status: string): any {
         return {
             first_name: record.___first_name,
             last_name: record.___last_name,
@@ -302,7 +302,7 @@ export default class Dataset {
     // 			Time		- time in months till censoring or event
     //			Censored	- number of events at this time
     //			Events		- number of events at this time
-    _GetTimeDtCtOfEventCensor(indices_map: { Censored: number[], Event: number[], Alive: number[] }, call_date: string): any[] {
+    private _GetTimeDtCtOfEventCensor(indices_map: { Censored: number[], Event: number[], Alive: number[] }, call_date: string): any[] {
         let km_map = new Map<number, { Censored: number, Events: number, Alive: number, Patients: any[] }>();
         for (let i = indices_map.Censored.length - 1; i >= 0; i--) {
             let record_idx = indices_map.Censored[i];
@@ -371,7 +371,7 @@ export default class Dataset {
         return km_sorted;
     }
     // Add KM-specific data
-    _KMaddSurvival(km_base: any[]): any[] {
+    private _KMaddSurvival(km_base: any[]): any[] {
         // Walk over table from the bottom to the top to calculate cumulative at risk numbers
         for (let i = km_base.length - 1; i >= 0; i--) {
             let cumulative_at_risk = (i < km_base.length - 1) ? km_base[i + 1].AtRisk : 0;
@@ -392,13 +392,13 @@ export default class Dataset {
     //			Events		- number of events at this time
     //			Alive		- number of alive at this time
     //			Patients	- list of all patients at timestamp
-    _CalculateKMSurvivalData(indexes: number[], call_date: string): any[] {
+    private _CalculateKMSurvivalData(indexes: number[], call_date: string): any[] {
         let indices_map = this._GetEventCensorIndexes(indexes);
         let km_base = this._GetTimeDtCtOfEventCensor(indices_map, call_date);
         let km_survival = this._KMaddSurvival(km_base);
         return km_survival;
     }
-    _ToggleDatasetVisibility_ClickHandler(): void {
+    private _ToggleDatasetVisibility_ClickHandler(): void {
         this._visibility = !this._visibility;
         if (this._visibility) {
             this.Indices_ChangeHandler();
@@ -414,7 +414,7 @@ export default class Dataset {
             this._coxph.UpdateUI();
         }
     }
-    _GetIndicesFromDatasets(filter_groups: FilterGroup[]): number[] {
+    private _GetIndicesFromDatasets(filter_groups: FilterGroup[]): number[] {
         let indices: number[] = [];
         for (let i = 0; i < filter_groups.length; i++) {
             if (filter_groups[i].indices) {
@@ -427,7 +427,7 @@ export default class Dataset {
         }
         return Array.from(map.keys());
     }
-    _ShowHideLogRankWarning(number_of_records: number): void {
+    private _ShowHideLogRankWarning(number_of_records: number): void {
         let tag = document.querySelectorAll(`[dataset='${this._id}'] [logrank-warning]`)[0] as HTMLElement;
         if (isNaN(number_of_records)) {
             tag.setAttribute("hidden", "");
@@ -446,10 +446,10 @@ export default class Dataset {
     //		data - KM data
     // Output:
     //		array of LogRank data
-    _CalculateLogRank(data: any): any {
+    private _CalculateLogRank(data: any): any {
         return data;
     }
-    _ConvertKMToCox(data: any[]): { T: number[], E: number[] } {
+    private _ConvertKMToCox(data: any[]): { T: number[], E: number[] } {
         let T: number[] = [];
         let E: number[] = [];
         for (let i = 0; i < data.length; i++) {
@@ -488,7 +488,7 @@ export default class Dataset {
     // Click handler to download filtered records
     // Input:  e		- Event
     // Output: none
-    _Download_ClickHandler(): void {
+    private _Download_ClickHandler(): void {
         let indices = this._GetIndicesFromDatasets(this._filter_groups);
         if (indices && indices.length) {
             // collect records filtered by indexes
