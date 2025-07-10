@@ -8,7 +8,6 @@ import KaplanMeier from "./kaplan-meier.js";
 import LogRank from "./log_rank.js";
 // @ts-ignore
 import OddsRatio from "./odds_ratio.js";
-// @ts-ignore
 import CoxPH from "./cox_ph.js";
 export default class Dataset {
     constructor(id, records, km, lr, or, coxph) {
@@ -434,8 +433,8 @@ export default class Dataset {
         return data;
     }
     _ConvertKMToCox(data) {
-        let T = [];
-        let E = [];
+        const T = [];
+        const E = [];
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i].Events; j++) {
                 T.push(data[i].Time);
@@ -446,7 +445,7 @@ export default class Dataset {
                 E.push(0);
             }
         }
-        return { T: T, E: E };
+        return { T, E };
     }
     Indices_ChangeHandler() {
         let indices = this._GetIndicesFromDatasets(this._filter_groups);

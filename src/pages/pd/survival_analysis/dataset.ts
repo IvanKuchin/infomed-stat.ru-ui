@@ -8,8 +8,9 @@ import KaplanMeier from "./kaplan-meier.js";
 import LogRank from "./log_rank.js";
 // @ts-ignore
 import OddsRatio from "./odds_ratio.js";
-// @ts-ignore
+
 import CoxPH from "./cox_ph.js";
+import type { UnivariateData } from "./cox_ph.js";
 
 export default class Dataset {
     private _id: number;
@@ -41,7 +42,8 @@ export default class Dataset {
     }
     get id() { return this._id; }
     set id(id: number) { this._id = id; }
-    GetDOM(): HTMLElement {
+
+    public GetDOM(): HTMLElement {
         let panel_wrapper_container = document.createElement("div");
         panel_wrapper_container.classList.add("container", "single_block", "box-shadow--6dp");
         let panel_wrapper_row = document.createElement("div");
@@ -210,7 +212,7 @@ export default class Dataset {
         this._RemoveFilterGroupFromArray(id);
         this.Indices_ChangeHandler();
     }
-    AddToParent(parentDOM: HTMLElement): void {
+    public AddToParent(parentDOM: HTMLElement): void {
         parentDOM.appendChild(this.GetDOM());
         this._ToggleCollapsible();
         // this.Indices_ChangeHandler();
@@ -449,9 +451,9 @@ export default class Dataset {
     private _CalculateLogRank(data: any): any {
         return data;
     }
-    private _ConvertKMToCox(data: any[]): { T: number[], E: number[] } {
-        let T: number[] = [];
-        let E: number[] = [];
+    private _ConvertKMToCox(data: any[]): UnivariateData {
+        const T: number[] = [];
+        const E: number[] = [];
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i].Events; j++) {
                 T.push(data[i].Time);
@@ -462,9 +464,9 @@ export default class Dataset {
                 E.push(0);
             }
         }
-        return { T: T, E: E };
+        return { T, E };
     }
-    Indices_ChangeHandler(): void {
+    public Indices_ChangeHandler(): void {
         let indices = this._GetIndicesFromDatasets(this._filter_groups);
         let km_metadata = this.GetKMMetadata(indices);
         (document.querySelectorAll(`[dataset='${this._id}'] [total-record-counter]`)[0] as HTMLElement).innerText = String(km_metadata.Total);

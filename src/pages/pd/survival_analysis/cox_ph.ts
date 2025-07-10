@@ -1,22 +1,26 @@
-import { coxphFit, CoxphFitResult } from './coxph/modules/cox-univariate.js';
+// @ts-ignore
+import { coxphFit } from './coxph/modules/cox-univariate.js';
+// @ts-ignore
 import { pValue } from './coxph/modules/p-value.js';
 
-// --- Types for dataset and results
-export type DatasetData = {
+import type { CoxphFitResult } from './coxph/modules/cox-univariate.d.ts';
+
+
+/// --- Types for dataset and results
+export type UnivariateData = {
     T: number[];
     E: number[];
-    X?: number[];
-    [key: string]: any;
+    X?: number[]; // Optional, used in CoxPH
 };
 
-export type DatasetObject = {
+type DatasetObject = {
     parent_id: number;
-    data: DatasetData;
+    data: UnivariateData;
 };
 
 type CombinedDatasetResult = {
     error: string | null;
-    dataset: { T: number[]; E: number[]; X: number[] } | null;
+    dataset: UnivariateData | null;
 };
 
 type CoxResult = {
@@ -59,7 +63,7 @@ export default class CoxPH {
 
     // Replaces dataset with parent_id in datasets array with one provided as a parameter
     // Output: none 
-    public UpdateDataset(parent_id: number, data: DatasetData): void {
+    public UpdateDataset(parent_id: number, data: UnivariateData): void {
         let datasets = this._datasets;
         let ds_idx = this._FindDSIndexByParentID(parent_id);
 
