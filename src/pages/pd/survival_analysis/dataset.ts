@@ -11,6 +11,7 @@ import OddsRatio from "./odds_ratio.js";
 
 import CoxPH from "./cox_ph.js";
 import type { UnivariateData } from "./cox_ph.js";
+import type { Patient } from "./kaplan-meier.js";
 
 export default class Dataset {
     private _id: number;
@@ -289,7 +290,7 @@ export default class Dataset {
     private _GetBasicKMObject(): { Censored: number, Events: number, Alive: number, Patients: any[] } {
         return { Censored: 0, Events: 0, Alive: 0, Patients: [] };
     }
-    private _GetPatientBriefObj(record: any, status: string): any {
+    private _GetPatientBriefObj(record: any, status: string): Patient {
         return {
             first_name: record.___first_name,
             last_name: record.___last_name,
@@ -364,7 +365,7 @@ export default class Dataset {
             }
         }
         // --- Convert map to array
-        let km_arr: { Time: number, Censored: number, Events: number, Alive: number, Patients: any[] }[] = [{ Time: 0, Censored: 0, Events: 0, Alive: 0, Patients: [] }];
+        let km_arr: { Time: number, Censored: number, Events: number, Alive: number, Patients: Patient[] }[] = [{ Time: 0, Censored: 0, Events: 0, Alive: 0, Patients: [] }];
         km_map.forEach((v, k) => {
             km_arr.push({ Time: k, Censored: v.Censored, Events: v.Events, Alive: v.Alive, Patients: v.Patients });
         });

@@ -1,7 +1,7 @@
 // Type definitions for Chart.js (minimal, for local usage)
 declare const Chart: any;
 
-type Patient = {
+export type Patient = {
 	last_name: string;
 	first_name: string;
 	middle_name: string;
