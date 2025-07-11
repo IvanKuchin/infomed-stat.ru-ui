@@ -1,6 +1,4 @@
-// @ts-ignore
 import ChiSquare from "./chi_square.js";
-// @ts-ignore
 import FishersExactTest from "./fisher.js";
 export default class OddsRatio {
     constructor(id) {

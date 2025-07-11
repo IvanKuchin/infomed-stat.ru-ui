@@ -1,9 +1,10 @@
-// @ts-ignore
-import ChiSquare from "./chi_square.js";
-// @ts-ignore
-import FishersExactTest from "./fisher.js";
 // @ts-ignore: Assume this is a global utility
 declare const common_infomed_stat: any;
+
+import ChiSquare from "./chi_square.js";
+import FishersExactTest from "./fisher.js";
+
+import type { ChiCell } from "./chi_square.js";
 
 // Type definitions
 interface Dataset {
@@ -33,11 +34,6 @@ interface OddsCell {
 interface ORCell {
 	or: number;
 	ci: number;
-}
-
-interface ChiCell {
-	observation: number;
-	expectation: number;
 }
 
 interface OddsRatioCalcs {

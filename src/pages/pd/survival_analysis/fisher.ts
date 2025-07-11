@@ -1,48 +1,56 @@
 import Factorial from "./factorial.js";
+// @ts-ignore
+declare const common_infomed_stat: any;
+
 export default class FishersExactTest {
+    validity_threshold: number;
     constructor() {
         this.validity_threshold = 10;
     }
-    _InputDataFromDatasets(datasets, months) {
+
+    _InputDataFromDatasets(datasets: any[], months: any[]): any[][] {
         const group_count = datasets.length;
         let matrix = new Array(group_count).fill(0).map(() => new Array(months.length + 1).fill(NaN));
+
         for (let i = 0; i < group_count; i++) {
-            const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events + curr.Alive + curr.Censored, 0);
+            const total_patients = datasets[i].data.reduce((acc: number, curr: any) => acc + curr.Events + curr.Alive + curr.Censored, 0);
             for (let j = 0; j < months.length; j++) {
-                const events_before_month = datasets[i].data.reduce((acc, curr) => {
+                const events_before_month = datasets[i].data.reduce((acc: number, curr: any) => {
                     return curr.Time < months[j] ? acc + curr.Events : acc;
-                }, 0);
+                }, 0)
                 matrix[i][j] = {
                     observation: total_patients - events_before_month,
-                };
+                }
             }
-            const items_before_last_month = datasets[i].data.filter((item) => item.Time < months[months.length - 1]);
+            const items_before_last_month = datasets[i].data.filter((item: any) => item.Time < months[months.length - 1]);
             matrix[i][months.length] = {
-                observation: items_before_last_month.reduce((acc, curr) => acc + curr.Events, 0),
-            };
+                observation: items_before_last_month.reduce((acc: number, curr: any) => acc + curr.Events, 0),
+            }
         }
         return matrix;
     }
-    _Factorial(n) {
+
+    _Factorial(n: number): number {
         if (n == 0) {
             return 1;
         }
         return n * this._Factorial(n - 1);
     }
-    _GetNumeratorAndDenominator(matrix) {
+
+    _GetNumeratorAndDenominator(matrix: any[][]): { numerator: number[]; denominator: number[] } {
         const rows = matrix.length;
         const columns = matrix[0].length;
         let total_per_row = new Array(rows).fill(0);
         let total_per_column = new Array(columns).fill(0);
         for (let i = 0; i < total_per_row.length; i++) {
-            total_per_row[i] = matrix[i].reduce((acc, curr) => acc + curr.observation, 0);
+            total_per_row[i] = matrix[i].reduce((acc: number, curr: any) => acc + curr.observation, 0);
         }
         for (let j = 0; j < total_per_column.length; j++) {
-            total_per_column[j] = matrix.reduce((acc, curr) => acc + curr[j].observation, 0);
+            total_per_column[j] = matrix.reduce((acc: number, curr: any[]) => acc + curr[j].observation, 0);
         }
-        const total = total_per_row.reduce((acc, curr) => acc + curr, 0);
+        const total = total_per_row.reduce((acc: number, curr: number) => acc + curr, 0);
         const numerator = total_per_row.concat(total_per_column);
-        let denominator = [];
+        let denominator: number[] = [];
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < columns; j++) {
                 denominator.push(matrix[i][j].observation);
@@ -51,12 +59,14 @@ export default class FishersExactTest {
         denominator.push(total);
         return { numerator, denominator };
     }
-    _CalcP(matrix) {
+
+    _CalcP(matrix: any[][]): number {
         const { numerator, denominator } = this._GetNumeratorAndDenominator(matrix);
         const f = new Factorial();
         return f.calc_ratio(numerator, denominator);
     }
-    _GetMaxIndexes(matrix) {
+
+    _GetMaxIndexes(matrix: any[][]): { i_max: number; j_max: number } {
         let i_max = 0;
         let j_max = 0;
         for (let i = 0; i < matrix.length; i++) {
@@ -69,23 +79,25 @@ export default class FishersExactTest {
         }
         return { i_max, j_max };
     }
-    _GetModifiedMatrix(i_max, j_max, curr, sum_per_row, sum_per_column) {
+
+    _GetModifiedMatrix(i_max: number, j_max: number, curr: number, sum_per_row: number[], sum_per_column: number[]): any[][] {
         let matrix = new Array(sum_per_row.length).fill(0).map(() => new Array(sum_per_column.length).fill(NaN));
         matrix[i_max][j_max] = {
             observation: curr,
-        };
+        }
         matrix[i_max][(j_max + 1) % 2] = {
             observation: sum_per_row[i_max] - matrix[i_max][j_max].observation,
-        };
+        }
         matrix[(i_max + 1) % 2][j_max] = {
             observation: sum_per_column[j_max] - matrix[i_max][j_max].observation,
-        };
+        }
         matrix[(i_max + 1) % 2][(j_max + 1) % 2] = {
             observation: sum_per_row[(i_max + 1) % 2] - matrix[(i_max + 1) % 2][j_max].observation,
-        };
+        }
         return matrix;
     }
-    _SkipMatrix(matrix) {
+
+    _SkipMatrix(matrix: any[][]): boolean {
         for (let i = 0; i < matrix.length; i++) {
             for (let j = 0; j < matrix[0].length; j++) {
                 if (matrix[i][j].observation < 0) {
@@ -95,12 +107,13 @@ export default class FishersExactTest {
         }
         return false;
     }
-    _SumOfPLessThanCutoff(matrix) {
+
+    _SumOfPLessThanCutoff(matrix: any[][]): number[] {
         const { i_max, j_max } = this._GetMaxIndexes(matrix);
         const max = matrix[i_max][j_max].observation;
-        let p_array = [];
-        const sum_per_row = matrix.map((row) => row.reduce((acc, curr) => acc + curr.observation, 0));
-        const sum_per_column = matrix[0].map((_, index) => matrix.reduce((acc, curr) => acc + curr[index].observation, 0));
+        let p_array: number[] = [];
+        const sum_per_row = matrix.map((row: any[]) => row.reduce((acc: number, curr: any) => acc + curr.observation, 0));
+        const sum_per_column = matrix[0].map((_: any, index: number) => matrix.reduce((acc: number, curr: any[]) => acc + curr[index].observation, 0));
         for (let curr = 1; curr <= max; curr++) {
             const matrix_mod = this._GetModifiedMatrix(i_max, j_max, curr, sum_per_row, sum_per_column);
             if (this._SkipMatrix(matrix_mod)) {
@@ -113,11 +126,13 @@ export default class FishersExactTest {
         }
         return p_array;
     }
-    Calculate(datasets, months) {
+
+    Calculate(datasets: any[], months: any[]): any[][] {
         let matrix = this._InputDataFromDatasets(datasets, months);
         return matrix;
     }
-    _GetEquation(matrix) {
+
+    _GetEquation(matrix: any[][]): Element {
         let math_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
         math_tag.setAttribute("xmlns", "http://www.w3.org/1998/Math/MathML");
         let left_side_sub = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msub");
@@ -170,7 +185,8 @@ export default class FishersExactTest {
         math_tag.appendChild(result_tag);
         return math_tag;
     }
-    _GetValidity(matrix) {
+
+    _GetValidity(matrix: any[][]): { tag: Element; validity: boolean } {
         let flag = false;
         let message = `в таблице нет значений меньше ${this.validity_threshold}`;
         for (let i = 0; i < matrix.length; i++) {
@@ -204,8 +220,7 @@ export default class FishersExactTest {
         if (flag) {
             tag2.className = "alert alert-success fa fa-check";
             tag2.innerHTML = "&nbsp; Вычисления можно применять";
-        }
-        else {
+        } else {
             tag2.className = "alert alert-danger fa fa-times";
             tag2.innerHTML = `&nbsp; Вычисления применять нельзя, так как ${message}`;
         }
@@ -216,7 +231,8 @@ export default class FishersExactTest {
             validity: flag,
         };
     }
-    _GetConclusion(p_cutoff, sum_of_p_less_than_p_cutoff) {
+
+    _GetConclusion(p_cutoff: number, sum_of_p_less_than_p_cutoff: number): Element {
         const p_table = [0.005, 0.01, 0.025, 0.05, 0.1, 0.9, 0.95, 0.975, 0.99, 0.995].reverse();
         let tag_parent = document.createElement("div");
         for (let i = 0; i < p_table.length; i++) {
@@ -224,8 +240,7 @@ export default class FishersExactTest {
             if (sum_of_p_less_than_p_cutoff < p_table[i]) {
                 tag_child.className = "fa fa-times";
                 tag_child.innerHTML = `&nbsp; Есть основания отклонмть H0, потому что ${common_infomed_stat.RoundToFour(sum_of_p_less_than_p_cutoff)} < ${p_table[i]}. Есть статистически значимая связь между группами при a = ${p_table[i]}`;
-            }
-            else {
+            } else {
                 tag_child.className = "fa fa-check";
                 tag_child.innerHTML = `&nbsp; Нет оснований отклонять H0, потому что ${common_infomed_stat.RoundToFour(sum_of_p_less_than_p_cutoff)} >= ${p_table[i]}. Статистически при a = ${p_table[i]} группы <b>независимы</b>`;
             }
@@ -233,10 +248,12 @@ export default class FishersExactTest {
         }
         return tag_parent;
     }
-    _AddExplanations(explanation_id, text) {
-        document.querySelector(`[${explanation_id}]`).innerHTML = text;
+
+    _AddExplanations(explanation_id: string, text: string): void {
+        (document.querySelector(`[${explanation_id}]`) as HTMLElement).innerHTML = text;
     }
-    _WarnIfFarFromOne(sum_of_p_array) {
+
+    _WarnIfFarFromOne(sum_of_p_array: number): void {
         const tag = document.querySelector("[fisher-p-sum]");
         while (tag && tag.firstChild) {
             tag.removeChild(tag.firstChild);
@@ -245,15 +262,14 @@ export default class FishersExactTest {
         if (Math.abs(sum_of_p_array - 1) > 0.1) {
             new_tag.innerHTML = `Сумма других возможных p-матриц ${common_infomed_stat.RoundToFour(sum_of_p_array)} далека от 1. Вычисления нельзя считать корректными. Попробуйте поменять период выживаемости`;
             new_tag.className = "alert alert-danger fa";
-        }
-        else {
+        } else {
             new_tag.innerHTML = `Сумма других возможных p-матриц ${common_infomed_stat.RoundToFour(sum_of_p_array)} близка к 1.`;
             new_tag.className = "alert alert-success fa";
         }
-        if (tag)
-            tag.appendChild(new_tag);
+        if (tag) tag.appendChild(new_tag);
     }
-    UpdateUI(matrix) {
+
+    UpdateUI(matrix: any[][]): void {
         this._AddExplanations("fisher-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
         const tag_equation = document.querySelector("[fisher-equation]");
         while (tag_equation && tag_equation.firstChild) {
@@ -272,8 +288,7 @@ export default class FishersExactTest {
             tag_validity.removeChild(tag_validity.firstChild);
         }
         const test_validity = this._GetValidity(matrix);
-        if (tag_validity)
-            tag_validity.appendChild(test_validity.tag);
+        if (tag_validity) tag_validity.appendChild(test_validity.tag);
         if (test_validity.validity == false) {
             return;
         }
@@ -284,14 +299,13 @@ export default class FishersExactTest {
         const sum_of_p_array = p_array.reduce((acc, curr) => acc + curr, 0);
         const sum_of_p_less_than_p_cutoff = p_array.reduce((acc, curr) => acc + (curr <= p_cutoff ? curr : 0), 0);
         this._WarnIfFarFromOne(sum_of_p_array);
-        if (tag_equation)
-            tag_equation.appendChild(this._GetEquation(matrix));
-        if (tag_conclusion)
-            tag_conclusion.appendChild(this._GetConclusion(p_cutoff, sum_of_p_less_than_p_cutoff));
+        if (tag_equation) tag_equation.appendChild(this._GetEquation(matrix));
+        if (tag_conclusion) tag_conclusion.appendChild(this._GetConclusion(p_cutoff, sum_of_p_less_than_p_cutoff));
     }
 }
+
 class _DrawGUIFishersTable {
-    _getTableDOM(matrix, sum_per_row, sum_per_column, total, table_titles) {
+    _getTableDOM(matrix: any[][], sum_per_row: number[], sum_per_column: number[], total: number, table_titles: string[]): HTMLTableElement {
         let table = document.createElement("table");
         table.className = "table table-striped";
         table.style.width = "100%";
@@ -338,17 +352,17 @@ class _DrawGUIFishersTable {
         table.appendChild(tbody);
         return table;
     }
-    Draw(matrix, selector) {
-        const sum_per_row = matrix.map((row) => row.reduce((acc, curr) => acc + curr.observation, 0));
-        const sum_per_column = matrix[0].map((_, index) => matrix.reduce((acc, curr) => acc + curr[index].observation, 0));
-        const total = sum_per_row.reduce((acc, curr) => acc + curr, 0);
+
+    Draw(matrix: any[][], selector: string): void {
+        const sum_per_row = matrix.map((row: any[]) => row.reduce((acc: number, curr: any) => acc + curr.observation, 0));
+        const sum_per_column = matrix[0].map((_: any, index: number) => matrix.reduce((acc: number, curr: any[]) => acc + curr[index].observation, 0));
+        const total = sum_per_row.reduce((acc: number, curr: number) => acc + curr, 0);
         const table_titles = ["жив + выбыл", "умер", "Сумма"];
         const table_dom = this._getTableDOM(matrix, sum_per_row, sum_per_column, total, table_titles);
         let tag = document.querySelector(selector);
         while (tag && tag.firstChild) {
             tag.removeChild(tag.firstChild);
         }
-        if (tag)
-            tag.appendChild(table_dom);
+        if (tag) tag.appendChild(table_dom);
     }
 }

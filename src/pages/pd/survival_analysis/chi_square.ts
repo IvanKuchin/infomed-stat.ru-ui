@@ -1,11 +1,37 @@
 import ChiTable from './chi_table.js';
+
+// Add missing import for common_infomed_stat if available
+declare const common_infomed_stat: {
+    RoundToTwo: (value: number) => number;
+};
+
+export type ChiCell = {
+    observation: number;
+    expectation?: number;
+};
+
+type DatasetItem = {
+    Time: number;
+    Events: number;
+    Alive: number;
+    Censored: number;
+};
+
+type Dataset = {
+    data: DatasetItem[];
+};
+
 export default class ChiSquare {
+    validity_threshold: number;
+
     constructor() {
         this.validity_threshold = 10;
     }
-    _InputDataFromDatasets(datasets, months) {
+
+    _InputDataFromDatasets(datasets: Dataset[], months: number[]): ChiCell[][] {
         const group_count = datasets.length;
-        let matrix = new Array(group_count).fill(0).map(() => new Array(months.length + 1).fill(null).map(() => ({ observation: NaN })));
+        let matrix: ChiCell[][] = new Array(group_count).fill(0).map(() => new Array(months.length + 1).fill(null).map(() => ({ observation: NaN })));
+
         for (let i = 0; i < group_count; i++) {
             const total_patients = datasets[i].data.reduce((acc, curr) => acc + curr.Events + curr.Alive + curr.Censored, 0);
             for (let j = 0; j < months.length; j++) {
@@ -23,7 +49,8 @@ export default class ChiSquare {
         }
         return matrix;
     }
-    _CalcExpectations(matrix) {
+
+    _CalcExpectations(matrix: ChiCell[][]): ChiCell[][] {
         const rows = matrix.length;
         const columns = matrix[0].length;
         let total_per_row = new Array(rows).fill(0);
@@ -42,13 +69,14 @@ export default class ChiSquare {
         }
         return matrix;
     }
-    Calculate(datasets, months) {
+
+    Calculate(datasets: Dataset[], months: number[]): ChiCell[][] {
         let matrix = this._InputDataFromDatasets(datasets, months);
         matrix = this._CalcExpectations(matrix);
         return matrix;
     }
-    _GetEquation(matrix) {
-        var _a, _b, _c, _d;
+
+    _GetEquation(matrix: ChiCell[][]): Element {
         let chi_square = 0;
         let math_tag = document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
         math_tag.setAttribute("xmlns", "http://www.w3.org/1998/Math/MathML");
@@ -65,7 +93,7 @@ export default class ChiSquare {
         math_tag.appendChild(equal_sign);
         for (let i = 0; i < matrix.length; i++) {
             for (let j = 0; j < matrix[0].length; j++) {
-                const curr = Math.pow(matrix[i][j].observation - ((_a = matrix[i][j].expectation) !== null && _a !== void 0 ? _a : 0), 2) / ((_b = matrix[i][j].expectation) !== null && _b !== void 0 ? _b : 1);
+                const curr = Math.pow(matrix[i][j].observation - (matrix[i][j].expectation ?? 0), 2) / (matrix[i][j].expectation ?? 1);
                 chi_square += curr;
                 if (i > 0 || j > 0) {
                     let plus_sign = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
@@ -81,7 +109,7 @@ export default class ChiSquare {
                 let ratio_nominator_diff_minus = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
                 ratio_nominator_diff_minus.innerHTML = `-`;
                 let ratio_nominator_diff_subtrahend = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
-                ratio_nominator_diff_subtrahend.innerHTML = `${common_infomed_stat.RoundToTwo((_c = matrix[i][j].expectation) !== null && _c !== void 0 ? _c : 0)}`;
+                ratio_nominator_diff_subtrahend.innerHTML = `${common_infomed_stat.RoundToTwo(matrix[i][j].expectation ?? 0)}`;
                 let ratio_nominator_diff_parenthesis_close = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
                 ratio_nominator_diff_parenthesis_close.innerHTML = ")";
                 let ratio_nominator_diff_square = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
@@ -94,7 +122,7 @@ export default class ChiSquare {
                 ratio_nominator.appendChild(ratio_nominator_diff);
                 ratio_nominator.appendChild(ratio_nominator_diff_square);
                 let ratio_denominator = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
-                ratio_denominator.innerHTML = `${common_infomed_stat.RoundToTwo((_d = matrix[i][j].expectation) !== null && _d !== void 0 ? _d : 0)}`;
+                ratio_denominator.innerHTML = `${common_infomed_stat.RoundToTwo(matrix[i][j].expectation ?? 0)}`;
                 let ratio = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mfrac");
                 ratio.appendChild(ratio_nominator);
                 ratio.appendChild(ratio_denominator);
@@ -109,18 +137,18 @@ export default class ChiSquare {
         math_tag.appendChild(chi_square_tag);
         return math_tag;
     }
-    _GetEquation_old(matrix) {
-        var _a, _b, _c, _d;
+
+    _GetEquation_old(matrix: ChiCell[][]): string {
         let chi_square = 0;
         let equation1 = "";
         let equation2 = "";
         for (let i = 0; i < matrix.length; i++) {
             for (let j = 0; j < matrix[0].length; j++) {
-                const curr = Math.pow(matrix[i][j].observation - ((_a = matrix[i][j].expectation) !== null && _a !== void 0 ? _a : 0), 2) / ((_b = matrix[i][j].expectation) !== null && _b !== void 0 ? _b : 1);
+                const curr = Math.pow(matrix[i][j].observation - (matrix[i][j].expectation ?? 0), 2) / (matrix[i][j].expectation ?? 1);
                 chi_square += curr;
                 if (i == 0) {
                     equation1 += equation1.length > 0 ? " + " : "";
-                    equation1 += `{ { ( ${common_infomed_stat.RoundToTwo(matrix[i][j].observation)} - ${common_infomed_stat.RoundToTwo((_c = matrix[i][j].expectation) !== null && _c !== void 0 ? _c : 0)} ) } ^2 \\over ${common_infomed_stat.RoundToTwo((_d = matrix[i][j].expectation) !== null && _d !== void 0 ? _d : 0)} }`;
+                    equation1 += `{ { ( ${common_infomed_stat.RoundToTwo(matrix[i][j].observation)} - ${common_infomed_stat.RoundToTwo(matrix[i][j].expectation ?? 0)} ) } ^2 \\over ${common_infomed_stat.RoundToTwo(matrix[i][j].expectation ?? 0)} }`;
                 }
                 equation2 += equation2.length > 0 ? " + " : "";
                 equation2 += `${common_infomed_stat.RoundToTwo(curr)}`;
@@ -130,26 +158,26 @@ export default class ChiSquare {
         equation2 += ` = ${common_infomed_stat.RoundToTwo(chi_square)}`;
         return "χ2 = \\(" + equation1 + "\\) = " + equation2 + " ";
     }
-    _GetChiSquare(matrix) {
-        var _a, _b;
+
+    _GetChiSquare(matrix: ChiCell[][]): number {
         let chi_square = 0;
         for (let i = 0; i < matrix.length; i++) {
             for (let j = 0; j < matrix[0].length; j++) {
-                chi_square += Math.pow(matrix[i][j].observation - ((_a = matrix[i][j].expectation) !== null && _a !== void 0 ? _a : 0), 2) / ((_b = matrix[i][j].expectation) !== null && _b !== void 0 ? _b : 1);
+                chi_square += Math.pow(matrix[i][j].observation - (matrix[i][j].expectation ?? 0), 2) / (matrix[i][j].expectation ?? 1);
             }
         }
         return chi_square;
     }
-    _GetValidity(matrix) {
-        var _a, _b;
+
+    _GetValidity(matrix: ChiCell[][]): HTMLDivElement {
         let flag = true;
         let message = "";
         for (let i = 0; i < matrix.length; i++) {
             for (let j = 0; j < matrix[0].length; j++) {
-                if (((_a = matrix[i][j].expectation) !== null && _a !== void 0 ? _a : 0) < this.validity_threshold) {
+                if ((matrix[i][j].expectation ?? 0) < this.validity_threshold) {
                     flag = false;
                     message += message.length > 0 ? ", " : "";
-                    message += `E(${i + 1},${j + 1}) = ${common_infomed_stat.RoundToTwo((_b = matrix[i][j].expectation) !== null && _b !== void 0 ? _b : 0)}`;
+                    message += `E(${i + 1},${j + 1}) = ${common_infomed_stat.RoundToTwo(matrix[i][j].expectation ?? 0)}`;
                 }
             }
         }
@@ -160,8 +188,7 @@ export default class ChiSquare {
         if (flag) {
             tag2.className = "alert alert-success fa fa-check";
             tag2.innerHTML = "&nbsp; Вычисления можно применять";
-        }
-        else {
+        } else {
             tag2.className = "alert alert-danger fa fa-times";
             tag2.innerHTML = `&nbsp; Вычисления применять нельзя, так как ${message}`;
         }
@@ -169,7 +196,8 @@ export default class ChiSquare {
         tag0.appendChild(tag2);
         return tag0;
     }
-    _GetConclusion(matrix) {
+
+    _GetConclusion(matrix: ChiCell[][]): HTMLDivElement {
         const chi_square = this._GetChiSquare(matrix);
         const df = (matrix.length - 1) * (matrix[0].length - 1);
         const chi_table_row = ChiTable.data[df];
@@ -179,8 +207,7 @@ export default class ChiSquare {
             if (chi_square < chi_table_row[i]) {
                 tag_child.className = "fa fa-check";
                 tag_child.innerHTML = `&nbsp; Нет оснований отклонять H0, потому что ${common_infomed_stat.RoundToTwo(chi_square)} < ${chi_table_row[i]}. Статистически при a = ${ChiTable.percentile[i]} группы <b>независимы</b>`;
-            }
-            else {
+            } else {
                 tag_child.className = "fa fa-times";
                 tag_child.innerHTML = `&nbsp; Есть основания отклонмть H0, потому что ${common_infomed_stat.RoundToTwo(chi_square)} >= ${chi_table_row[i]}. Есть статистически значимые доказательства при a = ${ChiTable.percentile[i]} показывающие, что H0 ложно или группы не независимы (те. группы в исследовании зависимы)`;
             }
@@ -188,12 +215,13 @@ export default class ChiSquare {
         }
         return tag_parent;
     }
-    _AddExplanations(explanation_id, text) {
+
+    _AddExplanations(explanation_id: string, text: string): void {
         const el = document.querySelector(`[${explanation_id}]`);
-        if (el)
-            el.innerHTML = text;
+        if (el) el.innerHTML = text;
     }
-    UpdateUI(matrix) {
+
+    UpdateUI(matrix: ChiCell[][]): void {
         this._AddExplanations("chi-observations-explanation", "Выбывшие пациенты учитываются в группе выживших.");
         const tag_equation = document.querySelector("[chi-square-equation]");
         if (tag_equation) {

@@ -1,6 +1,4 @@
 // @ts-ignore
-import FilterGroup from "./filter-group.js";
-// @ts-ignore
 import SaveToXLS from "../save2xls.js";
 // @ts-ignore
 import KaplanMeier from "./kaplan-meier.js";
@@ -8,6 +6,7 @@ import KaplanMeier from "./kaplan-meier.js";
 import LogRank from "./log_rank.js";
 // @ts-ignore
 import OddsRatio from "./odds_ratio.js";
+import FilterGroup from "./filter-group.js";
 import CoxPH from "./cox_ph.js";
 export default class Dataset {
     constructor(id, records, km, lr, or, coxph) {

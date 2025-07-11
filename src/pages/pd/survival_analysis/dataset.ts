@@ -1,6 +1,4 @@
 // @ts-ignore
-import FilterGroup from "./filter-group.js";
-// @ts-ignore
 import SaveToXLS from "../save2xls.js";
 // @ts-ignore
 import KaplanMeier from "./kaplan-meier.js";
@@ -9,6 +7,7 @@ import LogRank from "./log_rank.js";
 // @ts-ignore
 import OddsRatio from "./odds_ratio.js";
 
+import FilterGroup from "./filter-group.js";
 import CoxPH from "./cox_ph.js";
 import type { UnivariateData } from "./cox_ph.js";
 import type { Patient } from "./kaplan-meier.js";
@@ -183,7 +182,12 @@ export default class Dataset {
     }
     private _AddFilterGroup_ClickHandler(): void {
         let new_id = this._filter_groups.length ? this._filter_groups[this._filter_groups.length - 1].id + 1 : 0;
-        let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`), this);
+        let filter_group = new FilterGroup(
+            new_id,
+            this._records,
+            document.querySelector(`[dataset="${this.id}"]`) as HTMLElement,
+            this
+        );
         this._filter_groups.push(filter_group);
         let dom = filter_group.GetDOM();
         document.querySelectorAll(`[dataset="${this.id}"] [collapse-body]`)[0].appendChild(dom);
