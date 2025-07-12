@@ -1,14 +1,11 @@
 // @ts-ignore
 import SaveToXLS from "../save2xls.js";
-// @ts-ignore
-import KaplanMeier from "./kaplan-meier.js";
-// @ts-ignore
-import LogRank from "./log_rank.js";
-// @ts-ignore
-import OddsRatio from "./odds_ratio.js";
 
 import FilterGroup from "./filter-group.js";
-import CoxPH from "./cox_ph.js";
+import type LogRank from "./log_rank.js";
+import type OddsRatio from "./odds_ratio.js";
+import type KaplanMeier from "./kaplan-meier.js";
+import type CoxPH from "./cox_ph.js";
 import type { UnivariateData } from "./cox_ph.js";
 import type { Patient } from "./kaplan-meier.js";
 

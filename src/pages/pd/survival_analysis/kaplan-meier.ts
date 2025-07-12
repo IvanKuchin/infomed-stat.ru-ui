@@ -1,3 +1,6 @@
+// <reference types="chart.js" />
+// @ts-ignore: Assume this is a global utility
+
 // Type definitions for Chart.js (minimal, for local usage)
 declare const Chart: any;
 
