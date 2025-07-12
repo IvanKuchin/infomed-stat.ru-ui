@@ -1,5 +1,4 @@
-// <reference types="chart.js" />
-// @ts-ignore: Assume this is a global utility
+/* globals Chart */
 export default class KaplanMeier {
     constructor(id) {
         this._id = 0;
