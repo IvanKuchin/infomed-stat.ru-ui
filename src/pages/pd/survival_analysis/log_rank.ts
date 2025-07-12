@@ -1,6 +1,34 @@
 /* globals Chart */
+
+// @ts-ignore: Assume this is a global utility
+declare const Chart: any;
+
+interface DatasetObject {
+    parent_id: number;
+    data: Array<any>;
+}
+
+interface TableRow {
+    Time: number;
+    AtRisk1: number;
+    AtRisk2: number;
+    AtRiskTotal: number;
+    Events1: number;
+    Events2: number;
+    EventsTotal: number;
+    ExpectedEvents1: number;
+    ExpectedEvents2: number;
+}
+
 export default class LogRank {
-    constructor(id) {
+    private _id: number;
+    private _datasets: DatasetObject[];
+    private _datapoints: number[];
+    private _data: any;
+    private _config: any;
+    private _myChart: any;
+
+    constructor(id: number) {
         this._id = id;
         this._datasets = [];
         // Drawing normal distributions
@@ -78,20 +106,23 @@ export default class LogRank {
                 }
             },
         };
-        document.querySelector(`[lr-group="${this.id}"] [alpha-value]`).addEventListener("change", this.UpdateUI.bind(this));
+        (document.querySelector(`[lr-group="${this.id}"] [alpha-value]`) as HTMLInputElement).addEventListener("change", this.UpdateUI.bind(this));
         this._InitializeGraph();
     }
-    get id() { return this._id; }
-    set id(id) { this._id = id; }
-    _GetDatasetObject(parent_id) {
+
+    get id(): number { return this._id; }
+    set id(id: number) { this._id = id; }
+
+    private _GetDatasetObject(parent_id: number): DatasetObject {
         return {
             parent_id: parent_id,
             data: [],
         };
     }
-    _FindDSIndexByParentID(parent_id) {
+
+    private _FindDSIndexByParentID(parent_id: number): number {
         const datasets = this._datasets;
-        let ds_idx;
+        let ds_idx: number;
         for (ds_idx = 0; ds_idx < datasets.length; ++ds_idx) {
             if (datasets[ds_idx].parent_id === parent_id) {
                 break;
@@ -99,7 +130,8 @@ export default class LogRank {
         }
         return ds_idx;
     }
-    UpdateDataset(parent_id, data) {
+
+    public UpdateDataset(parent_id: number, data: any[]): void {
         const datasets = this._datasets;
         const ds_idx = this._FindDSIndexByParentID(parent_id);
         if (ds_idx == datasets.length) {
@@ -107,20 +139,22 @@ export default class LogRank {
         }
         datasets[ds_idx].data = data;
     }
-    RemoveDataset(parent_id) {
+
+    public RemoveDataset(parent_id: number): void {
         const datasets = this._datasets;
         const ds_idx = this._FindDSIndexByParentID(parent_id);
         if (ds_idx == datasets.length) {
             // --- success
-        }
-        else {
+        } else {
             datasets.splice(ds_idx, 1);
         }
     }
-    _GetGroupTitle() {
+
+    private _GetGroupTitle(): string {
         return "График";
     }
-    _GetTableHeader(length) {
+
+    private _GetTableHeader(length: number): HTMLTableSectionElement {
         const head = document.createElement("thead");
         const tr = document.createElement("tr");
         for (let i = 0; i < length + 1; i++) {
@@ -134,7 +168,8 @@ export default class LogRank {
         head.appendChild(tr);
         return head;
     }
-    _GetTableBody(length) {
+
+    private _GetTableBody(length: number): HTMLTableSectionElement {
         const tbody = document.createElement("tbody");
         for (let i = 0; i < length; i++) {
             const tr = document.createElement("tr");
@@ -152,14 +187,16 @@ export default class LogRank {
         }
         return tbody;
     }
-    _GetTableDOM(length) {
+
+    private _GetTableDOM(length: number): HTMLTableElement {
         const table = document.createElement("table");
         table.classList.add("table", "table-striped");
         table.appendChild(this._GetTableHeader(length));
         table.appendChild(this._GetTableBody(length));
         return table;
     }
-    _DrawGUITable() {
+
+    private _DrawGUITable(): void {
         const datasets = this._datasets;
         const placeholder = document.querySelector(`[lr-group="${this.id}"] [table-placeholder]`);
         if (placeholder) {
@@ -167,7 +204,8 @@ export default class LogRank {
             placeholder.appendChild(this._GetTableDOM(datasets.length));
         }
     }
-    _GetEmptyObject() {
+
+    private _GetEmptyObject(): TableRow {
         return {
             Time: 0,
             AtRisk1: 0,
@@ -180,7 +218,8 @@ export default class LogRank {
             ExpectedEvents2: 0,
         };
     }
-    _GetAtRiskAtATime(time, ds) {
+
+    private _GetAtRiskAtATime(time: number, ds: DatasetObject): number {
         let at_risk = ds.data[0].AtRisk;
         for (let i = 0; i < ds.data.length; i++) {
             const record = ds.data[i];
@@ -191,17 +230,18 @@ export default class LogRank {
         }
         return at_risk;
     }
-    _LogRank(ds1, ds2) {
-        const map = new Map();
+
+    private _LogRank(ds1: DatasetObject, ds2: DatasetObject): number {
+        const map = new Map<number, TableRow>();
         for (let i = 0; i < ds1.data.length; i++) {
             const record = ds1.data[i];
             if (record.Events) {
                 if (!map.has(record.Time)) {
                     map.set(record.Time, this._GetEmptyObject());
                 }
-                map.get(record.Time).Time = record.Time;
-                map.get(record.Time).Events1 = record.Events;
-                map.get(record.Time).AtRisk1 = record.AtRisk;
+                map.get(record.Time)!.Time = record.Time;
+                map.get(record.Time)!.Events1 = record.Events;
+                map.get(record.Time)!.AtRisk1 = record.AtRisk;
             }
         }
         for (let i = 0; i < ds2.data.length; i++) {
@@ -210,12 +250,12 @@ export default class LogRank {
                 if (!map.has(record.Time)) {
                     map.set(record.Time, this._GetEmptyObject());
                 }
-                map.get(record.Time).Time = record.Time;
-                map.get(record.Time).Events2 = record.Events;
-                map.get(record.Time).AtRisk2 = record.AtRisk;
+                map.get(record.Time)!.Time = record.Time;
+                map.get(record.Time)!.Events2 = record.Events;
+                map.get(record.Time)!.AtRisk2 = record.AtRisk;
             }
         }
-        const temp_table = [];
+        const temp_table: TableRow[] = [];
         map.forEach((v) => {
             temp_table.push(v);
         });
@@ -246,9 +286,10 @@ export default class LogRank {
         }
         return Math.pow(sumEvents1 - sumExpectedEvents1, 2) / sumExpectedEvents1 + Math.pow(sumEvents2 - sumExpectedEvents2, 2) / sumExpectedEvents2;
     }
-    _PutLogRankValuesInGUI() {
+
+    private _PutLogRankValuesInGUI(): void {
         const datasets = this._datasets;
-        const alpha = parseFloat(document.querySelector(`[lr-group="${this.id}"] [alpha-value]`).value);
+        const alpha = parseFloat((document.querySelector(`[lr-group="${this.id}"] [alpha-value]`) as HTMLInputElement).value);
         for (let i = 0; i < datasets.length; i++) {
             for (let j = 0; j < datasets.length; j++) {
                 if (i > j) {
@@ -265,8 +306,9 @@ export default class LogRank {
             }
         }
     }
-    _PlotNormalStdCurve() {
-        const labels = [];
+
+    private _PlotNormalStdCurve(): void {
+        const labels: string[] = [];
         const step = (this._data.max - this._data.min) / (this._datapoints.length - 1);
         this._data.x = [];
         for (let i = 0; i < this._datapoints.length; ++i) {
@@ -275,7 +317,8 @@ export default class LogRank {
         }
         this._data.labels = labels;
     }
-    _GetClosestIndex(x) {
+
+    private _GetClosestIndex(x: number): number {
         const x_arr = this._data.x;
         let i = 0;
         for (i = 0; i < x_arr.length; i++) {
@@ -290,7 +333,8 @@ export default class LogRank {
         }
         return i;
     }
-    _PlotLeftSide(idx) {
+
+    private _PlotLeftSide(idx: number): Array<{ x: string, y: number }> {
         const datapoints = this._datapoints;
         const data = [];
         for (let i = 0; i < idx; i++) {
@@ -298,7 +342,8 @@ export default class LogRank {
         }
         return data;
     }
-    _PlotRightSide(idx) {
+
+    private _PlotRightSide(idx: number): Array<{ x: string, y: number }> {
         const datapoints = this._datapoints;
         const data = [];
         for (let i = idx; i < datapoints.length; i++) {
@@ -306,8 +351,9 @@ export default class LogRank {
         }
         return data;
     }
-    _PlotSidePercentage() {
-        const tag = document.querySelector(`[lr-group="${this.id}"] [alpha-value]`);
+
+    private _PlotSidePercentage(): void {
+        const tag = document.querySelector(`[lr-group="${this.id}"] [alpha-value]`) as HTMLInputElement;
         const start_x = parseFloat(tag.value);
         const idx_right = this._GetClosestIndex(start_x);
         const idx_left = this._datapoints.length - idx_right;
@@ -316,7 +362,8 @@ export default class LogRank {
         this._data.datasets[1].data = left_side;
         this._data.datasets[2].data = right_side;
     }
-    _PlotChi() {
+
+    private _PlotChi(): void {
         const chi_x = this._data.chi;
         if (!isNaN(chi_x)) {
             const idx = this._GetClosestIndex(chi_x);
@@ -324,22 +371,29 @@ export default class LogRank {
             this._data.datasets[0].data = data;
         }
     }
-    _DrawLina_MouseEnterHandler(e) {
-        const tag = e.target;
+
+    private _DrawLina_MouseEnterHandler(e: MouseEvent): void {
+        const tag = e.target as HTMLElement;
         const x_value = parseFloat(tag.innerText);
         this._data.chi = x_value;
         this._PlotGraph();
     }
-    _PlotGraph() {
+
+    private _PlotGraph(): void {
         this._PlotNormalStdCurve();
         this._PlotSidePercentage();
         this._PlotChi();
         this._myChart.update();
     }
-    _InitializeGraph() {
-        this._myChart = new Chart(document.querySelectorAll(`[lr-group='${this.id}'] canvas`)[0], this._config);
+
+    private _InitializeGraph(): void {
+        this._myChart = new Chart(
+            (document.querySelectorAll(`[lr-group='${this.id}'] canvas`)[0] as HTMLCanvasElement),
+            this._config
+        );
     }
-    UpdateUI() {
+
+    public UpdateUI(): void {
         this._DrawGUITable();
         this._PutLogRankValuesInGUI();
         this._PlotGraph();

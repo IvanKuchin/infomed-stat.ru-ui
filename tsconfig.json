@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es6",
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "declaration": false,
+    "sourceMap": false,
+    "declarationMap": false,
+    "rootDir": "src",
+    "outDir": "html/js",
+  },
+}

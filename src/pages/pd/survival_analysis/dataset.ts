@@ -1,8 +1,32 @@
 // @ts-ignore
 import SaveToXLS from "../save2xls.js";
+
 import FilterGroup from "./filter-group.js";
+import type LogRank from "./log_rank.js";
+import type OddsRatio from "./odds_ratio.js";
+import type KaplanMeier from "./kaplan-meier.js";
+import type CoxPH from "./cox_ph.js";
+import type { UnivariateData } from "./cox_ph.js";
+import type { Patient } from "./kaplan-meier.js";
+
 export default class Dataset {
-    constructor(id, records, km, lr, or, coxph) {
+    private _id: number;
+    private _records: any[];
+    private _visibility: boolean;
+    private _filter_groups: FilterGroup[];
+    private _km: KaplanMeier;
+    private _coxph: CoxPH;
+    private _or: OddsRatio;
+    private _lr: LogRank;
+
+    constructor(
+        id: number,
+        records: any[],
+        km: KaplanMeier,
+        lr: LogRank,
+        or: OddsRatio,
+        coxph: CoxPH
+    ) {
         this._id = id;
         this._records = [];
         this._visibility = true;
@@ -14,8 +38,9 @@ export default class Dataset {
         this._coxph = coxph;
     }
     get id() { return this._id; }
-    set id(id) { this._id = id; }
-    GetDOM() {
+    set id(id: number) { this._id = id; }
+
+    public GetDOM(): HTMLElement {
         let panel_wrapper_container = document.createElement("div");
         panel_wrapper_container.classList.add("container", "single_block", "box-shadow--6dp");
         let panel_wrapper_row = document.createElement("div");
@@ -105,7 +130,7 @@ export default class Dataset {
         collapse_body.appendChild(this._GetDatasetControlDOM());
         return panel;
     }
-    _GetWarningDOM() {
+    private _GetWarningDOM() {
         let warning = document.createElement("div");
         warning.classList.add("alert", "alert-warning");
         warning.setAttribute("role", "alert");
@@ -114,7 +139,7 @@ export default class Dataset {
         warning.appendChild(document.createTextNode("LogRank вычисления требуют по крайней мере 30 записей."));
         return warning;
     }
-    _GetDatasetControlDOM() {
+    private _GetDatasetControlDOM() {
         let wrapper = document.createElement("div");
         wrapper.classList.add("col-xs-12", "form-group");
         let row = document.createElement("div");
@@ -144,17 +169,22 @@ export default class Dataset {
         col_button.appendChild(filters_row_button);
         return wrapper;
     }
-    _ToggleCollapsible() {
+    private _ToggleCollapsible(): void {
         // @ts-ignore
-        $("[dataset='" + this.id + "'] .collapse").collapse("toggle");
+        ($ as any)("[dataset='" + this.id + "'] .collapse").collapse("toggle");
     }
-    _CallDate_ChangeHandler() {
+    private _CallDate_ChangeHandler(): void {
         console.debug("Call date: change handler");
         this.Indices_ChangeHandler();
     }
-    _AddFilterGroup_ClickHandler() {
+    private _AddFilterGroup_ClickHandler(): void {
         let new_id = this._filter_groups.length ? this._filter_groups[this._filter_groups.length - 1].id + 1 : 0;
-        let filter_group = new FilterGroup(new_id, this._records, document.querySelector(`[dataset="${this.id}"]`), this);
+        let filter_group = new FilterGroup(
+            new_id,
+            this._records,
+            document.querySelector(`[dataset="${this.id}"]`) as HTMLElement,
+            this
+        );
         this._filter_groups.push(filter_group);
         let dom = filter_group.GetDOM();
         document.querySelectorAll(`[dataset="${this.id}"] [collapse-body]`)[0].appendChild(dom);
@@ -166,7 +196,7 @@ export default class Dataset {
     // Delete dataset with id == id from datasets[]
     // Input:
     //		id - dataset.id to be deleted
-    _RemoveFilterGroupFromArray(id) {
+    private _RemoveFilterGroupFromArray(id: number): void {
         let filter_groups = this._filter_groups;
         for (var i = 0; i < filter_groups.length; i++) {
             if (filter_groups[i].id == id) {
@@ -176,16 +206,15 @@ export default class Dataset {
         }
     }
     // Remove filter-group from GUI and filters[]
-    _RemoveFilterGroup_ClickHandler(e) {
-        const target = e.target;
+    private _RemoveFilterGroup_ClickHandler(e: Event): void {
+        const target = e.target as HTMLElement;
         let id = Number(target.getAttribute("close"));
         let tag = target.closest(`[filter-group="${id}"]`);
-        if (tag)
-            tag.remove();
+        if (tag) tag.remove();
         this._RemoveFilterGroupFromArray(id);
         this.Indices_ChangeHandler();
     }
-    AddToParent(parentDOM) {
+    public AddToParent(parentDOM: HTMLElement): void {
         parentDOM.appendChild(this.GetDOM());
         this._ToggleCollapsible();
         // this.Indices_ChangeHandler();
@@ -195,8 +224,8 @@ export default class Dataset {
     //		start1 - most priority
     //		start2 - medium
     //		start3 - least
-    _GetMonthsBetweenDates(start1, start2, start3, _finish) {
-        let error = null;
+    private _GetMonthsBetweenDates(start1: string, start2: string, start3: string, _finish: string): { error: Error | null, months: number } {
+        let error: Error | null = null;
         let months = 0;
         let d1 = new Date(start1);
         let d2 = new Date(start2);
@@ -223,10 +252,10 @@ export default class Dataset {
     //			Event		- [] of record indexes with event happened
     //			Censored	- [] of record indexes with censoring happened
     //			Alive		- number of records that alive
-    _GetEventCensorIndexes(indexes) {
-        let censored_idxs = [];
-        let event_idxs = [];
-        let alive_idxs = [];
+    private _GetEventCensorIndexes(indexes: number[]): { Event: number[], Censored: number[], Alive: number[] } {
+        let censored_idxs: number[] = [];
+        let event_idxs: number[] = [];
+        let alive_idxs: number[] = [];
         for (let i = indexes.length - 1; i >= 0; i--) {
             let record_idx = indexes[i];
             let retirement_date = this._records[record_idx].___study_retirement_date;
@@ -250,7 +279,7 @@ export default class Dataset {
     //			Censored	- number of censored
     //			Alive		- number of alive
     //			Total		- sum of all above
-    GetKMMetadata(indexes) {
+    private GetKMMetadata(indexes: number[]): { Events: number, Censored: number, Alive: number, Total: number } {
         let obj = this._GetEventCensorIndexes(indexes);
         return {
             Events: obj.Event.length,
@@ -259,10 +288,10 @@ export default class Dataset {
             Total: obj.Event.length + obj.Censored.length + obj.Alive.length,
         };
     }
-    _GetBasicKMObject() {
+    private _GetBasicKMObject(): { Censored: number, Events: number, Alive: number, Patients: any[] } {
         return { Censored: 0, Events: 0, Alive: 0, Patients: [] };
     }
-    _GetPatientBriefObj(record, status) {
+    private _GetPatientBriefObj(record: any, status: string): Patient {
         return {
             first_name: record.___first_name,
             last_name: record.___last_name,
@@ -277,8 +306,8 @@ export default class Dataset {
     // 			Time		- time in months till censoring or event
     //			Censored	- number of events at this time
     //			Events		- number of events at this time
-    _GetTimeDtCtOfEventCensor(indices_map, call_date) {
-        let km_map = new Map();
+    private _GetTimeDtCtOfEventCensor(indices_map: { Censored: number[], Event: number[], Alive: number[] }, call_date: string): any[] {
+        let km_map = new Map<number, { Censored: number, Events: number, Alive: number, Patients: any[] }>();
         for (let i = indices_map.Censored.length - 1; i >= 0; i--) {
             let record_idx = indices_map.Censored[i];
             let neoadj_chemo_date = this._records[record_idx].___neoadj_chemo___start_date;
@@ -294,8 +323,8 @@ export default class Dataset {
                 if (!km_map.has(time)) {
                     km_map.set(time, this._GetBasicKMObject());
                 }
-                km_map.get(time).Censored++;
-                km_map.get(time).Patients.push(this._GetPatientBriefObj(this._records[record_idx], "выбыл"));
+                km_map.get(time)!.Censored++;
+                km_map.get(time)!.Patients.push(this._GetPatientBriefObj(this._records[record_idx], "выбыл"));
             }
         }
         for (let i = indices_map.Event.length - 1; i >= 0; i--) {
@@ -313,8 +342,8 @@ export default class Dataset {
                 if (!km_map.has(time)) {
                     km_map.set(time, this._GetBasicKMObject());
                 }
-                km_map.get(time).Events++;
-                km_map.get(time).Patients.push(this._GetPatientBriefObj(this._records[record_idx], "умер"));
+                km_map.get(time)!.Events++;
+                km_map.get(time)!.Patients.push(this._GetPatientBriefObj(this._records[record_idx], "умер"));
             }
         }
         for (let i = indices_map.Alive.length - 1; i >= 0; i--) {
@@ -332,12 +361,12 @@ export default class Dataset {
                 if (!km_map.has(time)) {
                     km_map.set(time, this._GetBasicKMObject());
                 }
-                km_map.get(time).Alive++;
-                km_map.get(time).Patients.push(this._GetPatientBriefObj(this._records[record_idx], "жив"));
+                km_map.get(time)!.Alive++;
+                km_map.get(time)!.Patients.push(this._GetPatientBriefObj(this._records[record_idx], "жив"));
             }
         }
         // --- Convert map to array
-        let km_arr = [{ Time: 0, Censored: 0, Events: 0, Alive: 0, Patients: [] }];
+        let km_arr: { Time: number, Censored: number, Events: number, Alive: number, Patients: Patient[] }[] = [{ Time: 0, Censored: 0, Events: 0, Alive: 0, Patients: [] }];
         km_map.forEach((v, k) => {
             km_arr.push({ Time: k, Censored: v.Censored, Events: v.Events, Alive: v.Alive, Patients: v.Patients });
         });
@@ -346,7 +375,7 @@ export default class Dataset {
         return km_sorted;
     }
     // Add KM-specific data
-    _KMaddSurvival(km_base) {
+    private _KMaddSurvival(km_base: any[]): any[] {
         // Walk over table from the bottom to the top to calculate cumulative at risk numbers
         for (let i = km_base.length - 1; i >= 0; i--) {
             let cumulative_at_risk = (i < km_base.length - 1) ? km_base[i + 1].AtRisk : 0;
@@ -367,13 +396,13 @@ export default class Dataset {
     //			Events		- number of events at this time
     //			Alive		- number of alive at this time
     //			Patients	- list of all patients at timestamp
-    _CalculateKMSurvivalData(indexes, call_date) {
+    private _CalculateKMSurvivalData(indexes: number[], call_date: string): any[] {
         let indices_map = this._GetEventCensorIndexes(indexes);
         let km_base = this._GetTimeDtCtOfEventCensor(indices_map, call_date);
         let km_survival = this._KMaddSurvival(km_base);
         return km_survival;
     }
-    _ToggleDatasetVisibility_ClickHandler() {
+    private _ToggleDatasetVisibility_ClickHandler(): void {
         this._visibility = !this._visibility;
         if (this._visibility) {
             this.Indices_ChangeHandler();
@@ -389,21 +418,21 @@ export default class Dataset {
             this._coxph.UpdateUI();
         }
     }
-    _GetIndicesFromDatasets(filter_groups) {
-        let indices = [];
+    private _GetIndicesFromDatasets(filter_groups: FilterGroup[]): number[] {
+        let indices: number[] = [];
         for (let i = 0; i < filter_groups.length; i++) {
             if (filter_groups[i].indices) {
                 indices = indices.concat(filter_groups[i].indices);
             }
         }
-        let map = new Map();
+        let map = new Map<number, string>();
         for (var i = 0; i < indices.length; i++) {
             map.set(indices[i], "");
         }
         return Array.from(map.keys());
     }
-    _ShowHideLogRankWarning(number_of_records) {
-        let tag = document.querySelectorAll(`[dataset='${this._id}'] [logrank-warning]`)[0];
+    private _ShowHideLogRankWarning(number_of_records: number): void {
+        let tag = document.querySelectorAll(`[dataset='${this._id}'] [logrank-warning]`)[0] as HTMLElement;
         if (isNaN(number_of_records)) {
             tag.setAttribute("hidden", "");
         }
@@ -421,12 +450,12 @@ export default class Dataset {
     //		data - KM data
     // Output:
     //		array of LogRank data
-    _CalculateLogRank(data) {
+    private _CalculateLogRank(data: any): any {
         return data;
     }
-    _ConvertKMToCox(data) {
-        const T = [];
-        const E = [];
+    private _ConvertKMToCox(data: any[]): UnivariateData {
+        const T: number[] = [];
+        const E: number[] = [];
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i].Events; j++) {
                 T.push(data[i].Time);
@@ -439,15 +468,15 @@ export default class Dataset {
         }
         return { T, E };
     }
-    Indices_ChangeHandler() {
+    public Indices_ChangeHandler(): void {
         let indices = this._GetIndicesFromDatasets(this._filter_groups);
         let km_metadata = this.GetKMMetadata(indices);
-        document.querySelectorAll(`[dataset='${this._id}'] [total-record-counter]`)[0].innerText = String(km_metadata.Total);
-        document.querySelectorAll(`[dataset='${this._id}'] [censored-record-counter]`)[0].innerText = String(km_metadata.Censored);
-        document.querySelectorAll(`[dataset='${this._id}'] [alive-record-counter]`)[0].innerText = String(km_metadata.Alive);
-        document.querySelectorAll(`[dataset='${this._id}'] [event-record-counter]`)[0].innerText = String(km_metadata.Events);
+        (document.querySelectorAll(`[dataset='${this._id}'] [total-record-counter]`)[0] as HTMLElement).innerText = String(km_metadata.Total);
+        (document.querySelectorAll(`[dataset='${this._id}'] [censored-record-counter]`)[0] as HTMLElement).innerText = String(km_metadata.Censored);
+        (document.querySelectorAll(`[dataset='${this._id}'] [alive-record-counter]`)[0] as HTMLElement).innerText = String(km_metadata.Alive);
+        (document.querySelectorAll(`[dataset='${this._id}'] [event-record-counter]`)[0] as HTMLElement).innerText = String(km_metadata.Events);
         this._ShowHideLogRankWarning(km_metadata.Total);
-        let welfare_check_date = document.querySelectorAll(`[dataset='${this._id}'] [call_date]`)[0].value;
+        let welfare_check_date = (document.querySelectorAll(`[dataset='${this._id}'] [call_date]`)[0] as HTMLInputElement).value;
         let km_data = this._CalculateKMSurvivalData(indices, welfare_check_date);
         this._km.UpdateDataset(this.id, km_data);
         this._km.UpdateUI();
@@ -463,7 +492,7 @@ export default class Dataset {
     // Click handler to download filtered records
     // Input:  e		- Event
     // Output: none
-    _Download_ClickHandler() {
+    private _Download_ClickHandler(): void {
         let indices = this._GetIndicesFromDatasets(this._filter_groups);
         if (indices && indices.length) {
             // collect records filtered by indexes
