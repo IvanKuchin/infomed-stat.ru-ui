@@ -1,3 +1,4 @@
+/* globals Chart */
 export default class LogRank {
     constructor(id) {
         this._id = id;

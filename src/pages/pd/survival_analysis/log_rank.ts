@@ -1,4 +1,5 @@
 /* globals Chart */
+
 // @ts-ignore: Assume this is a global utility
 declare const Chart: any;
 
