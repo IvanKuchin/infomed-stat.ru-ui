@@ -218,7 +218,7 @@ export default class OddsRatio {
 			col_title.appendChild(document.createTextNode(`Относительные шансы выживаемости между группами (Odds Ratio) ${months[i]} месяцев`));
 			let col_table = document.createElement("div");
 			col_table.classList.add("col-xs-12");
-			let cb = this._GetORAndCI(i);
+			let cb = this._GetORAndCI();
 			let groups_title = [...Array(or.length).keys()].map((idx) => this._GetGroupTitle() + " " + idx);
 			col_table.appendChild(this._GetTableDOM(or.map(row => row.map(cell => cell[i])), groups_title, cb));
 			row.appendChild(col_title);
@@ -247,7 +247,7 @@ export default class OddsRatio {
 		return `odds: ${odds}<br>CI: (${ci_start} - ${ci_end})`;
 	}
 
-	_GetORAndCI(month_idx: number): (item: ORCell) => string {
+	_GetORAndCI(): (item: ORCell) => string {
 		return (item: ORCell) => {
 			const or = item.or;
 			const ci = item.ci;
