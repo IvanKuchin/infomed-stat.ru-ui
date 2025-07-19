@@ -3712,15 +3712,8 @@ var system_calls = (function () {
 
 
 	var FireChangeEvent = function (tag) {
-
-		if ("createEvent" in document) {
-			var evt = document.createEvent("HTMLEvents");
-			evt.initEvent("change", false, true);
-			tag.dispatchEvent(evt);
-		} else {
-			tag.fireEvent("onchange");
-		}
-
+		const evt = new Event("change", { bubbles: false, cancelable: true });
+		tag.dispatchEvent(evt);
 	};
 
 	// --- cookie part
