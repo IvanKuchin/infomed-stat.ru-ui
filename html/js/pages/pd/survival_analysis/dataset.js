@@ -143,7 +143,44 @@ export default class Dataset {
         col_date.appendChild(date_input);
         col_date.appendChild(call_date_info);
         col_button.appendChild(filters_row_button);
+        const rowEvent = this.eventTitleDOM();
+        wrapper.appendChild(rowEvent);
         return wrapper;
+    }
+    eventTitleDOM() {
+        const rowEvent = document.createElement("div");
+        rowEvent.classList.add("row");
+        const colEvent = document.createElement("div");
+        colEvent.classList.add("col-xs-12");
+        const eventTitle = document.createElement("span");
+        eventTitle.classList.add("event-title");
+        eventTitle.innerText = "Тип события:";
+        const eventSelect = document.createElement("select");
+        eventSelect.setAttribute("event-title", "");
+        eventSelect.addEventListener("change", this._eneventTitle_ChangeHandler.bind(this));
+        const eventOptions = [
+            { value: "___death_date", text: "Смерть" },
+            { value: "___relapse_date", text: "Рецидив" },
+            { value: "___surgery_date", text: "Операция" },
+            { value: "___progression_date", text: "Прогрессирование" },
+            { value: "___other_event_date", text: "Другое событие" }
+        ];
+        eventOptions.forEach(opt => {
+            const option = document.createElement("option");
+            option.value = opt.value;
+            option.text = opt.text;
+            if (opt.value === this._event_title) {
+                option.selected = true;
+            }
+            eventSelect.appendChild(option);
+        });
+        let info = document.createElement("span");
+        info.innerHTML = '&nbsp;<span class="fa fa-info-circle" onmouseover="system_calls.PopoverInfo($(this), \'если событие наступило раньше, чем дата выбытия, то выбытие не учитывается\', true)"></span>';
+        colEvent.appendChild(eventTitle);
+        colEvent.appendChild(eventSelect);
+        colEvent.appendChild(info);
+        rowEvent.appendChild(colEvent);
+        return rowEvent;
     }
     _ToggleCollapsible() {
         // @ts-ignore
@@ -151,6 +188,10 @@ export default class Dataset {
     }
     _CallDate_ChangeHandler() {
         console.debug("Call date: change handler");
+        this.Indices_ChangeHandler();
+    }
+    _eneventTitle_ChangeHandler(e) {
+        this._event_title = e.target.value;
         this.Indices_ChangeHandler();
     }
     _AddFilterGroup_ClickHandler() {
