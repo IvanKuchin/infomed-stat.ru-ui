@@ -34,6 +34,7 @@ export default class FilterGroup {
         let wrapper = document.createElement("div");
         wrapper.setAttribute("filter-group", String(this.id));
         wrapper.classList.add("col-xs-12");
+        wrapper.addEventListener("update_metadata", this._updateMetadataHandler.bind(this));
         let panel = document.createElement("div");
         panel.classList.add("panel", "panel-default");
         let panel_header = document.createElement("div");
@@ -101,6 +102,20 @@ export default class FilterGroup {
         control_row.appendChild(control_col);
         control_col.appendChild(add_button);
         return wrapper;
+    }
+    _updateMetadataHandler(e) {
+        // Update metadata in the filter group
+        if (!this._ref_dom)
+            return;
+        let indices = this._filters[this._filters.length - 1].post_filter_indices;
+        this._UpdateMetadata(indices);
+        // Fire update_metadata event to all child filters
+        const filterElements = this._ref_dom.querySelectorAll(`[filter-group="${this.id}"] [filter]`);
+        filterElements.forEach((filterElement) => {
+            const filter = filterElement;
+            const event = new Event("update_metadata", { bubbles: false, cancelable: true });
+            filter.dispatchEvent(event);
+        });
     }
     _AddFilter_ClickHandler() {
         var _a;

@@ -166,7 +166,7 @@ export default class Dataset {
         wrapper.appendChild(row);
         row.appendChild(col_date);
         row.appendChild(col_button);
-        col_date.appendChild(document.createTextNode("Дата обзвона:"));
+        col_date.appendChild(document.createTextNode("Дата обзвона: "));
         col_date.appendChild(date_input);
         col_date.appendChild(call_date_info);
         col_button.appendChild(filters_row_button);
@@ -184,7 +184,7 @@ export default class Dataset {
         colEvent.classList.add("col-xs-12");
         const eventTitle = document.createElement("span");
         eventTitle.classList.add("event-title");
-        eventTitle.innerText = "Тип события:";
+        eventTitle.innerText = "Событие - это: ";
         const eventSelect = document.createElement("select");
         eventSelect.setAttribute("event-title", "");
         eventSelect.addEventListener("change", this._eventTitle_ChangeHandler.bind(this));
@@ -225,6 +225,15 @@ export default class Dataset {
     private _eventTitle_ChangeHandler(e: Event): void {
         this._event_title = (e.target as HTMLSelectElement).value;
         this.Indices_ChangeHandler();
+
+        // fire change event to all child filter groups
+        const filterGroups = document.querySelectorAll(`[dataset="${this.id}"] [filter-group]`);
+        filterGroups.forEach((group) => {
+            const filterGroup = group as HTMLElement;
+            const event = new Event("update_metadata", { bubbles: false, cancelable: true });
+            filterGroup.dispatchEvent(event);
+        }
+        );
     }
     private _AddFilterGroup_ClickHandler(): void {
         let new_id = this._filter_groups.length ? this._filter_groups[this._filter_groups.length - 1].id + 1 : 0;

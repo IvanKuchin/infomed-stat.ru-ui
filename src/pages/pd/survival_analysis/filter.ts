@@ -164,6 +164,8 @@ export default class Filter {
 		col.classList.add("col-xs-12");
 		col.setAttribute("filter", `${this.id}`)
 		col.setAttribute("placeholder", "")
+		col.addEventListener("update_metadata", this._updateMetadata_Handler.bind(this));
+
 		let filter_key_div = document.createElement("div");
 		filter_key_div.classList.add("form-group");
 		let filter_key_sel = document.createElement("select");
@@ -191,6 +193,7 @@ export default class Filter {
 		let wrapper = document.createElement("div");
 		wrapper.classList.add("col-xs-12");
 		wrapper.setAttribute("remove", String(this.id));
+
 		let panel = document.createElement("div");
 		panel.classList.add("panel", "panel-default")
 		let panel_header = document.createElement("div");
@@ -262,6 +265,14 @@ export default class Filter {
 			}
 		} else {
 			console.debug(`_post_filter_indices array is empty`)
+		}
+	}
+
+	private _updateMetadata_Handler(e: Event): void {
+		const target = e.target as HTMLElement;
+		let panel_dom = target.closest(".panel");
+		if (panel_dom) {
+			this._UpdateMetadata(this._post_filter_indices, panel_dom);
 		}
 	}
 }
