@@ -158,13 +158,7 @@ export default class Dataset {
         const eventSelect = document.createElement("select");
         eventSelect.setAttribute("event-title", "");
         eventSelect.addEventListener("change", this._eventTitle_ChangeHandler.bind(this));
-        const eventOptions = [
-            { value: "___death_date", text: "Смерть" },
-            { value: "___relapse_date", text: "Рецидив" },
-            { value: "___surgery_date", text: "Операция" },
-            { value: "___progression_date", text: "Прогрессирование" },
-            { value: "___other_event_date", text: "Другое событие" }
-        ];
+        const eventOptions = this._getEventOptions();
         eventOptions.forEach(opt => {
             const option = document.createElement("option");
             option.value = opt.value;
@@ -174,13 +168,28 @@ export default class Dataset {
             }
             eventSelect.appendChild(option);
         });
-        let info = document.createElement("span");
+        const info = document.createElement("span");
         info.innerHTML = '&nbsp;<span class="fa fa-info-circle" onmouseover="system_calls.PopoverInfo($(this), \'если событие наступило раньше, чем дата выбытия, то выбытие не учитывается\', true)"></span>';
         colEvent.appendChild(eventTitle);
         colEvent.appendChild(eventSelect);
         colEvent.appendChild(info);
         rowEvent.appendChild(colEvent);
         return rowEvent;
+    }
+    _getEventOptions() {
+        let options = [];
+        if (this._records.length === 0) {
+            return options; // No records, no options
+        }
+        for (const key in this._records[0]) {
+            if (key.startsWith("___") && key.endsWith("_date")) {
+                const eventName = common_infomed_stat.GetMedicalItemNameSpelling(key);
+                if (!eventName)
+                    continue; // Skip if no valid event name
+                options.push({ value: key, text: eventName.charAt(0).toUpperCase() + eventName.slice(1) });
+            }
+        }
+        return options;
     }
     _ToggleCollapsible() {
         // @ts-ignore
