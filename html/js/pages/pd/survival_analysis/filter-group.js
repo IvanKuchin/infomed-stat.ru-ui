@@ -103,7 +103,7 @@ export default class FilterGroup {
         control_col.appendChild(add_button);
         return wrapper;
     }
-    _updateMetadataHandler(e) {
+    _updateMetadataHandler() {
         // Update metadata in the filter group
         if (!this._ref_dom)
             return;

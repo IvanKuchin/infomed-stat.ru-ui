@@ -132,7 +132,7 @@ export default class FilterGroup {
         return wrapper;
     }
 
-    private _updateMetadataHandler(e: Event) {
+    private _updateMetadataHandler() {
         // Update metadata in the filter group
         if (!this._ref_dom) return;
         let indices = this._filters[this._filters.length - 1].post_filter_indices;
