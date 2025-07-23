@@ -25,7 +25,7 @@ export default class FilterGroup {
     // Update filter GUI-metadata
     // Input:
     //      indices - array of indices to calculate metadata
-    _UpdateMetadata(indices: number[]) {
+    private _UpdateMetadata(indices: number[]) {
         if (!this._ref_dom) return;
         let dom_placeholder = this._ref_dom.querySelector(`[filter-group="${this.id}"]`);
         if (!dom_placeholder) return;
@@ -37,10 +37,11 @@ export default class FilterGroup {
         (dom_placeholder.querySelectorAll("[event-record-counter]")[0] as HTMLElement).innerText = km_metadata.Events;
     }
 
-    GetDOM(): HTMLElement {
+    public GetDOM(): HTMLElement {
         let wrapper = document.createElement("div");
         wrapper.setAttribute("filter-group", String(this.id));
         wrapper.classList.add("col-xs-12");
+        wrapper.addEventListener("update_metadata", this._updateMetadataHandler.bind(this));
 
         let panel = document.createElement("div");
         panel.classList.add("panel", "panel-default");
@@ -131,7 +132,23 @@ export default class FilterGroup {
         return wrapper;
     }
 
-    _AddFilter_ClickHandler() {
+    private _updateMetadataHandler() {
+        // Update metadata in the filter group
+        if (!this._ref_dom) return;
+        let indices = this._filters[this._filters.length - 1].post_filter_indices;
+        this._UpdateMetadata(indices);
+
+        // Fire update_metadata event to all child filters
+        const filterElements = this._ref_dom.querySelectorAll(`[filter-group="${this.id}"] [filter]`);
+        filterElements.forEach((filterElement) => {
+            const filter = filterElement as HTMLElement;
+            const event = new Event("update_metadata", { bubbles: false, cancelable: true });
+            filter.dispatchEvent(event);
+        }
+        );
+    }
+
+    private _AddFilter_ClickHandler() {
         let new_id = this._filters.length ? this._filters[this._filters.length - 1].id + 1 : 0;
         let pre_filter_indices = (new_id ? this._filters[this._filters.length - 1].post_filter_indices : Array.from(Array(this._records.length).keys()));
         let filter = new Filter(new_id, this._records, pre_filter_indices, this, this._dataset);
@@ -147,7 +164,7 @@ export default class FilterGroup {
     // Click handler to download filtered records
     // Input:  e       - Event
     // Output: none
-    _Download_ClickHandler() {
+    private _Download_ClickHandler() {
         if (this._indices && this._indices.length) {
             // collect records filtered by indexes
             let records_to_save = this._indices.map(idx => this._records[parseInt(idx as any)]);
@@ -166,7 +183,7 @@ export default class FilterGroup {
     // Delete filter from filter_group[]
     // Input:
     //      filter_id - filter.id to delete
-    _DeleteFilterFromArray(filter_id: number) {
+    private _DeleteFilterFromArray(filter_id: number) {
         let filters = this._filters;
         let idx = this._GetFilterIdxByID(filter_id);
 
@@ -191,7 +208,7 @@ export default class FilterGroup {
     }
 
     // Remove filter from GUI and filters[]
-    _RemoveFilter_ClickHandler(e: Event) {
+    private _RemoveFilter_ClickHandler(e: Event) {
         const target = e.target as HTMLElement;
         let id = target.getAttribute("close");
         if (!id) return;
@@ -206,7 +223,7 @@ export default class FilterGroup {
     //      filter.id - id to find
     // Output:
     //      index in the filters[]
-    _GetFilterIdxByID(filter_id: number): number {
+    private _GetFilterIdxByID(filter_id: number): number {
         for (let i = 0; i < this._filters.length; i++) {
             if (this._filters[i].id == filter_id) {
                 return i;
@@ -220,12 +237,12 @@ export default class FilterGroup {
     //      filter_id - filter.id to check
     // Output:
     //      bool if filter is the last in the list
-    _isLastInTheFiltersList(filter_id: number): boolean {
+    private _isLastInTheFiltersList(filter_id: number): boolean {
         let filters = this._filters;
         return filters.length > 0 && filters[filters.length - 1].id == filter_id;
     }
 
-    _FireChangeEventInTheFilterKey(filter_id: number) {
+    private _FireChangeEventInTheFilterKey(filter_id: number) {
         if (!this._ref_dom) return;
         let filter_dom = this._ref_dom.querySelector(`[filter-group="${this.id}"] [filter="${filter_id}"]`);
         if (filter_dom) {
@@ -239,7 +256,7 @@ export default class FilterGroup {
     // If filter is not the last one, fire change-event in th next filter key field
     // Input:
     //      filter_id   - filter.id
-    FilterValue_Changed(filter_id: number) {
+    public FilterValue_Changed(filter_id: number) {
         let idx = this._GetFilterIdxByID(filter_id);
         if (idx === -1) return;
         if (this._isLastInTheFiltersList(filter_id)) {

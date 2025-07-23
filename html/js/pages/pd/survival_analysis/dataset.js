@@ -3,6 +3,7 @@ import SaveToXLS from "../save2xls.js";
 import FilterGroup from "./filter-group.js";
 export default class Dataset {
     constructor(id, records, km, lr, or, coxph) {
+        this._event_title = "___death_date"; // event title is a type of event that is used to calculate survival analysis, e.g. "___death_date", "___relapse_date", etc."
         this._id = id;
         this._records = [];
         this._visibility = true;
@@ -138,11 +139,57 @@ export default class Dataset {
         wrapper.appendChild(row);
         row.appendChild(col_date);
         row.appendChild(col_button);
-        col_date.appendChild(document.createTextNode("Дата обзвона:"));
+        col_date.appendChild(document.createTextNode("Дата обзвона: "));
         col_date.appendChild(date_input);
         col_date.appendChild(call_date_info);
         col_button.appendChild(filters_row_button);
+        const rowEvent = this.eventTitleDOM();
+        wrapper.appendChild(rowEvent);
         return wrapper;
+    }
+    eventTitleDOM() {
+        const rowEvent = document.createElement("div");
+        rowEvent.classList.add("row");
+        const colEvent = document.createElement("div");
+        colEvent.classList.add("col-xs-12");
+        const eventTitle = document.createElement("span");
+        eventTitle.classList.add("event-title");
+        eventTitle.innerText = "Событие - это: ";
+        const eventSelect = document.createElement("select");
+        eventSelect.setAttribute("event-title", "");
+        eventSelect.addEventListener("change", this._eventTitle_ChangeHandler.bind(this));
+        const eventOptions = this._getEventOptions();
+        eventOptions.forEach(opt => {
+            const option = document.createElement("option");
+            option.value = opt.value;
+            option.text = opt.text;
+            if (opt.value === this._event_title) {
+                option.selected = true;
+            }
+            eventSelect.appendChild(option);
+        });
+        const info = document.createElement("span");
+        info.innerHTML = '&nbsp;<span class="fa fa-info-circle" onmouseover="system_calls.PopoverInfo($(this), \'если событие наступило раньше, чем дата выбытия, то выбытие не учитывается\', true)"></span>';
+        colEvent.appendChild(eventTitle);
+        colEvent.appendChild(eventSelect);
+        colEvent.appendChild(info);
+        rowEvent.appendChild(colEvent);
+        return rowEvent;
+    }
+    _getEventOptions() {
+        let options = [];
+        if (this._records.length === 0) {
+            return options; // No records, no options
+        }
+        for (const key in this._records[0]) {
+            if (key.startsWith("___") && key.endsWith("_date")) {
+                const eventName = common_infomed_stat.GetMedicalItemNameSpelling(key);
+                if (!eventName)
+                    continue; // Skip if no valid event name
+                options.push({ value: key, text: eventName.charAt(0).toUpperCase() + eventName.slice(1) });
+            }
+        }
+        return options;
     }
     _ToggleCollapsible() {
         // @ts-ignore
@@ -151,6 +198,17 @@ export default class Dataset {
     _CallDate_ChangeHandler() {
         console.debug("Call date: change handler");
         this.Indices_ChangeHandler();
+    }
+    _eventTitle_ChangeHandler(e) {
+        this._event_title = e.target.value;
+        this.Indices_ChangeHandler();
+        // fire change event to all child filter groups
+        const filterGroups = document.querySelectorAll(`[dataset="${this.id}"] [filter-group]`);
+        filterGroups.forEach((group) => {
+            const filterGroup = group;
+            const event = new Event("update_metadata", { bubbles: false, cancelable: true });
+            filterGroup.dispatchEvent(event);
+        });
     }
     _AddFilterGroup_ClickHandler() {
         let new_id = this._filter_groups.length ? this._filter_groups[this._filter_groups.length - 1].id + 1 : 0;
@@ -230,11 +288,18 @@ export default class Dataset {
         for (let i = indexes.length - 1; i >= 0; i--) {
             let record_idx = indexes[i];
             let retirement_date = this._records[record_idx].___study_retirement_date;
-            let death_date = this._records[record_idx].___death_date;
-            if (retirement_date.length) {
+            // event_date could be any date (death, relapse, surgery, etc.) selected by user,
+            // we have to choose carefully. If event date is relevant and sooner than the retirement date, we consider it as an event.
+            let event_date = this._records[record_idx][this._event_title];
+            const eventDateValid = isFinite(new Date(event_date).getTime());
+            const retirementDateValid = isFinite(new Date(retirement_date).getTime());
+            if (eventDateValid && retirementDateValid) {
+                (new Date(event_date) < new Date(retirement_date) ? event_idxs : censored_idxs).push(record_idx);
+            }
+            else if (retirementDateValid) {
                 censored_idxs.push(record_idx);
             }
-            else if (death_date.length) {
+            else if (eventDateValid) {
                 event_idxs.push(record_idx);
             }
             else {
@@ -303,7 +368,7 @@ export default class Dataset {
             let neoadj_chemo_date = this._records[record_idx].___neoadj_chemo___start_date;
             let invasion_date = this._records[record_idx].___op_done___invasion_date;
             let adj_chemo_date = ""; // --- is not important
-            let finish_date = this._records[record_idx].___death_date;
+            let finish_date = this._records[record_idx][this._event_title];
             let time_map = this._GetMonthsBetweenDates(neoadj_chemo_date, invasion_date, adj_chemo_date, finish_date);
             if (time_map.error instanceof Error) {
                 console.error(`record id: ${this._records[record_idx].id}\n${time_map.error}`);
