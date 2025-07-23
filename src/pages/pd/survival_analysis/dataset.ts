@@ -537,11 +537,18 @@ export default class Dataset {
         const T: number[] = [];
         const E: number[] = [];
         for (let i = 0; i < data.length; i++) {
+            // Events are treated as 1 in Cox PH
             for (let j = 0; j < data[i].Events; j++) {
                 T.push(data[i].Time);
                 E.push(1);
             }
+
+            // Censored and Alive are treated as 0 in Cox PH
             for (let j = 0; j < data[i].Censored; j++) {
+                T.push(data[i].Time);
+                E.push(0);
+            }
+            for (let j = 0; j < data[i].Alive; j++) {
                 T.push(data[i].Time);
                 E.push(0);
             }
