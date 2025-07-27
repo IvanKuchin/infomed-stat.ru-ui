@@ -149,19 +149,19 @@ export default class CoxPH {
                 errorMessages.push(`Группа ${ds2} содержит менее 3 событий. Анализ невозможен.`);
                 continue;
             }
-            if (ds1_totalCount < 5) {
+            if (res.ds1_totalCount < 5) {
                 errorMessages.push(`Группа ${ds1} содержит менее 5 наблюдений. Анализ невозможен.`);
                 continue;
             }
-            if (ds2_totalCount < 5) {
+            if (res.ds2_totalCount < 5) {
                 errorMessages.push(`Группа ${ds2} содержит менее 5 наблюдений. Анализ невозможен.`);
                 continue;
             }
-            if (this._eventRateDisbalance(ds1_E1, ds1_totalCount)) {
+            if (this._eventRateDisbalance(ds1_E1, res.ds1_totalCount)) {
                 errorMessages.push(`Группа ${ds1} несбалансирована по событиям и выбытию. Анализ невозможен.`);
                 continue;
             }
-            if (this._eventRateDisbalance(ds2_E1, ds2_totalCount)) {
+            if (this._eventRateDisbalance(ds2_E1, res.ds2_totalCount)) {
                 errorMessages.push(`Группа ${ds2} несбалансирована по событиям и выбытию. Анализ невозможен.`);
                 continue;
             }
