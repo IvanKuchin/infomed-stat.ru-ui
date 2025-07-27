@@ -119,6 +119,12 @@ export default class CoxPH {
         }
         return result;
     }
+    _eventRateDisbalance(eventCount, totalCount) {
+        if (totalCount === 0)
+            return false;
+        const eventRate = eventCount / totalCount;
+        return eventRate < 0.05 || eventRate > 0.95;
+    }
     _RenderResult(result) {
         if (!result || result.length === 0) {
             console.error("No result to render. Code suppose to be unreachable.");
@@ -151,11 +157,11 @@ export default class CoxPH {
                 errorMessages.push(`Группа ${ds2} содержит менее 5 наблюдений. Анализ невозможен.`);
                 continue;
             }
-            if (ds1_E1 / (ds1_E1 + ds1_E0) < 0.05 || ds1_E1 / (ds1_E1 + ds1_E0) > 0.95) {
+            if (this._eventRateDisbalance(ds1_E1, ds1_E0 + ds1_E1)) {
                 errorMessages.push(`Группа ${ds1} несбалансирована по событиям и выбытию. Анализ невозможен.`);
                 continue;
             }
-            if (ds2_E1 / (ds2_E1 + ds2_E0) < 0.05 || ds2_E1 / (ds2_E1 + ds2_E0) > 0.95) {
+            if (this._eventRateDisbalance(ds2_E1, ds2_E0 + ds2_E1)) {
                 errorMessages.push(`Группа ${ds2} несбалансирована по событиям и выбытию. Анализ невозможен.`);
                 continue;
             }
