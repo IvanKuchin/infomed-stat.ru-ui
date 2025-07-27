@@ -221,10 +221,6 @@ export default class CoxPH {
                 continue;
             }
 
-            if (res.p_value < 0.05) {
-                errorMessages.push(`Группы ${ds1} и ${ds2} статистически значимо различаются (p-value < 0.05).`);
-            }
-
             if (ds1_E1 / (ds1_E1 + ds1_E0) < 0.05 || ds1_E1 / (ds1_E1 + ds1_E0) > 0.95) {
                 errorMessages.push(`Группа ${ds1} несбалансирована по событиям и выбытию. Анализ невозможен.`);
                 continue;
