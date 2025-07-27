@@ -124,7 +124,7 @@ export default class CoxPH {
             console.error("No result to render. Code suppose to be unreachable.");
             return "";
         }
-        let error_msgs = [];
+        let errorMessages = [];
         let html = "<table class='table table-sm table-bordered table-striped'>";
         html += "<thead><tr><th>№ группы</th><th>№ группы</th><th>Coefficient</th><th>SE</th><th>HR</th><th>CI low</th><th>CI high</th><th>p-value</th></tr></thead>";
         html += "<tbody>";
@@ -136,32 +136,30 @@ export default class CoxPH {
             let ds2_E0 = res.ds2_totalCount - res.ds2_eventCount;
             let ds2_E1 = res.ds2_eventCount;
             if (ds1_E1 < 3) {
-                error_msgs.push(`Группа ${ds1} содержит менее 3 событий. Анализ невозможен.`);
+                errorMessages.push(`Группа ${ds1} содержит менее 3 событий. Анализ невозможен.`);
                 continue;
             }
             if (ds2_E1 < 3) {
-                error_msgs.push(`Группа ${ds2} содержит менее 3 событий. Анализ невозможен.`);
+                errorMessages.push(`Группа ${ds2} содержит менее 3 событий. Анализ невозможен.`);
                 continue;
             }
             if (ds1_E0 + ds1_E1 < 5) {
-                error_msgs.push(`Группа ${ds1} содержит менее 5 наблюдений. Анализ невозможен.`);
+                errorMessages.push(`Группа ${ds1} содержит менее 5 наблюдений. Анализ невозможен.`);
                 continue;
             }
             if (ds2_E0 + ds2_E1 < 5) {
-                error_msgs.push(`Группа ${ds2} содержит менее 5 наблюдений. Анализ невозможен.`);
+                errorMessages.push(`Группа ${ds2} содержит менее 5 наблюдений. Анализ невозможен.`);
                 continue;
             }
             if (res.p_value < 0.05) {
-                error_msgs.push(`Группы ${ds1} и ${ds2} статистически значимо различаются (p-value < 0.05).`);
+                errorMessages.push(`Группы ${ds1} и ${ds2} статистически значимо различаются (p-value < 0.05).`);
             }
-            let ds1_total = ds1_E1 + ds1_E0;
-            let ds2_total = ds2_E1 + ds2_E0;
-            if (ds1_E1 / ds1_total < 0.05 || ds1_E1 / ds1_total > 0.95) {
-                error_msgs.push(`Группа ${ds1} несбалансирована по событиям и выбытию. Анализ невозможен.`);
+            if (ds1_E1 / (ds1_E1 + ds1_E0) < 0.05 || ds1_E1 / (ds1_E1 + ds1_E0) > 0.95) {
+                errorMessages.push(`Группа ${ds1} несбалансирована по событиям и выбытию. Анализ невозможен.`);
                 continue;
             }
-            if (ds2_E1 / ds2_total < 0.05 || ds2_E1 / ds2_total > 0.95) {
-                error_msgs.push(`Группа ${ds2} несбалансирована по событиям и выбытию. Анализ невозможен.`);
+            if (ds2_E1 / (ds2_E1 + ds2_E0) < 0.05 || ds2_E1 / (ds2_E1 + ds2_E0) > 0.95) {
+                errorMessages.push(`Группа ${ds2} несбалансирована по событиям и выбытию. Анализ невозможен.`);
                 continue;
             }
             let coef = res.cox.coef.toFixed(4);
@@ -183,9 +181,9 @@ export default class CoxPH {
         }
         html += "</tbody></table>";
         let errorMessagesHTML = '';
-        if (error_msgs.length > 0) {
+        if (errorMessages.length > 0) {
             errorMessagesHTML += "<div class='alert alert-danger mt-3'><ul>";
-            for (let msg of error_msgs) {
+            for (let msg of errorMessages) {
                 errorMessagesHTML += `<li>${msg}</li>`;
             }
             errorMessagesHTML += "</ul></div>";
