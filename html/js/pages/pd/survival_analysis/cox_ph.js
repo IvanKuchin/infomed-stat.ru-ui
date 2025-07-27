@@ -120,10 +120,12 @@ export default class CoxPH {
         return result;
     }
     _eventRateDisbalance(eventCount, totalCount) {
+        const MIN_EVENT_RATE = 0.05;
+        const MAX_EVENT_RATE = 1 - MIN_EVENT_RATE;
         if (totalCount === 0)
             return false;
         const eventRate = eventCount / totalCount;
-        return eventRate < 0.05 || eventRate > 0.95;
+        return eventRate < MIN_EVENT_RATE || eventRate > MAX_EVENT_RATE;
     }
     _RenderResult(result) {
         if (!result || result.length === 0) {
