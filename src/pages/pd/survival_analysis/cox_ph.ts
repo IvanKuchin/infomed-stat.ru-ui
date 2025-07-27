@@ -25,6 +25,10 @@ type CombinedDatasetResult = {
 
 type CoxResult = {
     ds_idxs: [number, number];
+    ds1_eventCount: number;
+    ds1_totalCount: number;
+    ds2_eventCount: number;
+    ds2_totalCount: number;
     cox: CoxphFitResult;
     p_value: number;
 };
@@ -130,6 +134,16 @@ export default class CoxPH {
         let datasets = this._datasets;
         for (let i = 0; i < datasets.length - 1; ++i) {
             for (let j = i + 1; j < datasets.length; ++j) {
+                // calculate event counts and total counts in each dataset
+                // Note: E is expected to be an array of 0s and 1s
+                // where 1 indicates an event (death, failure, etc.) and 0 indicates
+                // censored data (survived, not failed, etc.)
+                let ds_i_eventCount = datasets[i].data.E.filter(x => x === 1).length;
+                let ds_i_totalCount = datasets[i].data.E.length;
+
+                let ds_j_eventCount = datasets[j].data.E.filter(x => x === 1).length;
+                let ds_j_totalCount = datasets[j].data.E.length;
+
                 let combined = this._CombineDatasets(i, j);
                 if (combined.error) {
                     console.error(combined.error);
@@ -145,8 +159,17 @@ export default class CoxPH {
                 let cox = coxphFit(combined.dataset.T, combined.dataset.E, combined.dataset.X);
                 let p_value_val = pValue(cox.coef, cox.se);
 
+                if (!cox || !cox.coef || !cox.se || !cox.hr || !cox.coef_lower || !cox.coef_upper) {
+                    console.error("Cox PH analysis failed for datasets " + datasets[i].parent_id + " and " + datasets[j].parent_id);
+                    continue;
+                }
+
                 result.push({
                     ds_idxs: [datasets[i].parent_id, datasets[j].parent_id],
+                    ds1_eventCount: ds_i_eventCount,
+                    ds1_totalCount: ds_i_totalCount,
+                    ds2_eventCount: ds_j_eventCount,
+                    ds2_totalCount: ds_j_totalCount,
                     cox: cox,
                     p_value: p_value_val,
                 });
@@ -156,11 +179,22 @@ export default class CoxPH {
         return result;
     }
 
+    private _eventRateDisbalance(eventCount: number, totalCount: number): boolean {
+        const MIN_EVENT_RATE = 0.05;
+        const MAX_EVENT_RATE = 1 - MIN_EVENT_RATE;
+
+        if (totalCount === 0) return false;
+        const eventRate = eventCount / totalCount;
+        return eventRate < MIN_EVENT_RATE || eventRate > MAX_EVENT_RATE;
+    }
+
     private _RenderResult(result: CoxResult[]): string {
         if (!result || result.length === 0) {
             console.error("No result to render. Code suppose to be unreachable.");
             return "";
         }
+
+        let errorMessages: string[] = [];
 
         let html = "<table class='table table-sm table-bordered table-striped'>";
         html += "<thead><tr><th>№ группы</th><th>№ группы</th><th>Coefficient</th><th>SE</th><th>HR</th><th>CI low</th><th>CI high</th><th>p-value</th></tr></thead>";
@@ -169,6 +203,43 @@ export default class CoxPH {
         for (let res of result) {
             let ds1 = res.ds_idxs[0];
             let ds2 = res.ds_idxs[1];
+
+            let ds1_E0 = res.ds1_totalCount - res.ds1_eventCount;
+            let ds1_E1 = res.ds1_eventCount;
+
+            let ds2_E0 = res.ds2_totalCount - res.ds2_eventCount;
+            let ds2_E1 = res.ds2_eventCount;
+
+            if (ds1_E1 < 3) {
+                errorMessages.push(`Группа ${ds1} содержит менее 3 событий. Анализ невозможен.`);
+                continue;
+            }
+
+            if (ds2_E1 < 3) {
+                errorMessages.push(`Группа ${ds2} содержит менее 3 событий. Анализ невозможен.`);
+                continue;
+            }
+
+            if (res.ds1_totalCount < 5) {
+                errorMessages.push(`Группа ${ds1} содержит менее 5 наблюдений. Анализ невозможен.`);
+                continue;
+            }
+
+            if (res.ds2_totalCount < 5) {
+                errorMessages.push(`Группа ${ds2} содержит менее 5 наблюдений. Анализ невозможен.`);
+                continue;
+            }
+
+            if (this._eventRateDisbalance(ds1_E1, res.ds1_totalCount)) {
+                errorMessages.push(`Группа ${ds1} несбалансирована по событиям и выбытию. Анализ невозможен.`);
+                continue;
+            }
+
+            if (this._eventRateDisbalance(ds2_E1, res.ds2_totalCount)) {
+                errorMessages.push(`Группа ${ds2} несбалансирована по событиям и выбытию. Анализ невозможен.`);
+                continue;
+            }
+
             let coef = res.cox.coef.toFixed(4);
             let se = res.cox.se.toFixed(4);
             let hr = res.cox.hr.toFixed(4);
@@ -177,8 +248,8 @@ export default class CoxPH {
             let p_value_str = res.p_value.toFixed(4);
 
             html += `<tr>
-                        <td>${ds1}</td>
-                        <td>${ds2}</td>
+                        <td>${ds1}<br>Событий: ${ds1_E1}<br>Выбыли + Выжили: ${ds1_E0}</td>
+                        <td>${ds2}<br>Событий: ${ds2_E1}<br>Выбыли + Выжили: ${ds2_E0}</td>
                         <td>${coef}</td>
                         <td>${se}</td>
                         <td>${hr}</td>
@@ -190,7 +261,16 @@ export default class CoxPH {
 
         html += "</tbody></table>";
 
-        return html;
+        let errorMessagesHTML = '';
+        if (errorMessages.length > 0) {
+            errorMessagesHTML += "<div class='alert alert-danger mt-3'><ul>";
+            for (let msg of errorMessages) {
+                errorMessagesHTML += `<li>${msg}</li>`;
+            }
+            errorMessagesHTML += "</ul></div>";
+        }
+
+        return errorMessagesHTML + html;
     }
 
     public UpdateUI(): void {
