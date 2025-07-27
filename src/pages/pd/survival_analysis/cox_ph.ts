@@ -226,7 +226,8 @@ export default class CoxPH {
                 continue;
             }
 
-            if (ds2_E1 / (ds2_E1 + ds2_E0) < 0.05 || ds2_E1 / (ds2_E1 + ds2_E0) > 0.95) {
+            const ds2_event_rate = ds2_E1 / (ds2_E1 + ds2_E0);
+            if (ds2_event_rate < 0.05 || ds2_event_rate > 0.95) {
                 errorMessages.push(`Группа ${ds2} несбалансирована по событиям и выбытию. Анализ невозможен.`);
                 continue;
             }
