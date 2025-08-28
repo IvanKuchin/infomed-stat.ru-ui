@@ -124,6 +124,8 @@ export default class DatasetPreprocess {
 		this._dictionary.___neoadj_chemo___start_date = { delete: false, type: "date" };
 		this._dictionary.___neoadj_chemo___finish_date = { delete: false, type: "date" };
 		this._dictionary.___neoadj_chemo___adverse_event = { delete: false, type: "string" };
+		this._dictionary.___neoadj_chemo___ca_level_post_chemo = { delete: false, type: "int32" };
+		this._dictionary.___neoadj_chemo___ca_level_reduction_post_chemo = { delete: false, type: "int32" };
 		this._dictionary.___ray_therapy = { delete: false, type: "string" };
 		this._dictionary.___ray_therapy___another_option = { delete: true, type: "string" };
 		this._dictionary.___brachi_therapy = { delete: false, type: "string" };
